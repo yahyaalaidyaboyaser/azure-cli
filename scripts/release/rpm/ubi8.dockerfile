@@ -13,7 +13,7 @@ WORKDIR /azure-cli
 COPY . .
 
 RUN dos2unix ./scripts/release/rpm/azure-cli.spec && \
-    REPO_PATH=$(pwd) CLI_VERSION=$cli_version rpmbuild -vvv -bb --clean scripts/release/rpm/azure-cli.spec && \
+    REPO_PATH=$(pwd) CLI_VERSION=$cli_version rpmbuild -vv -bb --clean scripts/release/rpm/azure-cli.spec && \
     cp /root/rpmbuild/RPMS/x86_64/azure-cli-${cli_version}-1.*.x86_64.rpm /azure-cli-dev.rpm
 
 FROM registry.access.redhat.com/ubi8/ubi:${tag} AS execution-env
