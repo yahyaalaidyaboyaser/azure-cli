@@ -19,17 +19,17 @@ class MSIAuthenticationWrapper(MSIAuthentication):
     def get_token(self, *scopes, **kwargs):  # pylint:disable=unused-argument
         logger.debug("MSIAuthenticationWrapper.get_token invoked by Track 2 SDK with scopes=%s", scopes)
 
-        # In Cloud Shell, we use
-        # - msrestazure to get access token
-        # - MSAL to get VM SSH certificate
         if 'data' in kwargs:
             if in_cloud_console():
+                # Use MSAL to get a VM SSH certificate.
                 import msal
                 from .util import check_result, build_sdk_access_token
+                from .identity import AZURE_CLI_CLIENT_ID
                 app = msal.PublicClientApplication(
-                    "04b07795-8ddb-461a-bbee-02f9e1bf7b46",  # Use a real client_id, so that cache would work
-                    #token_cache=...,  # TODO: This PoC does not currently maintain a token cache;
-                                       #       Ideally we should reuse the real MSAL app object which has cache configured.
+                    AZURE_CLI_CLIENT_ID,  # Use a real client_id, so that cache would work
+                    # TODO: This PoC does not currently maintain a token cache;
+                    #   Ideally we should reuse the real MSAL app object which has cache configured.
+                    # token_cache=...,
                     )
                 result = app.acquire_token_interactive(list(scopes), prompt="none", data=kwargs["data"])
                 check_result(result)
@@ -38,6 +38,7 @@ class MSIAuthenticationWrapper(MSIAuthentication):
                 from azure.cli.core.azclierror import AuthenticationError
                 raise AuthenticationError("VM SSH currently doesn't support managed identity.")
 
+        # Use msrestazure to get access token
         resource = scopes_to_resource(_normalize_scopes(scopes))
         if resource:
             # If available, use resource provided by SDK
