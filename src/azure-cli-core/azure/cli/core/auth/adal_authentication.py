@@ -17,7 +17,7 @@ class MSIAuthenticationWrapper(MSIAuthentication):
     # This method is exposed for Azure Core. Add *scopes, **kwargs to fit azure.core requirement
     # pylint: disable=line-too-long
     def get_token(self, *scopes, **kwargs):  # pylint:disable=unused-argument
-        logger.debug("MSIAuthenticationWrapper.get_token invoked by Track 2 SDK with scopes=%s", scopes)
+        logger.debug("MSIAuthenticationWrapper.get_token: scopes=%r, kwargs=%r", scopes, kwargs)
 
         if 'data' in kwargs:
             if in_cloud_console():
