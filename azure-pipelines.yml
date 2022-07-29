@@ -17,6 +17,18 @@ jobs:
   displayName: Test Windows MSI
   pool:
     vmImage: 'windows-2019'
+  strategy:
+    matrix:
+      Instance1:
+        instance_no: 1
+      Instance2:
+        instance_no: 2
+      Instance3:
+        instance_no: 3
+      Instance4:
+        instance_no: 4
+      Instance5:
+        instance_no: 5
   steps:
   - task: PowerShell@2
     displayName: Install and Load CLI
