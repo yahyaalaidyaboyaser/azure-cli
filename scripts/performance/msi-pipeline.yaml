@@ -1,0 +1,47 @@
+resources:
+- repo: self
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - '*'
+
+pr:
+  branches:
+    include:
+    - '*'
+
+jobs:
+- job: TestWindowsMSI
+  displayName: Test Windows MSI
+  pool:
+    vmImage: 'windows-2019'
+  strategy:
+    matrix:
+      Instance1:
+        instance_no: 1
+      Instance2:
+        instance_no: 2
+      Instance3:
+        instance_no: 3
+      Instance4:
+        instance_no: 4
+      Instance5:
+        instance_no: 5
+      Instance6:
+        instance_no: 6
+      Instance7:
+        instance_no: 7
+      Instance8:
+        instance_no: 8
+      Instance9:
+        instance_no: 9
+      Instance10:
+        instance_no: 10
+  steps:
+  - task: PowerShell@2
+    displayName: Install and Load CLI
+    inputs:
+      targetType: 'filePath'
+      filePath: ./scripts/performance/msi-installation.ps1
