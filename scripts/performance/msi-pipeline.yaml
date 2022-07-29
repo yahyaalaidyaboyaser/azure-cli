@@ -14,6 +14,7 @@ pr:
 
 jobs:
 - job: TestWindowsMSI
+  timeoutInMinutes: 300
   displayName: Test Windows MSI
   pool:
     vmImage: 'windows-2019'

@@ -33,12 +33,21 @@ $i=1
 for(;$i -le 10;$i++)
 {
     Write-Host "Testing MSI round $i"
+
+    Write-Host Uninstalling
     Uninstall-Package -Name "Microsoft Azure CLI"
+
+    Write-Host Installing
     $startTime = Get-Date
-    $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+    $ProgressPreference = 'SilentlyContinue'
+    Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi
+    Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+    Write-Host "Exit code:" $LASTEXITCODE
+    rm .\AzureCLI.msi
+
     $finishTime= Get-Date
     $totalTime = $finishTime - $startTime
     $totalSeconds = $totalTime.TotalSeconds
-    Write-Host "Sending telemetry: $totalSeconds"
+    Write-Host "Sending telemetry:" $totalSeconds
     SendTelemetry $totalSeconds
 }
