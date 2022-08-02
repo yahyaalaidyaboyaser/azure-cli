@@ -1,0 +1,68 @@
+resources:
+- repo: self
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - '*'
+
+pr:
+  branches:
+    include:
+    - '*'
+
+jobs:
+- job: TestUbuntuInstallation
+  timeoutInMinutes: 300
+  displayName: Test Ubuntu Installation
+  pool:
+    vmImage: 'ubuntu-20.04'
+  strategy:
+    matrix:
+      Instance1:
+        instance_no: 1
+      Instance2:
+        instance_no: 2
+      Instance3:
+        instance_no: 3
+      Instance4:
+        instance_no: 4
+      Instance5:
+        instance_no: 5
+      Instance6:
+        instance_no: 6
+      Instance7:
+        instance_no: 7
+      Instance8:
+        instance_no: 8
+      Instance9:
+        instance_no: 9
+      Instance10:
+        instance_no: 10
+  steps:
+    - bash: |
+        set -e
+
+        sudo apt-get remove azure-cli
+
+        os="Ubuntu"
+        osVersion="20.04"
+
+        startTime=$(date +%s)
+        curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+        echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+        sudo apt-get update
+        sudo apt-get install azure-cli
+        finishTime=$(date +%s)
+        totalTime=$(($finishTime-$startTime))
+        echo "Total installation time is $totalTime seconds"
+
+        telemetryObject="{\"iKey\":\"02b91c82-6729-4241-befc-e6d02ca4fbba\",\"name\":\"azurecli/extension\",\"time\":\"$(date -u)\",\"data\":{\"baseType\":\"EventData\",\"baseData\":{\"ver\":2,\"name\":\"azurecli/extension\",\"properties\":{\"Context.Default.VS.Core.OS.Type\":\"${os}\",\"Context.Default.VS.Core.OS.Version\":\"${osVersion}\",\"Context.Default.AzureCLI.InstallationTime\":${totalTime}}}}}"
+
+        echo $telemetryObject
+
+        curl -X POST https://eastus-2.in.applicationinsights.azure.com//v2/track -d "${telemetryObject}"
+
+      displayName: 'Install and Load CLI'
+
