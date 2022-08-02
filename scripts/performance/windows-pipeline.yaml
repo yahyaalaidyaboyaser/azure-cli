@@ -13,9 +13,9 @@ pr:
     - '*'
 
 jobs:
-- job: TestWindowsMSI
+- job: MeasureMsiInstallation
   timeoutInMinutes: 300
-  displayName: Test Windows MSI
+  displayName: Measure Windows MSI Installation
   pool:
     vmImage: 'windows-2019'
   strategy:
@@ -42,7 +42,7 @@ jobs:
         instance_no: 10
   steps:
   - task: PowerShell@2
-    displayName: Install and Load CLI
+    displayName: Install and send telemetry
     inputs:
       targetType: 'filePath'
-      filePath: ./scripts/performance/msi-installation.ps1
+      filePath: ./scripts/performance/measure_msi.ps1
