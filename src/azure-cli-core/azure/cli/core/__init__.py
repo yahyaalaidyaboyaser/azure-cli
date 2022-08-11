@@ -74,6 +74,8 @@ class AzCli(CLI):
         self.data['completer_active'] = ARGCOMPLETE_ENV_NAME in os.environ
         self.data['query_active'] = False
 
+        self.is_saw = 'IS_SAW' in os.environ
+
         azure_folder = self.config.config_dir
         ensure_dir(azure_folder)
         ACCOUNT.load(os.path.join(azure_folder, 'azureProfile.json'))
