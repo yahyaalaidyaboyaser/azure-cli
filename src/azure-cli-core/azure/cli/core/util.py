@@ -1342,3 +1342,11 @@ def should_encrypt_token_cache(cli_ctx):
     encrypt = cli_ctx.config.getboolean('core', 'encrypt_token_cache', fallback=fallback)
 
     return encrypt
+
+
+def get_transport():
+    if 'IS_SAW' in os.environ:
+        from azure.cli.core.windows_http_transport import WindowsHttpTransport
+        return WindowsHttpTransport()
+    else:
+        return None
