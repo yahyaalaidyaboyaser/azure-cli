@@ -3,6 +3,11 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 # pylint: disable=wrong-import-position
+# windows-http will overwrite build-in http package if it is not imported
+import http
+from azure.cli.core.vendored_sdks import winrequests
+import sys
+sys.modules['requests'] = winrequests
 
 import timeit
 # Log the start time
