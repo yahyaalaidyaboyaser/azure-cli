@@ -5,9 +5,11 @@
 # pylint: disable=wrong-import-position
 # windows-http will overwrite build-in http package if it is not imported
 import http
-from azure.cli.core.vendored_sdks import winrequests
+from azure.cli.core.vendored_sdks import winrequests, dummy_msal_extensions
 import sys
 sys.modules['requests'] = winrequests
+# Temporally workaround to make msal_extensions work on SPython
+sys.modules['msal_extensions'] = dummy_msal_extensions
 
 import timeit
 # Log the start time
