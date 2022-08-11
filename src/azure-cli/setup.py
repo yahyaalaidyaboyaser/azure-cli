@@ -147,6 +147,7 @@ DEPENDENCIES = [
     'PyNaCl~=1.5.0',
     'scp~=0.13.2',
     'semver==2.13.0',
+    'setuptools~=63.4.2',
     'six>=1.10.0',  # six is still used by countless extensions
     'sshtunnel~=0.1.4',
     'urllib3[secure]',
