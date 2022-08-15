@@ -160,6 +160,9 @@ def _prepare_client_kwargs_track2(cli_ctx):
     from azure.core.pipeline.policies import SansIOHTTPPolicy
     client_kwargs['http_logging_policy'] = SansIOHTTPPolicy()
 
+    from azure.cli.core.util import get_http_transport
+    client_kwargs['transport'] = get_http_transport()
+
     return client_kwargs
 
 
@@ -169,12 +172,12 @@ def _prepare_mgmt_client_kwargs_track2(cli_ctx, cred):
 
     # Enable CAE support in mgmt SDK
     from azure.core.pipeline.policies import BearerTokenCredentialPolicy
-    from azure.cli.core.util import get_transport
+    from azure.cli.core.util import get_http_transport
 
     # Track 2 SDK maintains `scopes` and passes `scopes` to get_token.
     scopes = resource_to_scopes(cli_ctx.cloud.endpoints.active_directory_resource_id)
     policy = BearerTokenCredentialPolicy(cred, *scopes)
-    transport = get_transport()
+    transport = get_http_transport()
 
     client_kwargs['credential_scopes'] = scopes
     client_kwargs['authentication_policy'] = policy

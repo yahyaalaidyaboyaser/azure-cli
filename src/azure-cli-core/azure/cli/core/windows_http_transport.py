@@ -1,3 +1,8 @@
+"""
+HttpTransport implementation for windows-http
+
+Modified from https://github.com/Azure/azure-sdk-for-python-pr/blob/win-transport/sdk/keyvault/azure-keyvault-secrets/tests/transport/windows_os_transport.py
+"""
 from azure.core.pipeline.transport import HttpResponse, HttpTransport, HttpRequest
 from windows.http import Response, Request, Session
 from typing import ContextManager, Iterator, Optional
@@ -39,7 +44,7 @@ class WindowsHttpStreamDownloadGenerator:
 
 
 class WindowsHttpTransport(HttpTransport):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.client = None
 
     def open(self):

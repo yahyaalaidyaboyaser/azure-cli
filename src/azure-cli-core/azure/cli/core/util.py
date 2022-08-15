@@ -1335,6 +1335,9 @@ def get_secret_store(cli_ctx, name):
 
 def should_encrypt_token_cache(cli_ctx):
     # Only enable encryption for Windows (for now).
+    if cli_ctx.is_spython:
+        return False
+
     fallback = sys.platform.startswith('win32')
 
     # EXPERIMENTAL: Use core.encrypt_token_cache=False to turn off token cache encryption.
@@ -1344,8 +1347,8 @@ def should_encrypt_token_cache(cli_ctx):
     return encrypt
 
 
-def get_transport():
-    if 'IS_SAW' in os.environ:
+def get_http_transport():
+    if 'IS_SPYTHON' in os.environ:
         from azure.cli.core.windows_http_transport import WindowsHttpTransport
         return WindowsHttpTransport()
     else:

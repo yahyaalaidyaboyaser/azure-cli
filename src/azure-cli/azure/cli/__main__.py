@@ -11,6 +11,13 @@ sys.modules['requests'] = winrequests
 # Temporally workaround to make msal_extensions work on SPython
 sys.modules['msal_extensions'] = dummy_msal_extensions
 
+import os
+os.environ["IS_SPYTHON"] = "true"
+
+# from azure.cli.core.windows_http_transport import WindowsPipelineClient
+# import azure.core
+# azure.core.PipelineClient = WindowsPipelineClient
+
 import timeit
 # Log the start time
 start_time = timeit.default_timer()

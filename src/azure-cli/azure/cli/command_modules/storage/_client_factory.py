@@ -6,6 +6,7 @@
 from azure.cli.core.commands.client_factory import get_mgmt_service_client, get_data_service_client, \
     prepare_client_kwargs_track2
 from azure.cli.core.profiles import ResourceType, get_sdk
+from azure.cli.core.util import get_http_transport
 
 from azure.cli.command_modules.storage.sdkutil import get_table_data_type
 
@@ -252,7 +253,8 @@ def cf_blob_client(cli_ctx, kwargs):
         return t_blob_client.from_blob_url(blob_url=kwargs.pop('blob_url'),
                                            credential=credential,
                                            snapshot=kwargs.pop('snapshot', None),
-                                           connection_timeout=kwargs.pop('connection_timeout', None))
+                                           connection_timeout=kwargs.pop('connection_timeout', None),
+                                           transport=get_http_transport())
     if 'blob_url' in kwargs:
         kwargs.pop('blob_url')
 
