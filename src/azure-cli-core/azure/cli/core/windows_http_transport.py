@@ -1,10 +1,10 @@
 """
 HttpTransport implementation for windows-http
 
-Modified from https://github.com/Azure/azure-sdk-for-python-pr/blob/win-transport/sdk/keyvault/azure-keyvault-secrets/tests/transport/windows_os_transport.py
+Modified from https://github.com/Azure/azure-sdk-for-python-pr/blob/win-transport/sdk/keyvault/azure-keyvault-secrets/tests/transport/windows_os_transport.py  # pylint: disable=line-too-long
 """
 from azure.core.pipeline.transport import HttpResponse, HttpTransport, HttpRequest
-from windows.http import Response, Request, Session
+from windows.http import Response, Session
 from typing import ContextManager, Iterator, Optional
 
 from azure.core import PipelineClient
@@ -23,7 +23,7 @@ class WindowsHttpTransportResponse(HttpResponse):
     def body(self):
         return self.internal_response.content
 
-    def stream_download(self, _) -> Iterator[bytes]:
+    def stream_download(self, _, **kwargs) -> Iterator[bytes]:
         return WindowsHttpStreamDownloadGenerator(_, self)
 
 
@@ -44,7 +44,7 @@ class WindowsHttpStreamDownloadGenerator:
 
 
 class WindowsHttpTransport(HttpTransport):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # pylint: disable=unused-argument
         self.client = None
 
     def open(self):

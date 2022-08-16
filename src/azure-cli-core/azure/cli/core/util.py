@@ -1347,9 +1347,12 @@ def should_encrypt_token_cache(cli_ctx):
     return encrypt
 
 
+def is_spython():
+    return 'IS_SPYTHON' in os.environ
+
+
 def get_http_transport():
-    if 'IS_SPYTHON' in os.environ:
+    if is_spython():
         from azure.cli.core.windows_http_transport import WindowsHttpTransport
         return WindowsHttpTransport()
-    else:
-        return None
+    return None

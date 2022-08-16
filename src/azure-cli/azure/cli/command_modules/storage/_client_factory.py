@@ -6,7 +6,6 @@
 from azure.cli.core.commands.client_factory import get_mgmt_service_client, get_data_service_client, \
     prepare_client_kwargs_track2
 from azure.cli.core.profiles import ResourceType, get_sdk
-from azure.cli.core.util import get_http_transport
 
 from azure.cli.command_modules.storage.sdkutil import get_table_data_type
 
@@ -241,6 +240,8 @@ def get_credential(kwargs):
 
 def cf_blob_client(cli_ctx, kwargs):
     # track2 partial migration
+    from azure.cli.core.util import get_http_transport
+
     if kwargs.get('blob_url'):
         t_blob_client = get_sdk(cli_ctx, ResourceType.DATA_STORAGE_BLOB, '_blob_client#BlobClient')
         credential = get_credential(kwargs)
