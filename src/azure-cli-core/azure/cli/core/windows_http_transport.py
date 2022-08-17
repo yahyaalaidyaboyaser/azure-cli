@@ -1,13 +1,18 @@
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+
 """
 HttpTransport implementation for windows-http
 
 Modified from https://github.com/Azure/azure-sdk-for-python-pr/blob/win-transport/sdk/keyvault/azure-keyvault-secrets/tests/transport/windows_os_transport.py  # pylint: disable=line-too-long
 """
-from azure.core.pipeline.transport import HttpResponse, HttpTransport, HttpRequest
-from windows.http import Response, Session
 from typing import ContextManager, Iterator, Optional
 
 from azure.core import PipelineClient
+from azure.core.pipeline.transport import HttpResponse, HttpTransport, HttpRequest
+from windows.http import Response, Session
 
 
 class WindowsHttpTransportResponse(HttpResponse):
@@ -44,7 +49,7 @@ class WindowsHttpStreamDownloadGenerator:
 
 
 class WindowsHttpTransport(HttpTransport):
-    def __init__(self, *args, **kwargs):  # pylint: disable=unused-argument
+    def __init__(self):
         self.client = None
 
     def open(self):
@@ -75,7 +80,7 @@ class WindowsHttpTransport(HttpTransport):
             **kwargs
         }
 
-        if type(parameters["data"]) is str:
+        if isinstance(parameters["data"], str):
             parameters["data"] = parameters["data"].encode('utf-8')
 
         stream_ctx = None
