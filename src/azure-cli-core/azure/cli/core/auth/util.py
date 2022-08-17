@@ -177,3 +177,8 @@ def read_response_templates():
         error_template = f.read()
 
     return success_template, error_template
+
+
+def windows_http_client():
+    from windows.http import Session
+    return Session()
