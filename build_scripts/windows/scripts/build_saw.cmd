@@ -16,9 +16,11 @@ if "%CLI_VERSION%"=="" (
 set PYTHON_VERSION=3.10.5
 set SPYTHON_VERSION=3.10.22165.3
 
+set WIX_DOWNLOAD_URL="https://azurecliprod.blob.core.windows.net/msi/wix310-binaries-mirror.zip"
 @REM windows-http only support amd64
 set PYTHON_DOWNLOAD_URL="https://www.python.org/ftp/python/%PYTHON_VERSION%/python-%PYTHON_VERSION%-embed-amd64.zip"
 set NUGET_DOWNLOAD_URL="https://dist.nuget.org/win-x86-commandline/v6.2.1/nuget.exe"
+set PROPAGATE_ENV_CHANGE_DOWNLOAD_URL="https://azurecliprod.blob.core.windows.net/util/propagate_env_change.zip"
 @REM TODO download from storage account
 set SPYTHON_SOURCE="C:\Users\hanglei"
 set WINDOWS_HTTP_PATH="C:\Users\hanglei\Downloads\windows_http-0.22.203.1-cp310-cp310-win_amd64.whl"
@@ -35,7 +37,8 @@ mkdir %OUTPUT_DIR%
 set ARTIFACTS_DIR=%~dp0..\artifacts
 mkdir %ARTIFACTS_DIR%
 set TEMP_SCRATCH_FOLDER=%ARTIFACTS_DIR%\cli_scratch
-set BUILDING_DIR=%ARTIFACTS_DIR%\Azure-CLI
+set BUILDING_DIR=%ARTIFACTS_DIR%\cli
+set WIX_DIR=%ARTIFACTS_DIR%\wix
 set PYTHON_DIR=%ARTIFACTS_DIR%\Python
 set SPYTHON_DIR=%ARTIFACTS_DIR%\SPython
 set SPYTHON_EXE=%SPYTHON_DIR%\Microsoft.Internal.SPython.win32.%SPYTHON_VERSION%\tools\python.exe
@@ -61,8 +64,6 @@ if not exist %SPYTHON_DIR% (
     %NUGET_DIR%\nuget.exe install Microsoft.Internal.SPython.win32 -version %SPYTHON_VERSION% -Source %SPYTHON_SOURCE%
 )
 
-@REM exit /b
-
 REM reset working folders
 if exist %BUILDING_DIR% rmdir /s /q %BUILDING_DIR%
 REM rmdir always returns 0, so check folder's existence
@@ -81,6 +82,22 @@ mkdir %TEMP_SCRATCH_FOLDER%
 
 if exist %REPO_ROOT%\privates (
     copy %REPO_ROOT%\privates\*.whl %TEMP_SCRATCH_FOLDER%
+)
+
+REM ensure wix is available
+if exist %WIX_DIR% (
+    echo Using existing Wix at %WIX_DIR%
+)
+if not exist %WIX_DIR% (
+    mkdir %WIX_DIR%
+    pushd %WIX_DIR%
+    echo Downloading Wix.
+    curl --output wix-archive.zip %WIX_DOWNLOAD_URL%
+    unzip wix-archive.zip
+    if %errorlevel% neq 0 goto ERROR
+    del wix-archive.zip
+    echo Wix downloaded and extracted successfully.
+    popd
 )
 
 REM ensure Python is available
@@ -134,6 +151,8 @@ robocopy %PYTHON_DIR%\Lib\site-packages\azure\cli %SPYTHON_LIB%\azure\cli /s /NF
 %SPYTHON_EXE% -m azure.cli --version
 
 robocopy %SPYTHON_DIR%\Microsoft.Internal.SPython.win32.%SPYTHON_VERSION%\tools %BUILDING_DIR% /s /NFL /NDL
+
+%BUILDING_DIR%\python.exe -m pip install --no-warn-script-location --requirement %CLI_SRC%\azure-cli\requirements.py3.windows.txt
 
 REM Check azure.cli can be executed. This also prints the Python version.
 %BUILDING_DIR%\python.exe -m azure.cli --version
@@ -200,7 +219,24 @@ popd
 
 if %errorlevel% neq 0 goto ERROR
 
-powershell Compress-Archive -Force %BUILDING_DIR% %OUTPUT_DIR%\azure-cli-%CLI_VERSION%.zip
+REM ensure propagate_env_change.exe is available
+if exist "%PROPAGATE_ENV_CHANGE_DIR%\propagate_env_change.exe" (
+    echo Using existing propagate_env_change.exe at %PROPAGATE_ENV_CHANGE_DIR%
+) else (
+    pushd %PROPAGATE_ENV_CHANGE_DIR%
+    echo Downloading propagate_env_change.exe.
+    curl --output propagate_env_change.zip %PROPAGATE_ENV_CHANGE_DOWNLOAD_URL%
+    unzip propagate_env_change.zip
+    if %errorlevel% neq 0 goto ERROR
+    del propagate_env_change.zip
+    echo propagate_env_change.exe downloaded and extracted successfully.
+    popd
+)
+
+echo Building MSI...
+msbuild /t:rebuild /p:Configuration=Release %REPO_ROOT%\build_scripts\windows\azure-cli.wixproj
+
+if %errorlevel% neq 0 goto ERROR
 
 start %OUTPUT_DIR%
 
