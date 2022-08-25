@@ -345,6 +345,9 @@ class CommandRecommender():  # pylint: disable=too-few-public-methods
 
         from azure.cli.core.cloud import CLOUDS_FORBIDDING_ALADDIN_REQUEST
 
+        if self.cli_ctx.is_spython:
+            return True
+
         # CLI is not started well
         if not self.cli_ctx or not self.cli_ctx.cloud:
             return True
