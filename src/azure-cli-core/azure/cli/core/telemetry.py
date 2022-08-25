@@ -456,7 +456,10 @@ def _add_event(event_name, properties, instrumentation_key=DEFAULT_INSTRUMENTATI
 @decorators.suppress_all_exceptions()
 def is_telemetry_enabled():
     from azure.cli.core.cloud import cloud_forbid_telemetry
+    from azure.cli.core.util import is_spython
     if cloud_forbid_telemetry(_session.application):
+        return False
+    if is_spython():
         return False
     return _get_config().getboolean('core', 'collect_telemetry', fallback=True)
 
