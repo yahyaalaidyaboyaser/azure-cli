@@ -14,8 +14,6 @@
 import json
 import os
 
-import requests
-
 from urllib.parse import urlparse
 # the urlopen is imported for automation purpose
 from urllib.request import urlopen  # noqa, pylint: disable=import-error,unused-import,ungrouped-imports
@@ -1767,6 +1765,7 @@ class BootLogStreamWriter:  # pylint: disable=too-few-public-methods
 def get_boot_log(cmd, resource_group_name, vm_name):
     import re
     import sys
+    import requests
     from azure.cli.core.profiles import get_sdk
     from azure.core.exceptions import HttpResponseError
     BlockBlobService = get_sdk(cmd.cli_ctx, ResourceType.DATA_STORAGE, 'blob.blockblobservice#BlockBlobService')

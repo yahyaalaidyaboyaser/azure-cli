@@ -11,8 +11,6 @@ import json
 import traceback
 from enum import Enum
 
-import requests
-
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -414,6 +412,7 @@ def create_image_template(  # pylint: disable=too-many-locals, too-many-branches
             # It should be an URL
             msg = '\nusage error: --image-template is not a correct local path or URL'
             try:
+                import requests
                 r = requests.get(image_template)
             except Exception:
                 raise CLIError(traceback.format_exc() + msg)

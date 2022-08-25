@@ -29,7 +29,6 @@ import time
 import platform
 import subprocess
 import tempfile
-import requests
 
 logger = get_logger(__name__)
 
@@ -8393,6 +8392,7 @@ def ssh_bastion_host(cmd, auth_type, target_resource_id, resource_group_name, ba
 def rdp_bastion_host(cmd, target_resource_id, resource_group_name, bastion_host_name, resource_port=None, disable_gateway=False):
     from azure.cli.core._profile import Profile
     import os
+    import requests
     from ._process_helper import launch_and_wait
     from azure.cli.command_modules.network._validators import _is_bastion_connectable_resource
 
