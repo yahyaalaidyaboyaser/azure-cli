@@ -7,7 +7,8 @@
 import http
 from azure.cli.core.vendored_sdks import winrequests, dummy_msal_extensions
 import sys
-sys.modules['requests'] = winrequests
+
+# sys.modules['requests'] = winrequests
 # Temporally workaround to make msal_extensions work on SPython
 sys.modules['msal_extensions'] = dummy_msal_extensions
 
