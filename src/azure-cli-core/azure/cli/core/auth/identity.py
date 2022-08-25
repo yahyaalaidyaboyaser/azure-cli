@@ -9,6 +9,7 @@ import re
 import sys
 
 from azure.cli.core._environment import get_config_dir
+from azure.cli.core.auth.util import windows_http_client
 from knack.log import get_logger
 from knack.util import CLIError
 from msal import PublicClientApplication
@@ -104,7 +105,8 @@ class Identity:  # pylint: disable=too-many-instance-attributes
         The instance is lazily created.
         """
         if not self._msal_app_instance:
-            self._msal_app_instance = PublicClientApplication(self.client_id, **self._msal_app_kwargs)
+            self._msal_app_instance = PublicClientApplication(self.client_id, **self._msal_app_kwargs,
+                                                              http_client=windows_http_client())
         return self._msal_app_instance
 
     def _load_msal_token_cache(self):
@@ -202,7 +204,7 @@ class Identity:  # pylint: disable=too-many-instance-attributes
         return accounts
 
     def get_user_credential(self, username):
-        return UserCredential(self.client_id, username, **self._msal_app_kwargs)
+        return UserCredential(self.client_id, username, **self._msal_app_kwargs, http_client=windows_http_client())
 
     def get_service_principal_credential(self, client_id):
         entry = self._service_principal_store.load_entry(client_id, self.tenant_id)
