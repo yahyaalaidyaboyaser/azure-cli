@@ -834,6 +834,9 @@ def find_child_collection(parent, *args, **kwargs):
 
 
 def check_connectivity(url='https://azure.microsoft.com', max_retries=5, timeout=1):
+    if is_spython():
+        return False
+
     import requests
     import timeit
     start = timeit.default_timer()
