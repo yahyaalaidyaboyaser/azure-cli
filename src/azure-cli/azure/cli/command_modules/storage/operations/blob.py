@@ -809,6 +809,7 @@ def generate_sas_blob_uri(cmd, client, permission=None, expiry=None, start=None,
                           content_type=None, full_uri=False, as_user=False, snapshot=None, **kwargs):
     from ..url_quote_util import encode_url_path
     from urllib.parse import quote
+    from azure.cli.core.util import get_http_transport
     t_generate_blob_sas = get_sdk(cmd.cli_ctx, ResourceType.DATA_STORAGE_BLOB,
                                   '_shared_access_signature#generate_blob_sas')
 
@@ -830,7 +831,8 @@ def generate_sas_blob_uri(cmd, client, permission=None, expiry=None, start=None,
             credential = client.credential._credential
         else:
             credential = client.credential.account_key
-        blob_client = t_blob_client.from_blob_url(blob_url=blob_url, credential=credential, snapshot=snapshot)
+        blob_client = t_blob_client.from_blob_url(blob_url=blob_url, credential=credential, snapshot=snapshot,
+                                                  transport=get_http_transport())
         container_name = blob_client.container_name
         blob_name = blob_client.blob_name
     else:

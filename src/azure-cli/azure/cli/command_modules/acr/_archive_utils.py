@@ -8,7 +8,6 @@ import os
 import re
 import codecs
 from io import open
-import requests
 from knack.log import get_logger
 from knack.util import CLIError
 from msrestazure.azure_exceptions import CloudError
@@ -215,6 +214,7 @@ def _archive_file_recursively(tar, name, arcname, parent_ignored, parent_matchin
 
 
 def check_remote_source_code(source_location):
+    import requests
     lower_source_location = source_location.lower()
 
     # git
