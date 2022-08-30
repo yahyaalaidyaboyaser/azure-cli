@@ -143,7 +143,7 @@ for %%a in (%CLI_SRC%\azure-cli %CLI_SRC%\azure-cli-core %CLI_SRC%\azure-cli-tel
 %PYTHON_EXE% -m pip install --no-warn-script-location --requirement %CLI_SRC%\azure-cli\requirements.py3.windows-spython.txt --target %SPYTHON_LIB%
 %PYTHON_EXE% -m pip install %WINDOWS_HTTP_PATH% --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
 
-REM Remove forbidden packages in SPython. (remove requests after remove_unused_api_versions.py is finished)
+REM Remove forbidden packages in SPython. (remove requests after calling remove_unused_api_versions.py)
 pushd %SPYTHON_LIB%
 for /d %%G in (cffi*) do rmdir /s /q "%%G"
 for /d %%G in (PyJWT*) do rmdir /s /q "%%G"
