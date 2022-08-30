@@ -143,18 +143,26 @@ for %%a in (%CLI_SRC%\azure-cli %CLI_SRC%\azure-cli-core %CLI_SRC%\azure-cli-tel
 %PYTHON_EXE% -m pip install --no-warn-script-location --requirement %CLI_SRC%\azure-cli\requirements.py3.windows-spython.txt --target %SPYTHON_LIB%
 %PYTHON_EXE% -m pip install %WINDOWS_HTTP_PATH% --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
 
+REM Remove forbidden packages in SPython. (remove requests after remove_unused_api_versions.py is finished)
+pushd %SPYTHON_LIB%
+for /d %%G in (cffi*) do rmdir /s /q "%%G"
+for /d %%G in (PyJWT*) do rmdir /s /q "%%G"
+for /d %%G in (cryptography*) do rmdir /s /q "%%G"
+@REM PyWin32 related
+for /d %%G in (pywin32*) do rmdir /s /q "%%G"
+for /d %%G in (win32*) do rmdir /s /q "%%G"
+rmdir /s /q pythonwin
+rmdir /s /q adodbapi
+rmdir /s /q isapi
+popd
+
 @REM --target is not compatible with namespace packages, as azure-cli, azure-cli-core, azure-cli=telemetry want to
 @REM install into same folder. So I have to copy azure folder from standard python
 mkdir %SPYTHON_LIB%\azure\cli
 robocopy %PYTHON_DIR%\Lib\site-packages\azure\cli %SPYTHON_LIB%\azure\cli /s /NFL /NDL
 
-%SPYTHON_EXE% -m azure.cli --version
-
 robocopy %SPYTHON_DIR%\Microsoft.Internal.SPython.win32.%SPYTHON_VERSION%\tools %BUILDING_DIR% /s /NFL /NDL
 
-%BUILDING_DIR%\python.exe -m pip install --no-warn-script-location --requirement %CLI_SRC%\azure-cli\requirements.py3.windows.txt
-
-REM Check azure.cli can be executed. This also prints the Python version.
 %BUILDING_DIR%\python.exe -m azure.cli --version
 
 if %errorlevel% neq 0 goto ERROR
@@ -162,6 +170,10 @@ if %errorlevel% neq 0 goto ERROR
 pushd %BUILDING_DIR%
 %BUILDING_DIR%\python.exe %~dp0\patch_models_v2.py
 %BUILDING_DIR%\python.exe %~dp0\remove_unused_api_versions.py
+popd
+
+pushd %BUILDING_DIR%\Lib
+for /d %%G in (requests*) do rmdir /s /q "%%G"
 popd
 
 echo Creating the wbin (Windows binaries) folder that will be added to the path...
