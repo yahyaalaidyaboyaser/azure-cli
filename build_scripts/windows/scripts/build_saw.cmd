@@ -169,15 +169,19 @@ if %errorlevel% neq 0 goto ERROR
 
 REM Replace requests to winrequests
 pushd %BUILDING_DIR%\Lib\msrest
-for %%a in ("pipeline\__init__.py" "universal_http\__init__.py" "universal_http\requests.py" "authentication.py" "pipeline\requests.py") do (
-  powershell -Command "(Get-Content %%a) -replace 'import requests_oauthlib as oauth', '' | Out-File -encoding utf8 %%a"
-  powershell -Command "(Get-Content %%a) -replace 'from requests', 'from azure.cli.core.vendored_sdks.winrequests' | Out-File -encoding utf8 %%a"
-  powershell -Command "(Get-Content %%a) -replace 'import requests', '' | Out-File -encoding utf8 %%a"
+for %%a in ("pipeline\__init__.py" "universal_http\__init__.py" "universal_http\requests.py" "authentication.py" "pipeline\requests.py" "universal_http\async_requests.py" "pipeline\async_requests.py") do (
+  powershell -Command "(Get-Content %%a) -replace '^import requests_oauthlib as oauth', '' | Out-File -encoding utf8 %%a"
+  powershell -Command "(Get-Content %%a) -replace '^from requests', 'from azure.cli.core.vendored_sdks.winrequests' | Out-File -encoding utf8 %%a"
+  powershell -Command "(Get-Content %%a) -replace '^import requests', 'import azure.cli.core.vendored_sdks.winrequests as requests' | Out-File -encoding utf8 %%a"
+)
+pushd %BUILDING_DIR%\Lib\msrestazure
+for %%a in ("azure_exceptions.py") do (
+  powershell -Command "(Get-Content %%a) -replace '^from requests', 'from azure.cli.core.vendored_sdks.winrequests' | Out-File -encoding utf8 %%a"
 )
 
 pushd %BUILDING_DIR%\Lib\azure\multiapi\storagev2\blob
 for /R %%a in (*_download.py) do (
-  powershell -Command "(Get-Content %%a) -replace 'import requests', 'import azure.cli.core.vendored_sdks.winrequests as requests' | Out-File -encoding utf8 %%a"
+  powershell -Command "(Get-Content %%a) -replace '^import requests', 'import azure.cli.core.vendored_sdks.winrequests as requests' | Out-File -encoding utf8 %%a"
 )
 popd
 
