@@ -3,7 +3,6 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
-import requests
 from knack.log import get_logger
 from knack.util import CLIError
 
@@ -31,6 +30,7 @@ class CredentialAdaptor:
         self._resource = resource
 
     def _get_token(self, scopes=None, **kwargs):
+        import azure.cli.core.vendored_sdks.winrequests as requests
         external_tenant_tokens = []
         # If scopes is not provided, use CLI-managed resource
         scopes = scopes or resource_to_scopes(self._resource)
