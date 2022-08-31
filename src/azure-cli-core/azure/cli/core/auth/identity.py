@@ -96,7 +96,7 @@ class Identity:  # pylint: disable=too-many-instance-attributes
         return {
             "authority": self._msal_authority,
             "token_cache": Identity._msal_token_cache,
-            "http_cache": Identity._msal_http_cache
+            "http_cache": None
         }
 
     @property

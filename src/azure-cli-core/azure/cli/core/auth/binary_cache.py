@@ -7,7 +7,6 @@ import collections.abc as collections
 import pickle
 
 from azure.cli.core.decorators import retry
-from azure.cli.core.util import is_spython
 from knack.log import get_logger
 
 logger = get_logger(__name__)
@@ -31,10 +30,6 @@ class BinaryCache(collections.MutableMapping):
     @retry()
     def _load(self):
         """Load cache with retry. If it still fails at last, raise the original exception as-is."""
-        # SPython use windows-http and its response is not picklable, so we also don't load it.
-        if is_spython():
-            return {}
-
         try:
             with open(self.filename, 'rb') as f:
                 return pickle.load(f)
@@ -56,10 +51,6 @@ class BinaryCache(collections.MutableMapping):
 
     @retry()
     def _save(self):
-        # SPython use windows-http and its response is not picklable, so we also don't load it.
-        if is_spython():
-            return
-
         with open(self.filename, 'wb') as f:
             # At this point, an empty cache file will be created. Loading this cache file will
             # raise EOFError. This can be simulated by adding time.sleep(30) here.
