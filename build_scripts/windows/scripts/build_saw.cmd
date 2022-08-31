@@ -167,6 +167,30 @@ robocopy %SPYTHON_DIR%\Microsoft.Internal.SPython.win32.%SPYTHON_VERSION%\tools 
 
 if %errorlevel% neq 0 goto ERROR
 
+REM Replace requests to winrequests
+pushd %BUILDING_DIR%\Lib\msrest
+for %%a in ("pipeline\__init__.py" "universal_http\__init__.py" "universal_http\requests.py" "authentication.py" "pipeline\requests.py") do (
+  powershell -Command "(Get-Content %%a) -replace 'import requests_oauthlib as oauth', '' | Out-File -encoding utf8 %%a"
+  powershell -Command "(Get-Content %%a) -replace 'from requests', 'from azure.cli.core.vendored_sdks.winrequests' | Out-File -encoding utf8 %%a"
+  powershell -Command "(Get-Content %%a) -replace 'import requests', '' | Out-File -encoding utf8 %%a"
+)
+
+pushd %BUILDING_DIR%\Lib\azure\multiapi\storagev2\blob
+for /R %%a in (*_download.py) do (
+  powershell -Command "(Get-Content %%a) -replace 'import requests', 'import azure.cli.core.vendored_sdks.winrequests as requests' | Out-File -encoding utf8 %%a"
+)
+popd
+
+pushd %BUILDING_DIR%\Lib\azure\multiapi\storagev2
+for /R %%a in (*encryption.py) do (
+  powershell -Command "(Get-Content %%a) -replace 'from cryptography.hazmat.backends import default_backend', '' | Out-File -encoding utf8 %%a"
+  powershell -Command "(Get-Content %%a) -replace 'from cryptography.hazmat.primitives.ciphers import Cipher', '' | Out-File -encoding utf8 %%a"
+  powershell -Command "(Get-Content %%a) -replace 'from cryptography.hazmat.primitives.ciphers.algorithms import AES', '' | Out-File -encoding utf8 %%a"
+  powershell -Command "(Get-Content %%a) -replace 'from cryptography.hazmat.primitives.ciphers.modes import CBC', '' | Out-File -encoding utf8 %%a"
+  powershell -Command "(Get-Content %%a) -replace 'from cryptography.hazmat.primitives.padding import PKCS7', '' | Out-File -encoding utf8 %%a"
+)
+popd
+
 pushd %BUILDING_DIR%
 %BUILDING_DIR%\python.exe %~dp0\patch_models_v2.py
 %BUILDING_DIR%\python.exe %~dp0\remove_unused_api_versions.py
