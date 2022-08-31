@@ -67,3 +67,5 @@ class SecretStore:
             return json.loads(self._persistence.load())
         except PersistenceNotFound:
             return []
+        except Exception:
+            return []
