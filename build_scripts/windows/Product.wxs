@@ -54,7 +54,7 @@
     <!-- Show message to restart any terminals only if the PATH is changed -->
     <CustomAction Id="Set_WIXUI_EXITDIALOGOPTIONALTEXT" Property="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Please close and reopen any active terminal window to use Azure CLI." />
     <InstallUISequence>
-      <Custom Action="Set_WIXUI_EXITDIALOGOPTIONALTEXT" After="CostFinalize">NOT Installed AND NOT WIX_UPGRADE_DETECTED</Custom>
+      <Custom Action="Set_WIXUI_EXITDIALOGOPTIONALTEXT" After="FindRelatedProducts">NOT Installed AND NOT WIX_UPGRADE_DETECTED</Custom>
     </InstallUISequence>
 
   </Product>
