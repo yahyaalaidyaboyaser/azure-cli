@@ -3,19 +3,14 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 # pylint: disable=wrong-import-position
-from azure.cli.core.vendored_sdks import winrequests, dummy_msal_extensions
-import sys
+from azure.cli.core.util import is_spython
 
-# sys.modules['requests'] = winrequests
-# Temporally workaround to make msal_extensions work on SPython
-sys.modules['msal_extensions'] = dummy_msal_extensions
+if is_spython():
+    from azure.cli.core.vendored_sdks import dummy_msal_extensions
+    import sys
 
-import os
-os.environ["IS_SPYTHON"] = "true"
+    sys.modules['msal_extensions'] = dummy_msal_extensions
 
-# from azure.cli.core.windows_http_transport import WindowsPipelineClient
-# import azure.core
-# azure.core.PipelineClient = WindowsPipelineClient
 
 import timeit
 # Log the start time
@@ -86,7 +81,6 @@ finally:
 
     try:
         # check for new version auto-upgrade
-        from azure.cli.core.util import is_spython
         if exit_code == 0 and az_cli.config.getboolean('auto-upgrade', 'enable', False) and not is_spython() and \
                 sys.argv[1] != 'upgrade' and (sys.argv[1] != 'extension' or sys.argv[2] != 'update'):
             from azure.cli.core._session import VERSIONS  # pylint: disable=ungrouped-imports

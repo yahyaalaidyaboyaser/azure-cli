@@ -29,20 +29,22 @@ from azure.cli.core.azclierror import InvalidArgumentValueError, RequiredArgumen
 from azure.cli.core.profiles import ResourceType, AZURE_API_PROFILES, SDKProfile
 from azure.cli.core.util import sdk_no_wait
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa, ec
-from cryptography.hazmat.primitives.serialization import load_pem_private_key, Encoding, PublicFormat
-from cryptography.exceptions import UnsupportedAlgorithm
-# from cryptography.hazmat.backends import default_backend
-# from cryptography.hazmat.primitives.asymmetric import rsa, ec
-# from cryptography.hazmat.primitives.serialization import load_pem_private_key, Encoding, PublicFormat
-# from cryptography.exceptions import UnsupportedAlgorithm
-# from cryptography.x509 import load_pem_x509_certificate
+try:
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives.asymmetric import rsa, ec
+    from cryptography.hazmat.primitives.serialization import load_pem_private_key, Encoding, PublicFormat
+    from cryptography.exceptions import UnsupportedAlgorithm
+    from cryptography.x509 import load_pem_x509_certificate
+except ImportError:
+    pass
 
 from knack.log import get_logger
 from knack.util import CLIError
 
-# from OpenSSL import crypto
+try:
+    from OpenSSL import crypto
+except ImportError:
+    pass
 
 
 logger = get_logger(__name__)

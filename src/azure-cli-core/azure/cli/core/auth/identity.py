@@ -87,6 +87,7 @@ class Identity:  # pylint: disable=too-many-instance-attributes
         """kwargs for creating UserCredential or ServicePrincipalCredential.
         MSAL token cache and HTTP cache are lazily created.
         """
+        from azure.cli.core.util import is_spython
         if not Identity._msal_token_cache:
             Identity._msal_token_cache = self._load_msal_token_cache()
 
@@ -96,7 +97,7 @@ class Identity:  # pylint: disable=too-many-instance-attributes
         return {
             "authority": self._msal_authority,
             "token_cache": Identity._msal_token_cache,
-            "http_cache": None
+            "http_cache": None if is_spython() else Identity._msal_http_cache,
         }
 
     @property

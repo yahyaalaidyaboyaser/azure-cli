@@ -30,7 +30,11 @@ class CredentialAdaptor:
         self._resource = resource
 
     def _get_token(self, scopes=None, **kwargs):
-        import azure.cli.core.vendored_sdks.winrequests as requests
+        try:
+            from requests.exceptions import SSLError
+        except ImportError:
+            from azure.cli.core.util import create_exception
+            SSLError = create_exception('SSLError')
         external_tenant_tokens = []
         # If scopes is not provided, use CLI-managed resource
         scopes = scopes or resource_to_scopes(self._resource)
@@ -39,7 +43,7 @@ class CredentialAdaptor:
             if self._auxiliary_credentials:
                 external_tenant_tokens = [cred.get_token(*scopes) for cred in self._auxiliary_credentials]
             return token, external_tenant_tokens
-        except requests.exceptions.SSLError as err:
+        except SSLError as err:
             from azure.cli.core.util import SSLERROR_TEMPLATE
             raise CLIError(SSLERROR_TEMPLATE.format(str(err)))
 

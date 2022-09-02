@@ -9,10 +9,13 @@ import hashlib
 import hmac
 import json
 
-# from cryptography.hazmat.backends import default_backend
-# from cryptography.hazmat.primitives import hashes, padding
-# from cryptography.hazmat.primitives.asymmetric import padding as asymmetric_padding
-# from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+try:
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives import hashes, padding
+    from cryptography.hazmat.primitives.asymmetric import padding as asymmetric_padding
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+except ImportError:
+    pass
 from knack.util import CLIError
 
 from azure.cli.command_modules.keyvault.security_domain.sp800_108 import KDF
