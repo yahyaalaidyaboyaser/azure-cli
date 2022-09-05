@@ -184,6 +184,10 @@ def read_response_templates():
     return success_template, error_template
 
 
-def windows_http_client():
-    from windows.http import Session  # pylint: disable=import-error
-    return Session()
+def get_http_client():
+    # return http_client in different environments
+    from azure.cli.core.util import is_spython
+    if is_spython():
+        from windows.http import Session  # pylint: disable=import-error
+        return Session()
+    return None
