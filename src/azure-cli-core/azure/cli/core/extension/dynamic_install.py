@@ -13,6 +13,10 @@ logger = get_logger(__name__)
 
 def _get_extension_command_tree(cli_ctx):
     from azure.cli.core._session import EXT_CMD_TREE
+    from azure.cli.core.util import is_spython
+    if is_spython():
+        logger.info("Can't get extension command tree in SPython environment")
+        return None
     import os
     VALID_SECOND = 3600 * 24 * 10
     if not cli_ctx:
