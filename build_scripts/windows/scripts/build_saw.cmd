@@ -135,10 +135,19 @@ set PYTHON_EXE=%PYTHON_DIR%\python.exe
 set CLI_SRC=%REPO_ROOT%\src
 %PYTHON_EXE% -m pip install pycparser==2.18 --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
 for %%a in (%CLI_SRC%\azure-cli %CLI_SRC%\azure-cli-core %CLI_SRC%\azure-cli-telemetry) do (
-   pushd %%a
-   %PYTHON_EXE% -m pip install --no-warn-script-location --no-cache-dir --no-deps -U .
-   popd
+    pushd %%a
+    %PYTHON_EXE% -m pip install --no-warn-script-location --no-cache-dir --no-deps -U .
+    popd
 )
+
+copy %CLI_SRC%\azure-cli\requirements.py3.windows.txt %CLI_SRC%\azure-cli\requirements.py3.windows-spython.txt
+pushd %CLI_SRC%\azure-cli\
+    powershell -Command "(Get-Content requirements.py3.windows-spython.txt) -replace '^azure-cli-core==.*', '' | Out-File -encoding utf8 requirements.py3.windows-spython.txt"
+    powershell -Command "(Get-Content requirements.py3.windows-spython.txt) -replace '^azure-cli-telemetry==.*', '' | Out-File -encoding utf8 requirements.py3.windows-spython.txt"
+    powershell -Command "(Get-Content requirements.py3.windows-spython.txt) -replace '^azure-cli==.*', '' | Out-File -encoding utf8 requirements.py3.windows-spython.txt"
+    echo 'setuptools==63.4.2' >> requirements.py3.windows-spython.txt
+    echo 'multidict==6.0.2' >> requirements.py3.windows-spython.txt
+popd
 
 %PYTHON_EXE% -m pip install --no-warn-script-location --requirement %CLI_SRC%\azure-cli\requirements.py3.windows-spython.txt --target %SPYTHON_LIB%
 %PYTHON_EXE% -m pip install %WINDOWS_HTTP_PATH% --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
