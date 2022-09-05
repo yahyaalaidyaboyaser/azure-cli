@@ -20,7 +20,6 @@ set WIX_DOWNLOAD_URL="https://azurecliprod.blob.core.windows.net/msi/wix310-bina
 @REM windows-http only support amd64
 set PYTHON_DOWNLOAD_URL="https://www.python.org/ftp/python/%PYTHON_VERSION%/python-%PYTHON_VERSION%-embed-amd64.zip"
 set NUGET_DOWNLOAD_URL="https://dist.nuget.org/win-x86-commandline/v6.2.1/nuget.exe"
-set PROPAGATE_ENV_CHANGE_DOWNLOAD_URL="https://azurecliprod.blob.core.windows.net/util/propagate_env_change.zip"
 @REM TODO download from storage account
 set SPYTHON_SOURCE="C:\Users\hanglei"
 set WINDOWS_HTTP_PATH="C:\Users\hanglei\Downloads\windows_http-0.22.203.1-cp310-cp310-win_amd64.whl"
@@ -44,7 +43,6 @@ set SPYTHON_DIR=%ARTIFACTS_DIR%\SPython
 set SPYTHON_EXE=%SPYTHON_DIR%\Microsoft.Internal.SPython.win32.%SPYTHON_VERSION%\tools\python.exe
 set SPYTHON_LIB=%SPYTHON_DIR%\Microsoft.Internal.SPython.win32.%SPYTHON_VERSION%\tools\Lib
 set NUGET_DIR=%ARTIFACTS_DIR%\Nuget
-set PROPAGATE_ENV_CHANGE_DIR=%~dp0..\propagate_env_change
 
 set REPO_ROOT=%~dp0..\..\..
 
@@ -145,11 +143,12 @@ pushd %CLI_SRC%\azure-cli\
     powershell -Command "(Get-Content requirements.py3.windows-spython.txt) -replace '^azure-cli-core==.*', '' | Out-File -encoding utf8 requirements.py3.windows-spython.txt"
     powershell -Command "(Get-Content requirements.py3.windows-spython.txt) -replace '^azure-cli-telemetry==.*', '' | Out-File -encoding utf8 requirements.py3.windows-spython.txt"
     powershell -Command "(Get-Content requirements.py3.windows-spython.txt) -replace '^azure-cli==.*', '' | Out-File -encoding utf8 requirements.py3.windows-spython.txt"
-    echo 'setuptools==63.4.2' >> requirements.py3.windows-spython.txt
-    echo 'multidict==6.0.2' >> requirements.py3.windows-spython.txt
+    echo setuptools==63.4.2 >> requirements.py3.windows-spython.txt
+    echo multidict==6.0.2 >> requirements.py3.windows-spython.txt
 popd
 
 %PYTHON_EXE% -m pip install --no-warn-script-location --requirement %CLI_SRC%\azure-cli\requirements.py3.windows-spython.txt --target %SPYTHON_LIB%
+rm %CLI_SRC%\azure-cli\requirements.py3.windows-spython.txt
 %PYTHON_EXE% -m pip install %WINDOWS_HTTP_PATH% --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
 
 REM Remove forbidden packages in SPython. (remove requests after calling remove_unused_api_versions.py)
@@ -268,20 +267,6 @@ for /d %%d in ("azure*.dist-info") do (
 popd
 
 if %errorlevel% neq 0 goto ERROR
-
-REM ensure propagate_env_change.exe is available
-if exist "%PROPAGATE_ENV_CHANGE_DIR%\propagate_env_change.exe" (
-    echo Using existing propagate_env_change.exe at %PROPAGATE_ENV_CHANGE_DIR%
-) else (
-    pushd %PROPAGATE_ENV_CHANGE_DIR%
-    echo Downloading propagate_env_change.exe.
-    curl --output propagate_env_change.zip %PROPAGATE_ENV_CHANGE_DOWNLOAD_URL%
-    unzip propagate_env_change.zip
-    if %errorlevel% neq 0 goto ERROR
-    del propagate_env_change.zip
-    echo propagate_env_change.exe downloaded and extracted successfully.
-    popd
-)
 
 echo Building MSI...
 msbuild /t:rebuild /p:Configuration=Release %REPO_ROOT%\build_scripts\windows\azure-cli.wixproj
