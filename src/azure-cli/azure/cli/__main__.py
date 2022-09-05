@@ -6,8 +6,9 @@
 from azure.cli.core.util import is_spython
 
 if is_spython():
-    from azure.cli.core.vendored_sdks import dummy_msal_extensions
     import sys
+
+    from azure.cli.core.vendored_sdks import dummy_msal_extensions
 
     sys.modules['msal_extensions'] = dummy_msal_extensions
 
@@ -82,7 +83,7 @@ finally:
     try:
         # check for new version auto-upgrade
         if exit_code == 0 and az_cli.config.getboolean('auto-upgrade', 'enable', False) and not is_spython() and \
-                sys.argv[1] != 'upgrade' and (sys.argv[1] != 'extension' or sys.argv[2] != 'update'):
+                sys.argv[1] != 'upgrade' and (sys.argv[1] != 'extension' or sys.argv[2] != 'update'):   #pylint: disable=too-many-boolean-expressions,line-too-long
             from azure.cli.core._session import VERSIONS  # pylint: disable=ungrouped-imports
             from azure.cli.core.util import get_cached_latest_versions, _VERSION_UPDATE_TIME  # pylint: disable=ungrouped-imports
             if VERSIONS[_VERSION_UPDATE_TIME]:

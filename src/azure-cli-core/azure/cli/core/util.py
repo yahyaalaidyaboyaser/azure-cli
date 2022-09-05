@@ -1358,6 +1358,7 @@ def is_spython():
 
 
 def get_http_transport():
+    # return HttpTransport in different environments
     if is_spython():
         from azure.cli.core.windows_http_transport import WindowsHttpTransport
         return WindowsHttpTransport()
@@ -1365,6 +1366,7 @@ def get_http_transport():
 
 
 def create_exception(name):
+    # Dynamically create an exception class with the given name.
     if isinstance(name, list):
         return [create_exception(n) for n in name]
     return type(name, (Exception,), {})

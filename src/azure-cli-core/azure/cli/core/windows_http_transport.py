@@ -12,7 +12,7 @@ from typing import ContextManager, Iterator, Optional
 
 from azure.core import PipelineClient
 from azure.core.pipeline.transport import HttpResponse, HttpTransport, HttpRequest
-from windows.http import Response, Session
+from windows.http import Response, Session  # pylint: disable=import-error
 
 
 class WindowsHttpTransportResponse(HttpResponse):

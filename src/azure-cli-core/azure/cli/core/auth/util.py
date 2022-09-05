@@ -180,5 +180,5 @@ def read_response_templates():
 
 
 def windows_http_client():
-    from windows.http import Session
+    from windows.http import Session  # pylint: disable=import-error
     return Session()

@@ -67,5 +67,5 @@ class SecretStore:
             return json.loads(self._persistence.load())
         except PersistenceNotFound:
             return []
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             return []
