@@ -1,0 +1,62 @@
+name: CLI Build Windows SAW MSI $(CLI_VERSION)
+
+resources:
+- repo: self
+
+trigger:
+  branches:
+    exclude:
+    - '*'
+
+jobs:
+- job: ExtractMetadata
+  displayName: Extract Metadata
+
+  condition: succeeded()
+  pool:
+    vmImage: 'ubuntu-20.04'
+  steps:
+  - task: Bash@3
+    displayName: 'Extract Version'
+    inputs:
+      targetType: 'filePath'
+      filePath: scripts/release/get_version.sh
+
+  - task: PublishPipelineArtifact@0
+    displayName: 'Publish Artifact: metadata'
+    inputs:
+      TargetPath: $(Build.ArtifactStagingDirectory)
+      ArtifactName: metadata
+
+- job: BuildWindowsSAWMSI
+  displayName: Build Windows SAW MSI
+
+  dependsOn: ExtractMetadata
+  condition: succeeded()
+  pool:
+    vmImage: 'windows-2019'
+  steps:
+  - task: DownloadPipelineArtifact@1
+    displayName: 'Download Build Artifacts'
+    inputs:
+      TargetPath: '$(Build.ArtifactStagingDirectory)/metadata'
+      artifactName: metadata
+
+  - script: |
+      set /p CLI_VERSION=<$(System.ArtifactsDirectory)/metadata/version
+      set
+      set BLOB_SAS=$(BLOB_SAS)
+      
+      build_scripts/windows/scripts/build_saw.cmd
+    displayName: 'Build Windows SAW MSI'
+
+  - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
+    displayName: 'SBOM'
+    inputs:
+      BuildDropPath: 'build_scripts/windows/out/'
+
+  - task: PublishPipelineArtifact@0
+    displayName: 'Publish Artifact: MSI'
+    inputs:
+      TargetPath: 'build_scripts/windows/out/'
+      ArtifactName: msi-saw
