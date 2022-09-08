@@ -13,6 +13,10 @@ if "%CLI_VERSION%"=="" (
     echo Please set the CLI_VERSION environment variable, e.g. 2.0.13
     goto ERROR
 )
+if "%BLOB_SAS%"=="" (
+    echo Please set the BLOB_SAS environment variable
+    goto ERROR
+)
 set PYTHON_VERSION=3.10.5
 set SPYTHON_VERSION=3.10.22165.3
 
@@ -20,9 +24,9 @@ set WIX_DOWNLOAD_URL="https://azurecliprod.blob.core.windows.net/msi/wix310-bina
 @REM windows-http only support amd64
 set PYTHON_DOWNLOAD_URL="https://www.python.org/ftp/python/%PYTHON_VERSION%/python-%PYTHON_VERSION%-embed-amd64.zip"
 set NUGET_DOWNLOAD_URL="https://dist.nuget.org/win-x86-commandline/v6.2.1/nuget.exe"
-@REM TODO download from storage account
-set SPYTHON_SOURCE="C:\Users\hanglei"
-set WINDOWS_HTTP_PATH="C:\Users\hanglei\Downloads\windows_http-0.22.203.1-cp310-cp310-win_amd64.whl"
+set BASE_MISC_URL=https://azurecliedge.blob.core.windows.net/saw
+set WINDOWS_HTTP_FILENAME=windows_http-0.22.203.1-cp310-cp310-win_amd64.whl
+set SPYTHON_FILENAME=microsoft.internal.spython.win32.%SPYTHON_VERSION%.nupkg
 
 REM https://pip.pypa.io/en/stable/installation/#get-pip-py
 set GET_PIP_DOWNLOAD_URL="https://bootstrap.pypa.io/get-pip.py"
@@ -43,6 +47,7 @@ set SPYTHON_DIR=%ARTIFACTS_DIR%\SPython
 set SPYTHON_EXE=%SPYTHON_DIR%\Microsoft.Internal.SPython.win32.%SPYTHON_VERSION%\tools\python.exe
 set SPYTHON_LIB=%SPYTHON_DIR%\Microsoft.Internal.SPython.win32.%SPYTHON_VERSION%\tools\Lib
 set NUGET_DIR=%ARTIFACTS_DIR%\Nuget
+set MISC_DIR=%ARTIFACTS_DIR%\misc
 
 set REPO_ROOT=%~dp0..\..\..
 
@@ -54,12 +59,21 @@ if not exist %NUGET_DIR% (
     popd
 )
 
+REM download wheel
+if not exist %MISC_DIR% (
+    mkdir %MISC_DIR%
+    pushd %MISC_DIR%
+    curl --output %WINDOWS_HTTP_FILENAME% "%BASE_MISC_URL%/%WINDOWS_HTTP_FILENAME%?%BLOB_SAS%"
+    curl --output %SPYTHON_FILENAME% "%BASE_MISC_URL%/%SPYTHON_FILENAME%?%BLOB_SAS%"
+    popd
+)
+
 REM reset spython dir
 if exist %SPYTHON_DIR% rmdir /s /q %SPYTHON_DIR%
 if not exist %SPYTHON_DIR% (
     mkdir %SPYTHON_DIR%
     cd %SPYTHON_DIR%
-    %NUGET_DIR%\nuget.exe install Microsoft.Internal.SPython.win32 -version %SPYTHON_VERSION% -Source %SPYTHON_SOURCE%
+    %NUGET_DIR%\nuget.exe install Microsoft.Internal.SPython.win32 -version %SPYTHON_VERSION% -Source %MISC_DIR%
 )
 
 REM reset working folders
@@ -149,7 +163,7 @@ popd
 
 %PYTHON_EXE% -m pip install --no-warn-script-location --requirement %CLI_SRC%\azure-cli\requirements.py3.windows-spython.txt --target %SPYTHON_LIB%
 rm %CLI_SRC%\azure-cli\requirements.py3.windows-spython.txt
-%PYTHON_EXE% -m pip install %WINDOWS_HTTP_PATH% --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
+%PYTHON_EXE% -m pip install "%MISC_DIR%\%WINDOWS_HTTP_FILENAME%" --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
 
 REM Remove forbidden packages in SPython. (remove requests after calling remove_unused_api_versions.py)
 pushd %SPYTHON_LIB%
