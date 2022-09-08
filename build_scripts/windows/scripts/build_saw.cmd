@@ -55,7 +55,7 @@ REM reset nuget dir
 if not exist %NUGET_DIR% (
     mkdir %NUGET_DIR%
     pushd %NUGET_DIR%
-    curl %NUGET_DOWNLOAD_URL%
+    curl --output nuget.exe %NUGET_DOWNLOAD_URL%
     popd
 )
 
