@@ -34,14 +34,16 @@ def _rmtree(path):
 def calculate_folder_size(start_path):
     # https://stackoverflow.com/questions/1392413/calculating-a-directorys-size-using-python
     total_size = 0
+    total_count = 0
     for dirpath, dirnames, filenames in os.walk(start_path):
         for f in filenames:
             fp = os.path.join(dirpath, f)
             # skip if it is symbolic link
             if not os.path.islink(fp):
+                total_count += 1
                 total_size += os.path.getsize(fp)
 
-    return total_size
+    return total_size, total_count
 
 
 def remove_aio_folders():
@@ -98,8 +100,9 @@ def remove_unused_api_versions(resource_type):
 
 
 def print_folder_size(folder):
-    size_in_mb = calculate_folder_size(folder) / 1048576
-    _LOGGER.info(f"{size_in_mb:.2f} MB")
+    size, count = calculate_folder_size(folder)
+    size_in_mb = size / 1048576
+    _LOGGER.info(f"{size_in_mb:.2f} MB, {count} files")
 
 
 def _get_all_sdks_to_trim():
