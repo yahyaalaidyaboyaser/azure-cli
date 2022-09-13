@@ -104,7 +104,7 @@ def print_folder_size(folder):
 
 def _get_all_sdks_to_trim():
     resource_types = [k for k, v in AZURE_API_PROFILES['latest'].items() if k.import_prefix.startswith('azure.mgmt')]
-    return
+    return resource_types
 
 
 def _get_biggest_sdks_to_trim():
@@ -154,7 +154,7 @@ def main():
     print_folder_size(mgmt_sdk_dir)
 
     # Removed unused API versions
-    resource_types = _get_biggest_sdks_to_trim()
+    resource_types = _get_all_sdks_to_trim()
 
     for r in resource_types:
         remove_unused_api_versions(r)
