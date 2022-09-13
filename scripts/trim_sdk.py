@@ -26,11 +26,12 @@ DRY_RUN = False
 
 
 def _rmtree(path):
+    _LOGGER.warning(path)
     if not DRY_RUN:
         shutil.rmtree(path)
 
 
-def caculate_folder_size(start_path):
+def calculate_folder_size(start_path):
     # https://stackoverflow.com/questions/1392413/calculating-a-directorys-size-using-python
     total_size = 0
     for dirpath, dirnames, filenames in os.walk(start_path):
@@ -47,7 +48,6 @@ def remove_aio_folders():
     _LOGGER.info("Removing aio folders:")
     mgmt_sdk_dir = azure.mgmt.__path__[0]
     for aio_folder in glob.glob(os.path.join(mgmt_sdk_dir, '**/aio'), recursive=True):
-        _LOGGER.warning(aio_folder)
         _rmtree(aio_folder)
 
 
@@ -94,12 +94,11 @@ def remove_unused_api_versions(resource_type):
 
     for api_folder in remove_api_folders:
         full_path = os.path.join(path, api_folder)
-        _LOGGER.warning(full_path)
         _rmtree(full_path)
 
 
 def print_folder_size(folder):
-    size_in_mb = caculate_folder_size(folder) / 1048576
+    size_in_mb = calculate_folder_size(folder) / 1048576
     _LOGGER.info(f"{size_in_mb:.2f} MB")
 
 
@@ -141,19 +140,12 @@ def main():
     mgmt_sdk_dir = azure.mgmt.__path__[0]
 
     # Remove aio folders
-    # print_folder_size(mgmt_sdk_dir)
-    # remove_aio_folders()
-    # print_folder_size(mgmt_sdk_dir)
-    #
-    # # Removed unused API versions
-    # print_folder_size(mgmt_sdk_dir)
-    #
-    # resource_types = [
-    #     ResourceType.MGMT_NETWORK,
-    #     ResourceType.MGMT_RESOURCE_RESOURCES,
-    #     ResourceType.MGMT_APPSERVICE,
-    # ]
+    print_folder_size(mgmt_sdk_dir)
+    remove_aio_folders()
 
+    print_folder_size(mgmt_sdk_dir)
+
+    # Removed unused API versions
     resource_types = _get_biggest_sdks_to_trim()
 
     for r in resource_types:
