@@ -13,7 +13,7 @@ if "%CLI_VERSION%"=="" (
     echo Please set the CLI_VERSION environment variable, e.g. 2.0.13
     goto ERROR
 )
-if "%BLOB_SAS%"=="" (
+if %BLOB_SAS%=="" (
     echo Please set the BLOB_SAS environment variable
     goto ERROR
 )
