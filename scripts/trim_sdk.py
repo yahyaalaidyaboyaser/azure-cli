@@ -131,6 +131,14 @@ def _get_biggest_sdks_to_trim():
         ResourceType.MGMT_RESOURCE_PRIVATELINKS,
         # /storage
         ResourceType.MGMT_STORAGE,
+        # /databoxedge
+        ResourceType.MGMT_DATABOXEDGE,
+        # /containerregistry
+        ResourceType.MGMT_CONTAINERREGISTRY,
+        # /iothub
+        ResourceType.MGMT_IOTHUB,
+        # /sql
+        ResourceType.MGMT_SQL,
     ]
 
     return resource_types
