@@ -63,8 +63,8 @@ REM download wheel
 if not exist %MISC_DIR% (
     mkdir %MISC_DIR%
     pushd %MISC_DIR%
-    curl --output %WINDOWS_HTTP_FILENAME% "%BASE_MISC_URL%/%WINDOWS_HTTP_FILENAME%?%BLOB_SAS%"
-    curl --output %SPYTHON_FILENAME% "%BASE_MISC_URL%/%SPYTHON_FILENAME%?%BLOB_SAS%"
+    curl --output %WINDOWS_HTTP_FILENAME% %BASE_MISC_URL%/%WINDOWS_HTTP_FILENAME%?%BLOB_SAS%
+    curl --output %SPYTHON_FILENAME% %BASE_MISC_URL%/%SPYTHON_FILENAME%?%BLOB_SAS%
     popd
 )
 
