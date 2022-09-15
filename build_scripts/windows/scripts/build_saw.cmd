@@ -18,7 +18,7 @@ if %BLOB_SAS%=="" (
     goto ERROR
 )
 set PYTHON_VERSION=3.10.5
-set SPYTHON_VERSION=3.10.22165.3
+set SPYTHON_VERSION=3.10.22251.3
 
 set WIX_DOWNLOAD_URL="https://azurecliprod.blob.core.windows.net/msi/wix310-binaries-mirror.zip"
 @REM windows-http only support amd64
