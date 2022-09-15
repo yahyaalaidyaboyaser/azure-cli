@@ -37,6 +37,8 @@ then
   fi
 fi
 
+# TODO check if python -m venv available
+
 chmod 775 $install_script
 echo "Running install script."
 $python_cmd $install_script < $_TTY

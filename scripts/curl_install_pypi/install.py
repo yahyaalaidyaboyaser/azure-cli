@@ -41,11 +41,6 @@ AZ_DISPATCH_TEMPLATE = """#!/usr/bin/env bash
 {install_dir}/bin/python -m azure.cli "$@"
 """
 
-VIRTUALENV_VERSION = '16.7.11'
-VIRTUALENV_ARCHIVE = 'virtualenv-'+VIRTUALENV_VERSION+'.tar.gz'
-VIRTUALENV_DOWNLOAD_URL = 'https://pypi.python.org/packages/source/v/virtualenv/'+VIRTUALENV_ARCHIVE
-VIRTUALENV_ARCHIVE_SHA256 = '0f73ef551d889bf4b3241f1819aaf5f5c7e27259c1537255b1f63207552919b1'
-
 DEFAULT_INSTALL_DIR = os.path.expanduser(os.path.join('~', 'lib', 'azure-cli'))
 DEFAULT_EXEC_DIR = os.path.expanduser(os.path.join('~', 'bin'))
 EXECUTABLE_NAME = 'az'
@@ -124,24 +119,9 @@ def is_valid_sha256sum(a_file, expected_sum):
     return expected_sum == computed_hash
 
 
-def create_virtualenv(tmp_dir, install_dir):
-    download_location = os.path.join(tmp_dir, VIRTUALENV_ARCHIVE)
-    print_status('Downloading virtualenv package from {}.'.format(VIRTUALENV_DOWNLOAD_URL))
-    response = urlopen(VIRTUALENV_DOWNLOAD_URL)
-    with open(download_location, 'wb') as f: f.write(response.read())
-    print_status("Downloaded virtualenv package to {}.".format(download_location))
-    if is_valid_sha256sum(download_location, VIRTUALENV_ARCHIVE_SHA256):
-        print_status("Checksum of {} OK.".format(download_location))
-    else:
-        raise CLIInstallError("The checksum of the downloaded virtualenv package does not match.")
-    print_status("Extracting '{}' to '{}'.".format(download_location, tmp_dir))
-    package_tar = tarfile.open(download_location)
-    package_tar.extractall(path=tmp_dir)
-    package_tar.close()
-    virtualenv_dir_name = 'virtualenv-'+VIRTUALENV_VERSION
-    working_dir = os.path.join(tmp_dir, virtualenv_dir_name)
-    cmd = [sys.executable, 'virtualenv.py', '--python', sys.executable, install_dir]
-    exec_command(cmd, cwd=working_dir)
+def create_virtualenv(install_dir):
+    cmd = [sys.executable, '-m', 'venv', install_dir]
+    exec_command(cmd)
 
 
 def install_cli(install_dir, tmp_dir):
@@ -304,8 +284,8 @@ def handle_path_and_tab_completion(completion_file_path, exec_filepath, exec_dir
 def verify_python_version():
     print_status('Verifying Python version.')
     v = sys.version_info
-    if v < (2, 7):
-        raise CLIInstallError('The CLI does not support Python versions less than 2.7.')
+    if v < (2, 7) or v < (3, 6):
+        raise CLIInstallError('The CLI does not support Python versions less than 2.7 or 3.6.')
     if 'conda' in sys.version:
         raise CLIInstallError("This script does not support the Python Anaconda environment. "
                               "Create an Anaconda virtual environment and install with 'pip'")
@@ -396,7 +376,7 @@ def main():
     exec_dir = get_exec_dir()
     exec_path = os.path.join(exec_dir, EXECUTABLE_NAME)
     verify_install_dir_exec_path_conflict(install_dir, exec_path)
-    create_virtualenv(tmp_dir, install_dir)
+    create_virtualenv(install_dir)
     install_cli(install_dir, tmp_dir)
     exec_filepath = create_executable(exec_dir, install_dir)
     completion_file_path = os.path.join(install_dir, COMPLETION_FILENAME)
