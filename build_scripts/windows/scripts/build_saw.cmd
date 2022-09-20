@@ -171,6 +171,7 @@ for /d %%G in (cffi*) do rmdir /s /q "%%G"
 for /d %%G in (PyJWT*) do rmdir /s /q "%%G"
 for /d %%G in (cryptography*) do rmdir /s /q "%%G"
 for /d %%G in (msal_extensions*) do rmdir /s /q "%%G"
+for /d %%G in (urllib3*) do rmdir /s /q "%%G"
 @REM PyWin32 related
 for /d %%G in (pywin32*) do rmdir /s /q "%%G"
 for /d %%G in (win32*) do rmdir /s /q "%%G"
