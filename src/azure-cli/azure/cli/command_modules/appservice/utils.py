@@ -6,7 +6,6 @@
 import time
 import os
 import urllib
-import urllib3
 import certifi
 import sys
 
@@ -186,6 +185,7 @@ def _normalize_location(cmd, location):
 
 
 def get_pool_manager(url):
+    import urllib3
     proxies = urllib.request.getproxies()
     bypass_proxy = urllib.request.proxy_bypass(urllib.parse.urlparse(url).hostname)
 

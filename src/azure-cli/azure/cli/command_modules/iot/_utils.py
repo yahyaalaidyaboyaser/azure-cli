@@ -6,13 +6,14 @@
 import datetime
 from os.path import exists, join
 import base64
-from cryptography import x509
-from cryptography.x509.oid import NameOID
-from cryptography.hazmat.primitives import serialization, hashes
-from cryptography.hazmat.primitives.asymmetric import rsa
 
 
 def create_self_signed_certificate(device_id, valid_days, cert_output_dir):
+    from cryptography import x509
+    from cryptography.x509.oid import NameOID
+    from cryptography.hazmat.primitives import serialization, hashes
+    from cryptography.hazmat.primitives.asymmetric import rsa
+
     cert_file = device_id + '-cert.pem'
     key_file = device_id + '-key.pem'
 

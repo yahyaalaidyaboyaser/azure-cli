@@ -193,6 +193,7 @@ for %%a in ("pipeline\__init__.py" "universal_http\__init__.py" "universal_http\
     powershell -Command "(Get-Content %%a) -replace '^import requests_oauthlib as oauth', '' | Out-File -encoding utf8 %%a"
     powershell -Command "(Get-Content %%a) -replace '^from requests', 'from azure.cli.core.vendored_sdks.winrequests' | Out-File -encoding utf8 %%a"
     powershell -Command "(Get-Content %%a) -replace '^import requests', 'import azure.cli.core.vendored_sdks.winrequests as requests' | Out-File -encoding utf8 %%a"
+    powershell -Command "(Get-Content %%a) -replace '^from urllib3 import Retry', '' | Out-File -encoding utf8 %%a"
 )
 pushd %BUILDING_DIR%\Lib\msrestazure
 for %%a in ("azure_exceptions.py") do (
