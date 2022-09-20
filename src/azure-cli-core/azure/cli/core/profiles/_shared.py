@@ -424,6 +424,14 @@ AD_HOC_API_VERSIONS = {
         '_AbstractStackRuntimeHelper': '2021-01-15',
         'list_consumption_locations': '2020-09-01',
         'list_locations': '2020-09-01'
+    },
+    ResourceType.MGMT_CONTAINERREGISTRY: {
+        # src/azure-cli/azure/cli/command_modules/acr/_client_factory.py
+        'VERSION_2019_05_01_PREVIEW': "2019-05-01-preview",
+        'VERSION_2019_06_01_PREVIEW': "2019-06-01-preview",
+        'VERSION_2020_11_01_PREVIEW': "2020-11-01-preview",
+        'VERSION_2021_08_01_PREVIEW': "2021-08-01-preview",
+        'VERSION_2022_02_01_PREVIEW': "2022-02-01-preview",
     }
 }
 
