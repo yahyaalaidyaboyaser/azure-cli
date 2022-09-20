@@ -1329,15 +1329,6 @@ def process_nw_cm_v2_create_namespace(cmd, namespace):
     return get_network_watcher_from_location()(cmd, namespace)
 
 
-def process_nw_cm_create_namespace(cmd, namespace):
-    # V2 parameter set
-    if namespace.source_resource is None:
-        return process_nw_cm_v2_create_namespace(cmd, namespace)
-
-    # V1 parameter set
-    return process_nw_cm_v1_create_namespace(cmd, namespace)
-
-
 def process_nw_cm_v2_endpoint_namespace(cmd, namespace):
     if hasattr(namespace, 'filter_type') or hasattr(namespace, 'filter_items'):
         filter_type, filter_items = namespace.filter_type, namespace.filter_items
@@ -2066,16 +2057,3 @@ def process_appgw_waf_policy_update(cmd, namespace):    # pylint: disable=unused
         raise CLIError('--rules and --rule-group-name must be provided at the same time')
     if rules is not None and rule_group_name is None:
         raise CLIError('--rules and --rule-group-name must be provided at the same time')
-
-
-def _is_bastion_connectable_resource(rid):
-    from azure.mgmt.core.tools import is_valid_resource_id
-    from azure.cli.command_modules.vm._vm_utils import is_valid_vm_resource_id, is_valid_vmss_resource_id
-
-    if is_valid_resource_id(rid):
-        if is_valid_vmss_resource_id(rid):
-            return True
-        if is_valid_vm_resource_id(rid):
-            return True
-
-    return False

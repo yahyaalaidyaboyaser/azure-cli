@@ -27,7 +27,7 @@ from azure.cli.command_modules.network._client_factory import (
     cf_service_tags, cf_private_link_services, cf_private_endpoint_types, cf_peer_express_route_circuit_connections,
     cf_virtual_router, cf_virtual_router_peering, cf_service_aliases, cf_bastion_hosts, cf_flow_logs,
     cf_private_dns_zone_groups, cf_load_balancer_backend_pools, cf_virtual_hub,
-    cf_virtual_hub_bgp_connection, cf_virtual_hub_bgp_connections, cf_custom_ip_prefixes)
+    cf_custom_ip_prefixes)
 from azure.cli.command_modules.network._util import (
     list_network_resource_property, get_network_resource_property_entry, delete_network_resource_property_entry,
     delete_lb_resource_property_entry)
@@ -48,8 +48,7 @@ from azure.cli.command_modules.network._validators import (
     process_ag_create_namespace, process_ag_http_listener_create_namespace, process_ag_listener_create_namespace, process_ag_settings_create_namespace, process_ag_http_settings_create_namespace,
     process_ag_rule_create_namespace, process_ag_routing_rule_create_namespace, process_ag_ssl_policy_set_namespace, process_ag_url_path_map_create_namespace,
     process_ag_url_path_map_rule_create_namespace, process_auth_create_namespace, process_nic_create_namespace,
-    process_lb_create_namespace, process_lb_frontend_ip_namespace,
-    process_nw_cm_create_namespace,
+    process_lb_create_namespace, process_lb_frontend_ip_namespace, process_nw_cm_v2_create_namespace,
     process_nw_cm_v2_endpoint_namespace, process_nw_cm_v2_test_configuration_namespace,
     process_nw_cm_v2_test_group, process_nw_cm_v2_output_namespace,
     process_nw_flow_log_set_namespace, process_nw_flow_log_create_namespace, process_nw_flow_log_show_namespace,
@@ -310,30 +309,6 @@ def load_command_table(self, _):
     network_virtual_hub_update_sdk = CliCommandType(
         operations_tmpl='azure.cli.command_modules.network.custom#{}',
         client_factory=cf_virtual_hub,
-        min_api='2020-07-01'
-    )
-
-    network_virtual_hub_bgp_connection_sdk = CliCommandType(
-        operations_tmpl='azure.mgmt.network.operations#VirtualHubBgpConnectionOperations.{}',
-        client_factory=cf_virtual_hub_bgp_connection,
-        min_api='2020-07-01'
-    )
-
-    network_virtual_hub_bgp_connection_update_sdk = CliCommandType(
-        operations_tmpl='azure.cli.command_modules.network.custom#{}',
-        client_factory=cf_virtual_hub_bgp_connection,
-        min_api='2020-07-01'
-    )
-
-    network_virtual_hub_bgp_connections_sdk = CliCommandType(
-        operations_tmpl='azure.mgmt.network.operations#VirtualHubBgpConnectionsOperations.{}',
-        client_factory=cf_virtual_hub_bgp_connections,
-        min_api='2020-07-01'
-    )
-
-    network_virtual_hub_bgp_connections_update_sdk = CliCommandType(
-        operations_tmpl='azure.cli.command_modules.network.custom#{}',
-        client_factory=cf_virtual_hub_bgp_connections,
         min_api='2020-07-01'
     )
 
@@ -1067,7 +1042,7 @@ def load_command_table(self, _):
         g.custom_command('run-configuration-diagnostic', 'run_network_configuration_diagnostic', client_factory=cf_network_watcher, min_api='2018-06-01', validator=process_nw_config_diagnostic_namespace)
 
     with self.command_group('network watcher connection-monitor', network_watcher_cm_sdk, client_factory=cf_connection_monitor, min_api='2018-01-01') as g:
-        g.custom_command('create', 'create_nw_connection_monitor', validator=process_nw_cm_create_namespace)
+        g.custom_command('create', 'create_nw_connection_monitor', validator=process_nw_cm_v2_create_namespace)
         g.command('delete', 'begin_delete')
         g.show_command('show', 'get')
         g.command('stop', 'begin_stop')
@@ -1356,31 +1331,7 @@ def load_command_table(self, _):
     with self.command_group('network routeserver', network_virtual_hub_sdk,
                             custom_command_type=network_virtual_hub_update_sdk) as g:
         g.custom_command('create', 'create_virtual_hub')
-        g.generic_update_command('update',
-                                 setter_name='virtual_hub_update_setter',
-                                 setter_type=network_virtual_hub_update_sdk,
-                                 custom_func_name='update_virtual_hub')
         g.custom_command('delete', 'delete_virtual_hub', supports_no_wait=True, confirmation=True)
-        g.show_command('show', 'get')
-        g.custom_command('list', 'list_virtual_hub')
-        g.wait_command('wait')
-
-    with self.command_group('network routeserver peering', network_virtual_hub_bgp_connection_sdk,
-                            custom_command_type=network_virtual_hub_bgp_connection_update_sdk) as g:
-        g.custom_command('create', 'create_virtual_hub_bgp_connection', supports_no_wait=True)
-        g.generic_update_command('update',
-                                 setter_name='virtual_hub_bgp_connection_update_setter',
-                                 setter_type=network_virtual_hub_bgp_connection_update_sdk,
-                                 custom_func_name='update_virtual_hub_bgp_connection')
-        g.custom_command('delete', 'delete_virtual_hub_bgp_connection', supports_no_wait=True, confirmation=True)
-        g.show_command('show', 'get')
-        g.wait_command('wait')
-
-    with self.command_group('network routeserver peering', network_virtual_hub_bgp_connections_sdk,
-                            custom_command_type=network_virtual_hub_bgp_connections_update_sdk) as g:
-        g.command('list', 'list')
-        g.custom_command('list-learned-routes', 'list_virtual_hub_bgp_connection_learned_routes')
-        g.custom_command('list-advertised-routes', 'list_virtual_hub_bgp_connection_advertised_routes')
     # endregion
 
     # region Bastion

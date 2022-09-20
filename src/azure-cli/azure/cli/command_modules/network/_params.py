@@ -370,7 +370,7 @@ def load_arguments(self, _):
             c.argument('address_pool', help='The name or ID of the backend address pool.',
                        completer=get_ag_subresource_completion_list('backend_address_pools'))
             c.argument('rule_type', help='The rule type (Basic, PathBasedRouting).')
-            c.argument('priority', type=int, help='Priority of the rule.')
+            c.argument('priority', type=int, help='Priority of the rule. Supported SKU tiers are Standard_v2, WAF_v2.')
 
     with self.argument_context('network application-gateway rule') as c:
         c.argument('http_listener', help='The name or ID of the HTTP listener.', completer=get_ag_subresource_completion_list('http_listeners'))
@@ -1347,19 +1347,6 @@ def load_arguments(self, _):
         c.argument('network_watcher_name', arg_type=ignore_type, options_list=['--__NETWORK_WATCHER_NAME'])
         c.argument('connection_monitor_name', name_arg_type, help='Connection monitor name.')
 
-    # connection monitor V1 parameter set
-    with self.argument_context('network watcher connection-monitor', arg_group='V1 Endpoint') as c:
-        c.argument('source_resource', help='Name or ID of the resource from which to originate traffic. '
-                                           'Currently only Virtual Machines are supported.')
-        c.argument('source_port', help='Port number from which to originate traffic.')
-        c.argument('dest_resource', help='Name of ID of the resource to receive traffic. '
-                                         'Currently only Virtual Machines are supported.')
-        c.argument('dest_port', help='Port number on which to receive traffic.')
-        c.argument('dest_address', help='The IP address or URI at which to receive traffic.')
-        c.argument('monitoring_interval', help='Monitoring interval in seconds.', type=int, default=60)
-        c.argument('do_not_start', action='store_true',
-                   help='Create the connection monitor but do not start it immediately.')
-
     nw_validator = get_network_watcher_from_location(remove=True, watcher_name='network_watcher_name', rg_name='resource_group_name')
     for scope in ['list', 'show', 'start', 'stop', 'delete', 'query']:
         with self.argument_context('network watcher connection-monitor {}'.format(scope)) as c:
@@ -2112,22 +2099,6 @@ def load_arguments(self, _):
                    min_api='2021-02-01')
 
     with self.argument_context('network routeserver create') as c:
-        c.argument('virtual_hub_name', id_part=None)
-
-    with self.argument_context('network routeserver peering') as c:
-        c.argument('virtual_hub_name', options_list=[
-            '--routeserver', c.deprecate(target='--vrouter-name', redirect='--routeserver', hide=True)
-        ], id_part='name', help='The name of the Route Server.')
-        c.argument('connection_name', options_list=['--name', '-n'], id_part='child_name_1',
-                   help='The name of the Route Server Peering')
-        c.argument('peer_asn', type=int, help='Peer ASN. Its range is from 1 to 4294967295.')
-        c.argument('peer_ip', help='Peer IP address.')
-
-    with self.argument_context('network routeserver peering create') as c:
-        c.argument('virtual_hub_name', id_part=None)
-        c.argument('connection_name', id_part=None)
-
-    with self.argument_context('network routeserver peering list') as c:
         c.argument('virtual_hub_name', id_part=None)
 
     for scope in ['vpn-connection', 'vnet-gateway', 'vnet-gateway vpn-client']:
