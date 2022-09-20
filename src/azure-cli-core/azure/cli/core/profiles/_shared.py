@@ -420,18 +420,26 @@ AD_HOC_API_VERSIONS = {
     },
     ResourceType.MGMT_APPSERVICE: {
         # Used by web_client_factory
+        # src/azure-cli/azure/cli/command_modules/appservice/custom.py:4343
         '_add_vnet_integration': '2021-01-01',
+        # src/azure-cli/azure/cli/command_modules/appservice/custom.py:3009
         '_AbstractStackRuntimeHelper': '2021-01-15',
+        # src/azure-cli/azure/cli/command_modules/appservice/custom.py:3865
         'list_consumption_locations': '2020-09-01',
+        # src/azure-cli/azure/cli/command_modules/appservice/custom.py:3871
         'list_locations': '2020-09-01'
     },
     ResourceType.MGMT_CONTAINERREGISTRY: {
-        # src/azure-cli/azure/cli/command_modules/acr/_client_factory.py
+        # src/azure-cli/azure/cli/command_modules/acr/_client_factory.py:8
         'VERSION_2019_05_01_PREVIEW': "2019-05-01-preview",
         'VERSION_2019_06_01_PREVIEW': "2019-06-01-preview",
         'VERSION_2020_11_01_PREVIEW': "2020-11-01-preview",
         'VERSION_2021_08_01_PREVIEW': "2021-08-01-preview",
         'VERSION_2022_02_01_PREVIEW': "2022-02-01-preview",
+    },
+    ResourceType.MGMT_CONTAINERSERVICE: {
+        # src/azure-cli/azure/cli/command_modules/acs/tests/latest/test_custom.py:50
+        'ManagedClusterAddonProfile': '2020-03-01',
     }
 }
 
