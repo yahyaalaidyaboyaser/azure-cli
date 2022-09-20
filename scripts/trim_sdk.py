@@ -57,10 +57,12 @@ def remove_unused_api_versions(resource_type):
     _LOGGER.info(f"Removing unused api folders for {resource_type.import_prefix}:")
     path = importlib.import_module(resource_type.import_prefix).__path__[0]
 
-    # Hard-coded API versions
-    #used_network_api_versions = set(AD_HOC_API_VERSIONS[ResourceType.MGMT_NETWORK].values())
-
     used_api_versions = set()
+
+    # Hard-coded API versions
+    if resource_type in AD_HOC_API_VERSIONS:
+        ad_hoc_api_versions = set(AD_HOC_API_VERSIONS[resource_type].values())
+        used_api_versions.update(ad_hoc_api_versions)
 
     # API versions in profile
     for profile in AZURE_API_PROFILES.values():
@@ -74,7 +76,7 @@ def remove_unused_api_versions(resource_type):
                 # default_api_version is in value.profile[None]
                 used_api_versions.update(value.profile.values())
 
-    # Normalize API version: 2019-02-01 -> v2019_02_01
+    # Convert API version to its folder format: 2019-02-01 -> v2019_02_01
     used_api_folders = {f"v{api.replace('-','_')}" for api in used_api_versions}
 
     # SDK has a set of versions imported in models.py.
@@ -140,8 +142,6 @@ def _get_biggest_sdks_to_trim():
         ResourceType.MGMT_CONTAINERREGISTRY,
         # /iothub
         ResourceType.MGMT_IOTHUB,
-        # /sql
-        ResourceType.MGMT_SQL,
     ]
 
     return resource_types
@@ -157,7 +157,7 @@ def main():
     print_folder_size(mgmt_sdk_dir)
 
     # Removed unused API versions
-    resource_types = _get_all_sdks_to_trim()
+    resource_types = _get_biggest_sdks_to_trim()
 
     for r in resource_types:
         remove_unused_api_versions(r)

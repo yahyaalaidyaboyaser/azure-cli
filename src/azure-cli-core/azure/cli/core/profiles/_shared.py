@@ -417,6 +417,13 @@ AD_HOC_API_VERSIONS = {
         'container_network': '2018-08-01',
         'appservice_network': '2020-04-01',
         'appservice_ensure_subnet': '2019-02-01'
+    },
+    ResourceType.MGMT_APPSERVICE: {
+        # Used by web_client_factory
+        '_add_vnet_integration': '2021-01-01',
+        '_AbstractStackRuntimeHelper': '2021-01-15',
+        'list_consumption_locations': '2020-09-01',
+        'list_locations': '2020-09-01'
     }
 }
 
