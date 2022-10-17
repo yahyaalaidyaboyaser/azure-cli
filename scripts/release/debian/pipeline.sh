@@ -4,7 +4,7 @@
 # This script assumes the Azure CLI is installed and logged in.
 
 set -exv
-
+env
 : ${DISTRO:?"DISTRO is not set"}
 : ${DISTRO_BASE_IMAGE:?"DISTRO_BASE_IMAGE is not set"}
 
