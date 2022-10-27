@@ -5,14 +5,6 @@
 # pylint: disable=wrong-import-position
 from azure.cli.core.util import is_spython
 
-if is_spython():
-    import sys
-
-    from azure.cli.core.vendored_sdks import dummy_msal_extensions
-
-    sys.modules['msal_extensions'] = dummy_msal_extensions
-
-
 import timeit
 # Log the start time
 start_time = timeit.default_timer()
