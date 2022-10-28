@@ -166,7 +166,7 @@ rm %CLI_SRC%\azure-cli\requirements.py3.windows-spython.txt
 %PYTHON_EXE% -m pip install "%MISC_DIR%\%WINDOWS_HTTP_FILENAME%" --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
 
 @REM Install portalocker free version msal_extensions
-%PYTHON_EXE% -m pip install https://github.com/AzureAD/microsoft-authentication-extensions-for-python/archive/optional-portalocker.zip --no-warn-script-location --ignore-installed --target %SPYTHON_LIB%
+%PYTHON_EXE% -m pip install git+https://github.com/AzureAD/microsoft-authentication-extensions-for-python.git@refs/pull/117/head --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
 
 REM Remove forbidden packages in SPython. (remove requests after calling remove_unused_api_versions.py)
 pushd %SPYTHON_LIB%
