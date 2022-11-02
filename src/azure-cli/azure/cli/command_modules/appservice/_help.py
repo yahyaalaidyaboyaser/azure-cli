@@ -201,10 +201,18 @@ examples:
 helps['functionapp config appsettings set'] = """
 type: command
 short-summary: Update a function app's settings.
+parameters:
+  - name: --settings
+    short-summary: Space-separated appsettings in KEY=VALUE format. Use @{file} to load from a file.
+  - name: --slot-settings
+    short-summary: Space-separated appsettings in KEY=VALUE format. Use @{file} to load from a file. Given setting are added to the configuration and marked as Deployment slot setting by default.
 examples:
   - name: Update a function app's settings.
     text: |
         az functionapp config appsettings set --name MyFunctionApp --resource-group MyResourceGroup --settings "AzureWebJobsStorage=$storageConnectionString"
+  - name: Set using both key-value pair and a json file with more settings.
+    text: >
+        az functionapp config appsettings set -g MyResourceGroup -n MyUniqueApp --settings mySetting=value @moreSettings.json
 """
 
 helps['functionapp config container'] = """
@@ -603,6 +611,35 @@ examples:
   - name: Set FTP and git deployment credentials for all apps.
     text: >
         az functionapp deployment user set --user-name MyUserName
+"""
+
+helps['functionapp deployment github-actions'] = """
+type: group
+short-summary: Configure GitHub Actions for a functionapp
+"""
+
+helps['functionapp deployment github-actions add'] = """
+type: command
+short-summary: Add a GitHub Actions workflow file to the specified repository. The workflow will build and deploy your app to the specified functionapp.
+examples:
+  - name: Add GitHub Actions to a specified repository, providing personal access token
+    text: >
+        az functionapp deployment github-actions add --repo "githubUser/githubRepo" -g MyResourceGroup -n MyFunctionapp --token MyPersonalAccessToken
+  - name: Add GitHub Actions to a specified repository, using interactive method of retrieving personal access token
+    text: >
+        az functionapp deployment github-actions add --repo "githubUser/githubRepo" -g MyResourceGroup -n MyFunctionapp --login-with-github
+"""
+
+helps['functionapp deployment github-actions remove'] = """
+type: command
+short-summary: Remove and disconnect the GitHub Actions workflow file from the specified repository.
+examples:
+  - name: Remove GitHub Actions from a specified repository, providing personal access token
+    text: >
+        az functionapp deployment github-actions remove --repo "githubUser/githubRepo" -g MyResourceGroup -n MyFunctionapp --token MyPersonalAccessToken
+  - name: Remove GitHub Actions from a specified repository, using interactive method of retrieving personal access token
+    text: >
+        az functionapp deployment github-actions remove --repo "githubUser/githubRepo" -g MyResourceGroup -n MyFunctionapp --login-with-github
 """
 
 helps['functionapp function'] = """
@@ -1064,6 +1101,11 @@ examples:
 helps['webapp config appsettings set'] = """
 type: command
 short-summary: Set a web app's settings.
+parameters:
+  - name: --settings
+    short-summary: Space-separated appsettings in KEY=VALUE format. Use @{file} to load from a file.
+  - name: --slot-settings
+    short-summary: Space-separated appsettings in KEY=VALUE format. Use @{file} to load from a file. Given setting are added to the configuration and marked as Deployment slot setting by default.
 examples:
   - name: Set the default NodeJS version to 6.9.1 for a web app.
     text: >
@@ -1071,11 +1113,6 @@ examples:
   - name: Set using both key-value pair and a json file with more settings.
     text: >
         az webapp config appsettings set -g MyResourceGroup -n MyUniqueApp --settings mySetting=value @moreSettings.json
-parameters:
-  - name: --settings
-    short-summary: Space-separated appsettings in KEY=VALUE format. Use @{file} to load from a file.
-  - name: --slot-settings
-    short-summary: Space-separated appsettings in KEY=VALUE format. Use @{file} to load from a file. Given setting are added to the configuration and marked as Deployment slot setting by default.
 """
 
 helps['webapp config backup'] = """
@@ -2053,9 +2090,9 @@ examples:
   - name: Add a regional virtual network integration to a webapp
     text: az webapp vnet-integration add -g MyResourceGroup -n MyWebapp --vnet MyVnetName --subnet MySubnetName -s [slot]
   - name: Add a regional virtual network integration to a webapp using vnet resource id
-    text: az webapp vnet-integration add -g MyResourceGroup -n MyWebapp --vnet '/subscriptions/[sub id]/resourceGroups/[MyResourceGroup]/providers/Microsoft.Network/virtualNetworks/[MyVnetName]' --subnet MySubnetName -s [slot]
+    text: az webapp vnet-integration add -g MyResourceGroup -n MyWebapp --vnet /subscriptions/[SubscriptionId]/resourceGroups/[MyResourceGroup]/providers/Microsoft.Network/virtualNetworks/[MyVnetName] --subnet MySubnetName -s [slot]
   - name: Add a regional virtual network integration to a webapp using subnet resource id
-    text: az webapp vnet-integration add -g MyResourceGroup -n MyWebapp --vnet MyVnetName --subnet '/subscriptions/[sub id]/resourceGroups/[MyResourceGroup]/providers/Microsoft.Network/virtualNetworks/[MyVnetName]/subnets/MySubnetName' -s [slot]
+    text: az webapp vnet-integration add -g MyResourceGroup -n MyWebapp --vnet MyVnetName --subnet /subscriptions/[SubscriptionId]/resourceGroups/[MyResourceGroup]/providers/Microsoft.Network/virtualNetworks/[MyVnetName]/subnets/MySubnetName -s [slot]
 """
 
 helps['webapp vnet-integration list'] = """

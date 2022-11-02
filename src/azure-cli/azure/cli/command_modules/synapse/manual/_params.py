@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
-# pylint: disable=too-many-statements, line-too-long, too-many-branches
+# pylint: disable=too-many-statements, line-too-long, too-many-branches, option-length-too-long
 from knack.arguments import CLIArgumentType
 from argcomplete import FilesCompleter
 from azure.mgmt.synapse.models import TransparentDataEncryptionStatus, SecurityAlertPolicyState, BlobAuditingPolicyState
@@ -101,6 +101,7 @@ def load_arguments(self, _):
             c.argument('root_folder', arg_group=repository_arg_group, help='The name of the folder to the location of your Azure synapse JSON resources are imported. Default is /')
             c.argument('project_name', arg_group=repository_arg_group, help='The project name to which you are connecting.')
             c.argument('tenant_id', arg_group=repository_arg_group, help='The tenant id used to connect Azure devops')
+            c.argument('last_commit_id', arg_group=repository_arg_group, help='The last commit ID.')
 
     with self.argument_context('synapse workspace create') as c:
         c.argument('location', get_location_type(self.cli_ctx), validator=get_default_location_from_resource_group)
@@ -116,6 +117,8 @@ def load_arguments(self, _):
         c.argument('prevent_data_exfiltration', arg_type=get_three_state_flag(),
                    help='The flag indicates whether enable data exfiltration.', options_list=['--prevent-exfiltration', '--prevent-data-exfiltration'])
         c.argument('key_identifier', help='The customer-managed key used to encrypt all data at rest in the workspace. Key identifier should be in the format of: https://{keyvaultname}.vault.azure.net/keys/{keyname}.', options_list=['--key-identifier', '--cmk'])
+        c.argument('managed_resource_group_name', options_list=['--managed-rg-name'],
+                   help=' Workspace managed resource group. The resource group name uniquely identifies the resource group within the user subscriptionId.')
 
     with self.argument_context('synapse workspace check-name') as c:
         c.argument('name', arg_type=name_type, help='The name you wanted to check.')
@@ -168,6 +171,12 @@ def load_arguments(self, _):
         # Spark config file
         c.argument('spark_config_file_path', arg_group='Environment Configuration', help='Absolute path of Spark pool properties configuration file.')
 
+        # Dynamic executor allocation
+        c.argument('enable_dynamic_executor_allocation', arg_type=get_three_state_flag(), arg_group='DynamicExecutor',
+                   options_list=['--enable-dynamic-exec'], help='Indicates whether Dynamic Executor Allocation is enabled or not.')
+        c.argument('max_executors', type=int, arg_group='DynamicExecutor', help='The maximum number of executors alloted.')
+        c.argument('min_executors', type=int, arg_group='DynamicExecutor', help='The minimum number of executors alloted.')
+
         c.argument('tags', arg_type=tags_type)
 
     with self.argument_context('synapse spark pool update') as c:
@@ -201,6 +210,12 @@ def load_arguments(self, _):
 
         # Spark config file
         c.argument('spark_config_file_path', arg_group='Environment Configuration', help='Absolute path of Spark pool properties configuration file.')
+
+        # Dynamic executor allocation
+        c.argument('enable_dynamic_executor_allocation', arg_type=get_three_state_flag(), arg_group='DynamicExecutor',
+                   options_list=['--enable-dynamic-exec'], help='Indicates whether Dynamic Executor Allocation is enabled or not.')
+        c.argument('max_executors', type=int, arg_group='DynamicExecutor', help='The maximum number of executors alloted.')
+        c.argument('min_executors', type=int, arg_group='DynamicExecutor', help='The minimum number of executors alloted.')
 
     # synapse sql pool
     with self.argument_context('synapse sql pool') as c:
@@ -1100,6 +1115,11 @@ def load_arguments(self, _):
         c.argument('workspace_name', arg_type=workspace_name_arg_type, help='The name of the workspace')
         c.argument('output_folder', type=str, help='The name of the output folder')
         c.argument('script_name', arg_type=name_type, help='The name of the KQL script.')
+
+    for scope in ['enable', 'disable']:
+        with self.argument_context('synapse ad-only-auth ' + scope) as c:
+            c.argument('workspace_name', arg_type=workspace_name_arg_type, help='The name of the workspace')
+            c.argument('resource_group_name', resource_group_name_type)
 
     # synapse link connections
     with self.argument_context('synapse link-connection list') as c:

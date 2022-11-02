@@ -20,8 +20,7 @@ from azure.cli.core.azclierror import (ValidationError, ArgumentUsageError, Requ
 from azure.cli.core.commands.validators import (
     get_default_location_from_resource_group, validate_file_or_dict, validate_parameter_set, validate_tags)
 from azure.cli.core.util import (hash_string, DISALLOWED_USER_NAMES, get_default_admin_username)
-from azure.cli.command_modules.vm._vm_utils import (
-    check_existence, get_target_network_api, get_storage_blob_uri, list_sku_info)
+from azure.cli.command_modules.vm._vm_utils import (check_existence, get_storage_blob_uri, list_sku_info)
 from azure.cli.command_modules.vm._template_builder import StorageProfile
 from azure.cli.core import keys
 from azure.core.exceptions import ResourceNotFoundError
@@ -1311,6 +1310,17 @@ def _enable_msi_for_trusted_launch(namespace):
             namespace.assign_identity.append(MSI_LOCAL_ID)
 
 
+def _validate_trusted_launch(namespace):
+    if not namespace.security_type or namespace.security_type.lower() != 'trustedlaunch':
+        return
+
+    if namespace.enable_vtpm is None:
+        namespace.enable_vtpm = True
+
+    if namespace.enable_secure_boot is None:
+        namespace.enable_secure_boot = True
+
+
 def _validate_vm_vmss_set_applications(cmd, namespace):  # pylint: disable=unused-argument
     if namespace.application_configuration_overrides and \
        len(namespace.application_version_ids) != len(namespace.application_configuration_overrides):
@@ -1382,6 +1392,7 @@ def process_vm_create_namespace(cmd, namespace):
 
     if namespace.secrets:
         _validate_secrets(namespace.secrets, namespace.os_type)
+    _validate_trusted_launch(namespace)
     _validate_vm_vmss_msi(cmd, namespace)
     if namespace.boot_diagnostics_storage:
         namespace.boot_diagnostics_storage = get_storage_blob_uri(cmd.cli_ctx, namespace.boot_diagnostics_storage)
@@ -1503,9 +1514,7 @@ def _validate_vmss_create_load_balancer_or_app_gateway(cmd, namespace):
                     if len(lb.inbound_nat_pools) > 1:
                         raise CLIError("Multiple possible values found for '{0}': {1}\nSpecify '{0}' explicitly.".format(  # pylint: disable=line-too-long
                             '--nat-pool-name', ', '.join([n.name for n in lb.inbound_nat_pools])))
-                    if not lb.inbound_nat_pools:  # Associated scaleset will be missing ssh/rdp, so warn here.
-                        logger.warning("No inbound nat pool was configured on '%s'", namespace.load_balancer)
-                    else:
+                    if lb.inbound_nat_pools:
                         namespace.nat_pool_name = lb.inbound_nat_pools[0].name
                 logger.debug("using specified existing load balancer '%s'", namespace.load_balancer)
             else:
@@ -1537,7 +1546,7 @@ def _validate_vmss_create_load_balancer_or_app_gateway(cmd, namespace):
 def get_network_client(cli_ctx):
     from azure.cli.core.profiles import ResourceType
     from azure.cli.core.commands.client_factory import get_mgmt_service_client
-    return get_mgmt_service_client(cli_ctx, ResourceType.MGMT_NETWORK, api_version=get_target_network_api(cli_ctx))
+    return get_mgmt_service_client(cli_ctx, ResourceType.MGMT_NETWORK)
 
 
 def get_network_lb(cli_ctx, resource_group_name, lb_name):
@@ -1558,6 +1567,11 @@ def process_vmss_create_namespace(cmd, namespace):
         if namespace.orchestration_mode.lower() != flexible_str.lower():
             raise InvalidArgumentValueError('usage error: --os-disk-delete-option/--data-disk-delete-option is only'
                                             ' available for VMSS with flexible orchestration mode')
+
+    if namespace.regular_priority_count is not None or namespace.regular_priority_percentage is not None:
+        if namespace.orchestration_mode.lower() != flexible_str.lower():
+            raise InvalidArgumentValueError('usage error: --regular-priority-count/--regular-priority-percentage is'
+                                            ' only available for VMSS with flexible orchestration mode')
 
     if namespace.orchestration_mode.lower() == flexible_str.lower():
 
@@ -1586,6 +1600,7 @@ def process_vmss_create_namespace(cmd, namespace):
         if namespace.vm_sku and not namespace.image:
             raise ArgumentUsageError('usage error: please specify the --image when you want to specify the VM SKU')
 
+        _validate_trusted_launch(namespace)
         if namespace.image:
 
             if namespace.vm_sku is None:
@@ -1675,6 +1690,7 @@ def process_vmss_create_namespace(cmd, namespace):
     _validate_vmss_create_nsg(cmd, namespace)
     _validate_vm_vmss_accelerated_networking(cmd.cli_ctx, namespace)
     _validate_vm_vmss_create_auth(namespace, cmd)
+    _validate_trusted_launch(namespace)
     _validate_vm_vmss_msi(cmd, namespace)
     _validate_proximity_placement_group(cmd, namespace)
     _validate_vmss_terminate_notification(cmd, namespace)
@@ -2139,9 +2155,8 @@ def _disk_encryption_set_format(cmd, namespace, name):
 
 
 def process_ppg_create_namespace(namespace):
-    """
-    The availability zone can be provided only when an intent is provided
-    """
+    validate_tags(namespace)
+    # The availability zone can be provided only when an intent is provided
     if namespace.zone and not namespace.intent_vm_sizes:
         raise RequiredArgumentMissingError('The --zone can be provided only when an intent is provided. '
                                            'Please use parameter --intent-vm-sizes to specify possible sizes of '
@@ -2150,6 +2165,7 @@ def process_ppg_create_namespace(namespace):
 
 
 def process_image_version_create_namespace(cmd, namespace):
+    validate_tags(namespace)
     process_gallery_image_version_namespace(cmd, namespace)
     process_image_resource_id_namespace(namespace)
 # endregion
