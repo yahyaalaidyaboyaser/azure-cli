@@ -12,12 +12,15 @@ pr:
     include:
     - '*'
 
+variables:
+- template: ${{ variables.Pipeline.Workspace }}/.azure-pipelines/templates/variables.yml
+
 jobs:
 - job: MeasureMsiInstallation
   timeoutInMinutes: 300
   displayName: Measure Windows MSI Installation
   pool:
-    vmImage: 'windows-2019'
+    name: ${{ variables.windows_pool }}
   strategy:
     matrix:
       Instance1:
