@@ -5,7 +5,7 @@
 @IF EXIST "%~dp0\..\python.exe" (
   SET AZ_INSTALLER=MSI
   SET IS_SPYTHON=true
-  "%~dp0\..\python.exe" "%~dp0\..\Lib\site-packages\azure\cli\__main__.pyc" %*
+  "%~dp0\..\python.exe" "%~dp0\..\Lib\azure\cli\__main__.pyc" %*
 ) ELSE (
   echo Failed to load python executable.
   exit /b 1
