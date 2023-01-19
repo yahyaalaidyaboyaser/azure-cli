@@ -25,7 +25,7 @@ set WIX_DOWNLOAD_URL="https://azurecliprod.blob.core.windows.net/msi/wix310-bina
 set PYTHON_DOWNLOAD_URL="https://www.python.org/ftp/python/%PYTHON_VERSION%/python-%PYTHON_VERSION%-embed-amd64.zip"
 set NUGET_DOWNLOAD_URL="https://dist.nuget.org/win-x86-commandline/v6.2.1/nuget.exe"
 set BASE_MISC_URL=https://azurecliedge.blob.core.windows.net/saw
-set WINDOWS_HTTP_FILENAME=windows_http-0.22.203.1-cp310-cp310-win_amd64.whl
+set WINDOWS_HTTP_FILENAME=windows_http-0.23.017.1-cp310-cp310-win_amd64.whl
 set SPYTHON_FILENAME=Microsoft.Internal.SPython.win32.%SPYTHON_VERSION%.nupkg
 
 REM https://pip.pypa.io/en/stable/installation/#get-pip-py
