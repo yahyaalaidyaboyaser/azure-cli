@@ -50,11 +50,10 @@ RUN curl -L https://github.com/jmespath/jp/releases/download/${JP_VERSION}/jp-li
  && chmod +x /usr/local/bin/jp
 
 WORKDIR azure-cli
-COPY . /azure-cli
 
 # 1. Build packages and store in tmp dir
 # 2. Install the cli and the other command modules that weren't included
-RUN ./scripts/install_full.sh \
+RUN --mount=type=secret,id=azure,target=/azure-cli ./scripts/install_full.sh \
  && cat /azure-cli/az.completion > ~/.bashrc \
  && runDeps="$( \
     scanelf --needed --nobanner --recursive /usr/local \
@@ -68,8 +67,7 @@ RUN ./scripts/install_full.sh \
 WORKDIR /
 
 # Remove CLI source code from the final image and normalize line endings.
-RUN rm -rf ./azure-cli && \
-    dos2unix /root/.bashrc /usr/local/bin/az
+RUN dos2unix /root/.bashrc /usr/local/bin/az
 
 ENV AZ_INSTALLER=DOCKER
 CMD bash
