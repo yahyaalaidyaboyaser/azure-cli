@@ -17,3 +17,4 @@ src/azure-cli/azure/cli/command_modules/*/tests
 # Exclude python cache
 **/*.pyc
 **/__pycache__
+!azure-cli.tar.gz
