@@ -42,26 +42,27 @@ WORKDIR azure-cli
 
 # 1. Build packages and store in tmp dir
 # 2. Install the cli and the other command modules that weren't included
-RUN --mount=type=bind,target=/azure-cli.tar.gz,source=./azure-cli.tar.gz tar xf /azure-cli.tar.gz  --directory=/azure-cli && apk add --no-cache bash openssh ca-certificates jq curl openssl openssl1.1-compat perl git zip \
-                                                    && apk add --no-cache --virtual .build-deps gcc make openssl1.1-compat-dev libffi-dev musl-dev linux-headers \
-                                                    && apk add --no-cache libintl icu-libs libc6-compat \
-                                                    && apk add --no-cache bash-completion \
-                                                    && update-ca-certificates \
-                                                    && curl -L https://github.com/jmespath/jp/releases/download/${JP_VERSION}/jp-linux-amd64 -o /usr/local/bin/jp \
-                                                        && chmod +x /usr/local/bin/jp \
-                                                    && /azure-cli/scripts/install_full.sh \
- && cat /azure-cli/az.completion > ~/.bashrc \
- && runDeps="$( \
-    scanelf --needed --nobanner --recursive /usr/local \
-        | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-        | sort -u \
-        | xargs -r apk info --installed \
-        | sort -u \
-    )" \
- && apk add --virtual .rundeps $runDeps \
- && apk del .build-deps \
- && rm -rf /azure-cli \
- && rm -rf `pip cache dir`
+RUN --mount=type=bind,target=/azure-cli.tar.gz,source=./azure-cli.tar.gz set -e; tar xf /azure-cli.tar.gz  --directory=/azure-cli ; apk add --no-cache bash openssh ca-certificates jq curl openssl openssl1.1-compat perl git zip ; \
+    apk add --no-cache --virtual .build-deps gcc make openssl1.1-compat-dev libffi-dev musl-dev linux-headers ;\
+    apk add --no-cache libintl icu-libs libc6-compat; \
+    apk add --no-cache bash-completion; \
+    update-ca-certificates; \
+    curl -L https://github.com/jmespath/jp/releases/download/${JP_VERSION}/jp-linux-amd64 -o /usr/local/bin/jp;chmod +x /usr/local/bin/jp; \
+    /azure-cli/scripts/install_full.sh; \
+    cat /azure-cli/az.completion > ~/.bashrc ; \
+    runDeps="$( \
+       scanelf --needed --nobanner --recursive /usr/local \
+           | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+           | sort -u \
+           | xargs -r apk info --installed \
+           | sort -u \
+       )" ; \
+    apk add --virtual .rundeps $runDeps; \
+    python /azure-cli/scripts/trim_sdk.py; \
+#    apk del .build-deps;\
+    pip cache purge; \
+    find find /usr/local -name __pycache__ | xargs rm -rf; \
+    rm -rf /azure-cli;
 
 WORKDIR /
 
