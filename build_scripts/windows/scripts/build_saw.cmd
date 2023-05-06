@@ -13,12 +13,12 @@ if "%CLI_VERSION%"=="" (
     echo Please set the CLI_VERSION environment variable, e.g. 2.0.13
     goto ERROR
 )
-if %BLOB_SAS%=="" (
+if "%BLOB_SAS%"=="" (
     echo Please set the BLOB_SAS environment variable
     goto ERROR
 )
 set PYTHON_VERSION=3.10.5
-set SPYTHON_VERSION=3.10.22251.3
+set SPYTHON_VERSION=3.10.23131.3
 
 set WIX_DOWNLOAD_URL="https://azurecliprod.blob.core.windows.net/msi/wix310-binaries-mirror.zip"
 @REM windows-http only support amd64
@@ -63,8 +63,8 @@ REM download wheel
 if not exist %MISC_DIR% (
     mkdir %MISC_DIR%
     pushd %MISC_DIR%
-    curl --output %WINDOWS_HTTP_FILENAME% %BASE_MISC_URL%/%WINDOWS_HTTP_FILENAME%?%BLOB_SAS%
-    curl --output %SPYTHON_FILENAME% %BASE_MISC_URL%/%SPYTHON_FILENAME%?%BLOB_SAS%
+    curl --output %WINDOWS_HTTP_FILENAME% --fail "%BASE_MISC_URL%/%WINDOWS_HTTP_FILENAME%?%BLOB_SAS%"
+    curl --output %SPYTHON_FILENAME% --fail "%BASE_MISC_URL%/%SPYTHON_FILENAME%?%BLOB_SAS%"
     popd
 )
 
