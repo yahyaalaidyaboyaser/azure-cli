@@ -25,7 +25,7 @@ parameters:
     pool: pool-windows-2019
     vmImage:
   - name: macos12
-    pool: Default
+    pool:
     vmImage: macOS-12
 
 #schedules:
