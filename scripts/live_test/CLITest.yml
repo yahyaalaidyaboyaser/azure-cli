@@ -19,14 +19,14 @@ parameters:
   type: object
   default:
   - name: ubuntu2004
-    type: name
     pool: pool-ubuntu-2004
+    vmImage:
   - name: window2019
-    type: name
     pool: pool-windows-2019
+    vmImage:
   - name: macos12
-    type: vmImage
-    pool: macOS-12
+    pool: Default
+    vmImage: macOS-12
 
 #schedules:
 #- cron: "0 18 * * 5"
@@ -43,19 +43,20 @@ jobs:
   # Sometimes the live test will be stuck forever, so the timeout cannot be set to 0, it is recommended to set it to twice the maximum time
   timeoutInMinutes: 600
   pool:
-    $(type): $(pool)
+    name: $(pool)
+    vmImage: $(vmImage)
   strategy:
     maxParallel: 20
     matrix:
       ${{ each plat in parameters.platforms }}:
-        advisor ${{ plat.name }}:
+        advisor-${{ plat.name }}:
           Target: advisor
-          type: ${{ plat.type }}
           pool: ${{ plat.pool }}
-        aro ${{ plat.name }}:
+          vmImage: ${{ plat.vmImage }}
+        aro-${{ plat.name }}:
           Target: aro
-          type: ${{ plat.type }}
           pool: ${{ plat.pool }}
+          vmImage: ${{ plat.vmImage }}
 #      acr:
 #        Target: acr
 #      acs:
