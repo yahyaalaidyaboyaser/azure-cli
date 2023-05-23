@@ -48,11 +48,11 @@ jobs:
     maxParallel: 20
     matrix:
       ${{ each plat in parameters.platforms }}:
-        advisor:
+        advisor ${{ plat.name }}:
           Target: advisor
           type: ${{ plat.type }}
           pool: ${{ plat.pool }}
-        aro:
+        aro ${{ plat.name }}:
           Target: aro
           type: ${{ plat.type }}
           pool: ${{ plat.pool }}
