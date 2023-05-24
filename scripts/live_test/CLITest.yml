@@ -488,7 +488,13 @@ jobs:
         fi
 
         python -m venv env
-        source env/bin/activate
+        if["$(uname)"=="Darwin"];then
+          source env/bin/activate
+        elif["$(expr substr $(uname -s) 1 5)"=="Linux"];then
+          source env/bin/activate
+        elif["$(expr substr $(uname -s) 1 5)"=="MINGW"];then
+          source env/Scripts/activate
+        fi
         pip install azdev
         # git clone https://github.com/Azure/azure-cli-dev-tools.git
         # git clone -b fix https://github.com/qwordy/azure-cli-dev-tools.git
@@ -510,10 +516,10 @@ jobs:
         echo ${FinalTarget}
 
         # This helps detect issues in CI if a used SDK API version is deleted by the below script.
-        python $CLI_REPO_PATH/scripts/trim_sdk.py
+        python $(System.DefaultWorkingDirectory)/scripts/trim_sdk.py
 
         # Compact aaz folders of modules
-        python /mnt/vss/_work/1/s/scripts/compact_aaz.py
+        python $(System.DefaultWorkingDirectory)/scripts/compact_aaz.py
 
         az -v
         # az login -u azureclilivetest@azuresdkteam.onmicrosoft.com -p $(AZURECLITESTPASSWORD)
@@ -521,7 +527,7 @@ jobs:
         az account set -s $(AZURECLITESTSUBSCRIPTIONID)
         
         # Clean resources
-        python /mnt/vss/_work/1/s/scripts/live_test/clean_policy.py
+        python $(System.DefaultWorkingDirectory)/scripts/live_test/clean_policy.py
 
         # Whether commit changes
         if [[ "$(USER_USERNAME)" != "" && "$(USER_TOKEN)" != "" ]]; then
@@ -555,7 +561,7 @@ jobs:
 
         echo "Send data to kusto db!"
         pip install azure-kusto-data azure-kusto-ingest bs4
-        python /mnt/vss/_work/1/s/scripts/live_test/send_to_kusto.py "$(KUSTO_CLUSTER)" "$(KUSTO_CLIENT_ID)" "$(KUSTO_CLIENT_SECRET)" "$(KUSTO_TENANT_ID)" "$(KUSTO_DATABASE)" "$(KUSTO_TABLE)" "$(Target)" "$(Build.BuildId)" "$(USER_TARGET)"
+        python $(System.DefaultWorkingDirectory)/scripts/live_test/send_to_kusto.py "$(KUSTO_CLUSTER)" "$(KUSTO_CLIENT_ID)" "$(KUSTO_CLIENT_SECRET)" "$(KUSTO_TENANT_ID)" "$(KUSTO_DATABASE)" "$(KUSTO_TABLE)" "$(Target)" "$(Build.BuildId)" "$(USER_TARGET)"
 
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
     - task: PublishTestResults@2
@@ -633,6 +639,6 @@ jobs:
         az account set -s $(AZURECLITESTSUBSCRIPTIONID)
         echo "set account"
         echo "send email to grid"
-        python /mnt/vss/_work/1/s/scripts/live_test/sendemail.py "$(SENDGRID_KEY)" "$(Build.BuildId)" "$(USER_REPO)" "$(USER_BRANCH)" "$(USER_TARGET)" "$(USER_LIVE)" "$(System.ArtifactsDirectory)" "$(Build.RequestedForEmail)" "$(ACCOUNT_KEY)" "$commit_id"
-        python /mnt/vss/_work/1/s/scripts/live_test/clean.py
-        # python /mnt/vss/_work/1/s/scripts/live_test/upload.py "$(System.ArtifactsDirectory)" "$(ACCOUNT_KEY)" "$(USER_LIVE)"
+        python $(System.DefaultWorkingDirectory)/scripts/live_test/sendemail.py "$(SENDGRID_KEY)" "$(Build.BuildId)" "$(USER_REPO)" "$(USER_BRANCH)" "$(USER_TARGET)" "$(USER_LIVE)" "$(System.ArtifactsDirectory)" "$(Build.RequestedForEmail)" "$(ACCOUNT_KEY)" "$commit_id"
+        python $(System.DefaultWorkingDirectory)/scripts/live_test/clean.py
+        # python $(System.DefaultWorkingDirectory)/scripts/live_test/upload.py "$(System.ArtifactsDirectory)" "$(ACCOUNT_KEY)" "$(USER_LIVE)"
