@@ -488,11 +488,11 @@ jobs:
         fi
 
         python -m venv env
-        if["$(uname)"=="Darwin"];then
+        if [ "$(uname)"=="Darwin" ]; then
           source env/bin/activate
-        elif["$(expr substr $(uname -s) 1 5)"=="Linux"];then
+        elif [ "$(expr substr $(uname -s) 1 5)"=="Linux" ]; then
           source env/bin/activate
-        elif["$(expr substr $(uname -s) 1 5)"=="MINGW"];then
+        elif [ "$(expr substr $(uname -s) 1 5)"=="MINGW" ]; then
           source env/Scripts/activate
         fi
         pip install azdev
