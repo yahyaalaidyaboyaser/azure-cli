@@ -36,13 +36,14 @@ KUSTO_TABLE = sys.argv[6]
 TARGET = sys.argv[7]
 BUILDID = sys.argv[8]
 USER_TARGET = sys.argv[9]
+OUTPUT_DIR = sys.argv[10]
 
 
 def generate_csv_file():
     logger.warning('Start generate csv file for {TARGET}.'.format(TARGET=TARGET))
     data = []
-    parallel_file = f'/mnt/vss/_work/1/{TARGET}.report.parallel.html'
-    sequential_file = f'/mnt/vss/_work/1/{TARGET}.report.sequential.html'
+    parallel_file = f'{OUTPUT_DIR}/{TARGET}.report.parallel.html'
+    sequential_file = f'{OUTPUT_DIR}/{TARGET}.report.sequential.html'
 
     def _get_data(html_file):
         data = []
@@ -82,7 +83,7 @@ def generate_csv_file():
     data.extend(_get_data(parallel_file))
     data.extend(_get_data(sequential_file))
 
-    with open(f'/mnt/vss/_work/1/{TARGET}.csv', mode='w', newline='') as file:
+    with open(f'{OUTPUT_DIR}/{TARGET}.csv', mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data)
     logger.warning('Finish generate csv file for {TARGET}.'.format(TARGET=TARGET))
@@ -104,7 +105,7 @@ def send_to_kusto():
         )
 
         # ingest from file
-        result = client.ingest_from_file(f"/mnt/vss/_work/1/{TARGET}.csv", ingestion_properties=ingestion_props)
+        result = client.ingest_from_file(f"{OUTPUT_DIR}/{TARGET}.csv", ingestion_properties=ingestion_props)
         # Inspect the result for useful information, such as source_id and blob_url
         print(repr(result))
         logger.info('Finsh send csv data to kusto db for {}.'.format(TARGET))
