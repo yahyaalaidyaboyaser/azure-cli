@@ -498,6 +498,7 @@ jobs:
         python -m venv env
         if [ "$(uname)"=="Darwin" ]; then
           source env/bin/activate
+          export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
         elif [ "$(expr substr $(uname -s) 1 5)"=="Linux" ]; then
           source env/bin/activate
         elif [ "$(expr substr $(uname -s) 1 5)"=="MINGW" ]; then
