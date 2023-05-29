@@ -502,7 +502,7 @@ jobs:
         elif [ "$(expr substr $(uname -s) 1 5)"=="Linux" ]; then
           source env/bin/activate
         elif [ "$(expr substr $(uname -s) 1 5)"=="MINGW" ]; then
-          ./env/Scripts/activate
+          source env/Scripts/activate
         fi
         pip install azdev
         # git clone https://github.com/Azure/azure-cli-dev-tools.git
@@ -570,7 +570,7 @@ jobs:
 
         echo "Send data to kusto db!"
         pip install azure-kusto-data azure-kusto-ingest bs4
-        python $workDir/s/scripts/live_test/send_to_kusto.py "$(KUSTO_CLUSTER)" "$(KUSTO_CLIENT_ID)" "$(KUSTO_CLIENT_SECRET)" "$(KUSTO_TENANT_ID)" "$(KUSTO_DATABASE)" "$(KUSTO_TABLE)" "$(Target)" "$(Build.BuildId)" "$(USER_TARGET)" "$workDir"
+        python $workDir/s/scripts/live_test/send_to_kusto.py "$(KUSTO_CLUSTER)" "$(KUSTO_CLIENT_ID)" "$(KUSTO_CLIENT_SECRET)" "$(KUSTO_TENANT_ID)" "$(KUSTO_DATABASE)" "$(KUSTO_TABLE)" "$(Target)" "$(Build.BuildId)" "$(USER_TARGET)" "$workDir" "3.8.16" "${{ plat.name }}"
 
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
     - task: PublishTestResults@2

@@ -37,6 +37,8 @@ TARGET = sys.argv[7]
 BUILDID = sys.argv[8]
 USER_TARGET = sys.argv[9]
 OUTPUT_DIR = sys.argv[10]
+PYTHON_VERSION = sys.argv[11]
+OS_VERSION = sys.argv[12]
 
 
 def generate_csv_file():
@@ -50,12 +52,9 @@ def generate_csv_file():
         if os.path.exists(html_file):
             with open(html_file) as file:
                 bs = BeautifulSoup(file, "html.parser")
-                environment = bs.find(id="environment")
-                PythonVersion = environment.find(string="Python").findNext('td').text
                 results = bs.find(id="results-table")
                 Source = 'LiveTest'
                 BuildId = BUILDID
-                OSVersion = 'Ubuntu20.04'
                 Module = TARGET
                 Description = ''
                 ExtendedProperties = ''
@@ -77,7 +76,7 @@ def generate_csv_file():
                         Details = ''
                     EndDateTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     StartDateTime = (datetime.datetime.now() - datetime.timedelta(seconds=int(float(Duration)))).strftime("%Y-%m-%d %H:%M:%S")
-                    data.append([Source, BuildId, OSVersion, PythonVersion, Module, Name, Description, StartDateTime, EndDateTime, Status, Details, ExtendedProperties])
+                    data.append([Source, BuildId, OS_VERSION, PYTHON_VERSION, Module, Name, Description, StartDateTime, EndDateTime, Status, Details, ExtendedProperties])
         return data
 
     data.extend(_get_data(parallel_file))
