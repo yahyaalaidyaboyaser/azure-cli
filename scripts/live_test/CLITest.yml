@@ -53,10 +53,12 @@ jobs:
           Target: advisor
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
+          platform: ${{ plat.name }}
         aro-${{ plat.name }}:
           Target: aro
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
+          platform: ${{ plat.name }}
 #      acr:
 #        Target: acr
 #      acs:
@@ -570,7 +572,7 @@ jobs:
 
         echo "Send data to kusto db!"
         pip install azure-kusto-data azure-kusto-ingest bs4
-        python $workDir/s/scripts/live_test/send_to_kusto.py "$(KUSTO_CLUSTER)" "$(KUSTO_CLIENT_ID)" "$(KUSTO_CLIENT_SECRET)" "$(KUSTO_TENANT_ID)" "$(KUSTO_DATABASE)" "$(KUSTO_TABLE)" "$(Target)" "$(Build.BuildId)" "$(USER_TARGET)" "$workDir" "3.8.16" "${{ plat.name }}"
+        python $workDir/s/scripts/live_test/send_to_kusto.py "$(KUSTO_CLUSTER)" "$(KUSTO_CLIENT_ID)" "$(KUSTO_CLIENT_SECRET)" "$(KUSTO_TENANT_ID)" "$(KUSTO_DATABASE)" "$(KUSTO_TABLE)" "$(Target)" "$(Build.BuildId)" "$(USER_TARGET)" "$workDir" "3.8.16" "$(platform)"
 
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
     - task: PublishTestResults@2
