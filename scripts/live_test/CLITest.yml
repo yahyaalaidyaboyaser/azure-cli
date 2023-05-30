@@ -576,8 +576,6 @@ jobs:
         python $workDir/s/scripts/live_test/send_to_kusto.py "$(KUSTO_CLUSTER)" "$(KUSTO_CLIENT_ID)" "$(KUSTO_CLIENT_SECRET)" "$(KUSTO_TENANT_ID)" "$(KUSTO_DATABASE)" "$(KUSTO_TABLE)" "$(Target)" "$(Build.BuildId)" "$(USER_TARGET)" "$workDir" "3.8.16" "$(platform)"
 
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
-    - bash: |
-        echo "You can use macro syntax for variables: $(workDir)"
     - task: PublishTestResults@2
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
