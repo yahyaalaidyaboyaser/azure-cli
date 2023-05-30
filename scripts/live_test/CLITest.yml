@@ -467,7 +467,6 @@ jobs:
         cd ..
         pwd
         workDir=$(pwd)
-        echo "##vso[task.setvariable variable=workDir]$workDir"
         ls
         # ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
         git config --global user.email "AzurePipelines"
@@ -502,10 +501,13 @@ jobs:
         if [[ "$(uname)" == "Darwin" ]]; then
           source env/bin/activate
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+          echo "##vso[task.setvariable variable=workDir]$workDir"
         elif [[ "$(expr substr $(uname -s) 1 5)" == "Linux" ]]; then
           source env/bin/activate
+          echo "##vso[task.setvariable variable=workDir]$workDir"
         elif [[ "$(expr substr $(uname -s) 1 5)" == "MINGW" ]]; then
           source env/Scripts/activate
+          echo "##vso[task.setvariable variable=workDir]$(Agent.BuildDirectory)"
         fi
         pip install azdev
         # git clone https://github.com/Azure/azure-cli-dev-tools.git
