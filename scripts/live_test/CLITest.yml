@@ -473,12 +473,6 @@ jobs:
         git config --global user.name "AzurePipelines"
 
         # print variables
-        echo "UNAME: $(uname)"
-        echo "UNAME2: $(expr substr $(uname -s) 1 5)"
-        echo "DIR: $(System.DefaultWorkingDirectory)"
-        echo "DIR2: $(Build.Repository.LocalPath)"
-        echo "DIR3: $(Build.SourcesDirectory)"
-        echo "DIR4: $(Agent.BuildDirectory)"
         echo "USER_TARGET: $(USER_TARGET)"
         echo "USER_REPO: $(USER_REPO)"
         echo "USER_REPO_EXT: $(USER_REPO_EXT)"
