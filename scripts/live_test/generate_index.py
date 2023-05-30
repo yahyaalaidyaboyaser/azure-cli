@@ -68,10 +68,10 @@ def generate(container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_
 def sort_by_module_name(item):
     # Sort test data by module name,
     # and modules starting with `ext-` need to be placed after modules not starting with `ext-`,
-    if item["module"].startswith("ext-"):
-        return item["module"][4:], 1  # sort with higher priority
+    if item[0].startswith("ext-"):
+        return item[0][4:], 1  # sort with higher priority
     else:
-        return item["module"], 0  # sort with lower priority
+        return item[0], 0  # sort with lower priority
 
 
 def render(data, container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_ID, USER_LIVE):
