@@ -541,13 +541,13 @@ jobs:
         if [[ "$(USER_USERNAME)" != "" && "$(USER_TOKEN)" != "" ]]; then
           echo "Commit mode"
           azdev test ${FinalTarget} --no-exitfirst -a "-n $(USER_PARALLELISM)"
-          azdev test ${FinalTarget} --live --lf --xml-path test_results.parallel.xml --no-exitfirst -a "-n $(USER_PARALLELISM) --json-report --json-report-summary --json-report-file=$(Target).report.parallel.json --html=$(Target).report.parallel.html --self-contained-html --reruns 3 --capture=sys"
+          azdev test ${FinalTarget} --live --lf --xml-path test_results.parallel.xml --no-exitfirst -a "-n $(USER_PARALLELISM) --json-report --json-report-summary --json-report-file=$(Target).report.parallel.json --html=$(Target)-$(platform).report.parallel.html --self-contained-html --reruns 3 --capture=sys"
         else
           echo "Normal mode"
           # Sequential
-          azdev test ${FinalTarget} $(USER_LIVE) --mark serial --xml-path test_results.sequential.xml --no-exitfirst -a "-n 1 --json-report --json-report-summary --json-report-file=$(Target).report.sequential.json --html=$(Target).report.sequential.html --self-contained-html --reruns 3 --capture=sys"
+          azdev test ${FinalTarget} $(USER_LIVE) --mark serial --xml-path test_results.sequential.xml --no-exitfirst -a "-n 1 --json-report --json-report-summary --json-report-file=$(Target).report.sequential.json --html=$(Target)-$(platform).report.sequential.html --self-contained-html --reruns 3 --capture=sys"
           # Parallel
-          azdev test ${FinalTarget} $(USER_LIVE) --mark "not serial" --xml-path test_results.parallel.xml --no-exitfirst -a "-n $(USER_PARALLELISM) --json-report --json-report-summary --json-report-file=$(Target).report.parallel.json --html=$(Target).report.parallel.html --self-contained-html --reruns 3 --capture=sys"
+          azdev test ${FinalTarget} $(USER_LIVE) --mark "not serial" --xml-path test_results.parallel.xml --no-exitfirst -a "-n $(USER_PARALLELISM) --json-report --json-report-summary --json-report-file=$(Target).report.parallel.json --html=$(Target)-$(platform).report.parallel.html --self-contained-html --reruns 3 --capture=sys"
         fi
 
         pwd
@@ -581,32 +581,26 @@ jobs:
     - task: PublishBuildArtifacts@1
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
-        PathtoPublish: '$(workDir)/$(Target).report.sequential.json'
-        ArtifactName: '$(Target)-$(platform).report.sequential.json'
+        PathtoPublish: '$(workDir)/$(Target)-$(platform).report.sequential.json'
+        ArtifactName: '$(Target).json'
         publishLocation: 'Container'
     - task: PublishBuildArtifacts@1
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
-        PathtoPublish: '$(workDir)/$(Target).report.sequential.html'
-        ArtifactName: '$(Target)-$(platform).report.sequential.html'
+        PathtoPublish: '$(workDir)/$(Target)-$(platform).report.sequential.html'
+        ArtifactName: '$(Target).html'
         publishLocation: 'Container'
     - task: PublishBuildArtifacts@1
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
-        PathtoPublish: '$(workDir)/$(Target).report.parallel.json'
-        ArtifactName: '$(Target)-$(platform).report.parallel.json'
+        PathtoPublish: '$(workDir)/$(Target)-$(platform).report.parallel.json'
+        ArtifactName: '$(Target).json'
         publishLocation: 'Container'
     - task: PublishBuildArtifacts@1
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
-        PathtoPublish: '$(workDir)/$(Target).report.parallel.html'
-        ArtifactName: '$(Target)-$(platform).report.parallel.html'
-        publishLocation: 'Container'
-    - task: PublishBuildArtifacts@1
-      condition: and(succeededOrFailed(), eq(variables.Match, '1'))
-      inputs:
-        PathtoPublish: '$(workDir)/$(Target).csv'
-        ArtifactName: '$(Target)-$(platform).csv'
+        PathtoPublish: '$(workDir)/$(Target)-$(platform).report.parallel.html'
+        ArtifactName: '$(Target).html'
         publishLocation: 'Container'
 
 - job: SendEmail
