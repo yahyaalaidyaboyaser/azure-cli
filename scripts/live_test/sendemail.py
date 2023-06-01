@@ -41,6 +41,13 @@ def main():
     logger.warning(REQUESTED_FOR_EMAIL)
     logger.warning(COMMIT_ID)
 
+    # Collect statistics
+    testdata = test_data.TestData(ARTIFACT_DIR)
+    testdata.collect()
+
+    # Summary data by module
+    summary_data_by_module(testdata)
+
     # Upload results to storage account, container
     container = ''
     try:
@@ -49,13 +56,6 @@ def main():
         upload_files(container)
     except Exception:
         logger.exception(traceback.format_exc())
-
-    # Collect statistics
-    testdata = test_data.TestData(ARTIFACT_DIR)
-    testdata.collect()
-
-    # Summary data by module
-    summary_data_by_module(container, ARTIFACT_DIR, ACCOUNT_KEY, testdata)
 
     # Generate index.html, send email
     try:
@@ -76,7 +76,7 @@ def main():
     logger.warning('Exit main()')
 
 
-def summary_data_by_module(container, ARTIFACT_DIR, ACCOUNT_KEY):
+def summary_data_by_module(testdata):
     modules = set([module[0].split('.')[0] for module in testdata.modules])
     total_test = testdata.total[1] + testdata.total[2]
     # duration = 27.01
