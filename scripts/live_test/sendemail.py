@@ -72,6 +72,7 @@ def main():
 
 
 def summary_data_by_module(testdata):
+    logger.warning('Enter summary_data_by_module()')
     modules = set([module[0].split('.')[0] for module in testdata.modules])
     total_test = testdata.total[1] + testdata.total[2]
     passed = testdata.total[1]
@@ -145,9 +146,12 @@ def summary_data_by_module(testdata):
 
     # delete other html and json files
     files = os.listdir(ARTIFACT_DIR)
+    logger.warning(files)
     for file in files:
         if len(file.split('.')) > 3 and file.endswith('html'):
             os.remove(os.path.join(ARTIFACT_DIR, file))
+    files = os.listdir(ARTIFACT_DIR)
+    logger.warning(files)
 
 
 def get_container_name():
