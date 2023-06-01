@@ -147,7 +147,7 @@ def summary_data_by_module(testdata):
     files = os.listdir(ARTIFACT_DIR)
     for file in files:
         if len(file.split('.')) > 3 and file.endswith('html'):
-            os.remove(file)
+            os.remove(os.path.join(ARTIFACT_DIR, file))
 
 
 def get_container_name():
