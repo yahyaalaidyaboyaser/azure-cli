@@ -74,16 +74,6 @@ def sort_by_module_name(item):
         return item[0], 0  # sort with lower priority
 
 
-def summary_data_by_module(container, ARTIFACT_DIR, ACCOUNT_KEY):
-    for root, dirs, files in os.walk(ARTIFACT_DIR):
-        for name in files:
-            if name.endswith('html'):
-                pass
-                # fullpath = os.path.join(root, name)
-                # cmd = 'az storage blob upload -f {} -c {} -n {} --account-name clitestresultstac --account-key {}'.format(fullpath, container, name, ACCOUNT_KEY)
-                # os.system(cmd)
-
-
 def render(data, container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_ID, USER_LIVE):
     """
     Return a HTML string
@@ -178,10 +168,10 @@ def render(data, container, container_url, testdata, USER_REPO, USER_BRANCH, COM
             url = x['url']
             if name.startswith(module + '.'):
                 display_name = 'report'
-                if 'parallel' in name:
-                    display_name = 'parallel'
-                elif 'sequential' in name:
-                    display_name = 'sequential'
+                # if 'parallel' in name:
+                #     display_name = 'parallel'
+                # elif 'sequential' in name:
+                #     display_name = 'sequential'
                 try:
                     html = requests.get(url).content.__str__()
                     pattern = re.compile('\\d+ tests ran in')
