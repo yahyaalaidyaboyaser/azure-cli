@@ -18,6 +18,9 @@ parameters:
 - name: platforms
   type: object
   default:
+  # pool: 1ES self-hosted agent pools, https://dev.azure.com/azclitools/internal/_settings/agentqueues
+  # vmImage: Microsoft-hosted agent pools, https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&tabs=yaml#software
+  # Please do not use pool and vmImage at the same time.
   - name: ubuntu2004
     pool: pool-ubuntu-2004
     vmImage:
@@ -582,25 +585,25 @@ jobs:
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
         PathtoPublish: '$(workDir)/$(Target).$(platform).report.sequential.json'
-        ArtifactName: '$(Target).json'
+        ArtifactName: '$(Target)'
         publishLocation: 'Container'
     - task: PublishBuildArtifacts@1
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
         PathtoPublish: '$(workDir)/$(Target).$(platform).report.sequential.html'
-        ArtifactName: '$(Target).html'
+        ArtifactName: '$(Target)'
         publishLocation: 'Container'
     - task: PublishBuildArtifacts@1
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
         PathtoPublish: '$(workDir)/$(Target).$(platform).report.parallel.json'
-        ArtifactName: '$(Target).json'
+        ArtifactName: '$(Target)'
         publishLocation: 'Container'
     - task: PublishBuildArtifacts@1
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
         PathtoPublish: '$(workDir)/$(Target).$(platform).report.parallel.html'
-        ArtifactName: '$(Target).html'
+        ArtifactName: '$(Target)'
         publishLocation: 'Container'
 
 - job: SendEmail

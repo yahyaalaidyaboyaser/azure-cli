@@ -77,7 +77,7 @@ def summary_data_by_module(testdata):
     failed = testdata.total[2]
     # skipped
     for module in modules:
-        html_name = '.'.join([module, 'html'])
+        html_name = '.'.join([module, 'report.html'])
         for root, dirs, files in os.walk(ARTIFACT_DIR):
             First = True
             dst_html = os.path.join(root, html_name)
