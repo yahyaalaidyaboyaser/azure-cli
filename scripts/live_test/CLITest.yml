@@ -38,7 +38,7 @@ parameters:
 
 # https://stackoverflow.com/questions/54372758/azure-devops-yaml-pipelines-specification-of-matrix-through-build-variable
 jobs:
-- job: LiveTestPython$(PYTHON_VERSION)
+- job: LiveTest
   displayName: Live Test Python $(PYTHON_VERSION)
   # Sometimes the live test will be stuck forever, so the timeout cannot be set to 0, it is recommended to set it to twice the maximum time
   timeoutInMinutes: 600
@@ -606,7 +606,7 @@ jobs:
 - job: SendEmail
   displayName: Send email
   timeoutInMinutes: 360
-  dependsOn: LiveTestPython38
+  dependsOn: LiveTest
   condition: succeededOrFailed()
   pool:
     name: ${{ variables.ubuntu_pool }}
