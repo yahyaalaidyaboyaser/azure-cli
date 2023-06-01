@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import generate_index
 import logging
 import os
+import re
 import sys
 import test_data
 import traceback

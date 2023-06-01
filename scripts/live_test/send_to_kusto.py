@@ -10,14 +10,13 @@ from azure.kusto.ingest import (
     QueuedIngestClient,
     ReportLevel,
 )
-from azure.kusto.ingest.status import KustoIngestStatusQueues
+
 from bs4 import BeautifulSoup
 import csv
 import datetime
 import logging
 import os
 import sys
-import time
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
