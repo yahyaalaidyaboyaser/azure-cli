@@ -78,6 +78,7 @@ def summary_data_by_module(testdata):
     # skipped
     for module in modules:
         html_name = '.'.join([module, 'report.html'])
+        src_soup = ''
         for root, dirs, files in os.walk(ARTIFACT_DIR):
             First = True
             dst_html = os.path.join(root, html_name)
@@ -116,7 +117,7 @@ def summary_data_by_module(testdata):
                         src_soup.find('span', {'class': 'failed'}).string = f'{failed} failed'
                         # src_soup.find('span', {'class': 'skipped'}).string = f'{skiped} skipped'
 
-                elif file.endswith('html'):
+                elif file.startswith(module) and file.endswith('html'):
                     platform = file.split('.')[1]
                     other = os.path.join(root, file)
                     with open(other, 'r') as f:
@@ -138,13 +139,13 @@ def summary_data_by_module(testdata):
                     duration = float(duration) + float(duration2)
                     p1.string = f'{total_test} tests ran in {duration} seconds. '
 
-            with open(dst_html, 'w') as f:
-                f.write(str(src_soup))
+        with open(dst_html, 'w') as f:
+            f.write(str(src_soup))
 
     # delete other html and json files
     files = os.listdir(ARTIFACT_DIR)
     for file in files:
-        if len(file.split('.')) > 2:
+        if len(file.split('.')) > 3 and file.endswith('html'):
             os.remove(file)
 
 
