@@ -144,14 +144,10 @@ def summary_data_by_module(testdata):
         with open(dst_html, 'w') as f:
             f.write(str(src_soup))
 
-    # delete other html and json files
-    files = os.listdir(ARTIFACT_DIR)
-    logger.warning(files)
-    for file in files:
-        if len(file.split('.')) > 3 and file.endswith('html'):
-            os.remove(os.path.join(ARTIFACT_DIR, file))
-    files = os.listdir(ARTIFACT_DIR)
-    logger.warning(files)
+    for root, dirs, files in os.walk(ARTIFACT_DIR):
+        for file in files:
+            if len(file.split('.')) > 3 and file.endswith('html'):
+                os.remove(os.path.join(ARTIFACT_DIR, file))
 
 
 def get_container_name():
