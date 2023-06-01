@@ -67,35 +67,25 @@ def main():
     except Exception:
         logger.exception(traceback.format_exc())
 
-    # Write database
-    # try:
-    #     write_db(container, testdata)
-    # except Exception:
-    #     logger.exception(traceback.format_exc())
-
     logger.warning('Exit main()')
 
 
 def summary_data_by_module(testdata):
     modules = set([module[0].split('.')[0] for module in testdata.modules])
     total_test = testdata.total[1] + testdata.total[2]
-    # duration = 27.01
     passed = testdata.total[1]
-    # skiped = -1
     failed = testdata.total[2]
+    # skipped
     for module in modules:
+        html_name = '.'.join([module, 'html'])
         for root, dirs, files in os.walk(ARTIFACT_DIR):
             First = True
-            fullpath = ''
+            dst_html = os.path.join(root, html_name)
             for file in files:
                 if file.startswith(module) and file.endswith('html') and First:
                     First = False
-                    html_name = '.'.join([module, 'html'])
-                    json_name = '.'.join([module, 'json'])
                     platform = file.split('.')[1]
                     first = os.path.join(root, file)
-                    dst_html = os.path.join(root, html_name)
-                    dst_json = os.path.join(root, json_name)
                     with open(first, 'r') as f:
                         src_html = f.read()
                         src_soup = BeautifulSoup(src_html, 'html.parser')
@@ -123,8 +113,8 @@ def summary_data_by_module(testdata):
                             if 'disabled' in i.attrs:
                                 del i['disabled']
                         src_soup.find('span', {'class': 'passed'}).string = f'{passed} passed'
-                        # src_soup.find('span', {'class': 'skipped'}).string = f'{skiped} skipped'
                         src_soup.find('span', {'class': 'failed'}).string = f'{failed} failed'
+                        # src_soup.find('span', {'class': 'skipped'}).string = f'{skiped} skipped'
 
                 elif file.endswith('html'):
                     platform = file.split('.')[1]
@@ -141,7 +131,6 @@ def summary_data_by_module(testdata):
                     table = src_soup.find('table', id='results-table')
                     for tbody in tbodys:
                         table.append(tbody)
-                    duration_pattern = re.compile('.*tests ran in ')
                     p1 = src_soup.find('p', string=re.compile('.*tests ran in.*'))
                     duration = p1.string.split(' ')[-3]
                     p2 = other_soup.find('p', string=re.compile('.*tests ran in.*'))

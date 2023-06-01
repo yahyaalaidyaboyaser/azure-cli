@@ -39,7 +39,7 @@ parameters:
 # https://stackoverflow.com/questions/54372758/azure-devops-yaml-pipelines-specification-of-matrix-through-build-variable
 jobs:
 - job: LiveTest
-  displayName: 'Live Test Python $(PYTHON_VERSION)'
+  displayName: 'Live Test Python ${{ variables.PYTHON_VERSION }}'
   # Sometimes the live test will be stuck forever, so the timeout cannot be set to 0, it is recommended to set it to twice the maximum time
   timeoutInMinutes: 600
   pool:
