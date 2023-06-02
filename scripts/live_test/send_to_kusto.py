@@ -43,8 +43,8 @@ OS_VERSION = sys.argv[12]
 def generate_csv_file():
     logger.warning('Start generate csv file for {TARGET}.'.format(TARGET=TARGET))
     data = []
-    parallel_file = f'{OUTPUT_DIR}/{TARGET}.report.parallel.html'
-    sequential_file = f'{OUTPUT_DIR}/{TARGET}.report.sequential.html'
+    parallel_file = f'{OUTPUT_DIR}/{TARGET}.{OS_VERSION}.report.parallel.html'
+    sequential_file = f'{OUTPUT_DIR}/{TARGET}.{OS_VERSION}.report.sequential.html'
 
     def _get_data(html_file):
         data = []
