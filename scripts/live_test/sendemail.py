@@ -358,12 +358,11 @@ def get_remaining_tests():
 
 def summary_data_by_module(testdata):
     logger.warning('Enter summary_data_by_module()')
-    modules = set([module[0].split('.')[0] for module in testdata.modules])
-    total_test = testdata.total[1] + testdata.total[2]
-    passed = testdata.total[1]
-    failed = testdata.total[2]
-    # skipped
-    for module in modules:
+    modules = [module[0].split('.')[0] for module in testdata.modules]
+    for idx, module in enumerate(modules):
+        total_test = testdata.modules[idx][1] + testdata.modules[idx][2]
+        passed = testdata.modules[idx][1]
+        failed = testdata.modules[idx][2]
         html_name = '.'.join([module, 'report.html'])
         src_soup = ''
         for root, dirs, files in os.walk(ARTIFACT_DIR):
