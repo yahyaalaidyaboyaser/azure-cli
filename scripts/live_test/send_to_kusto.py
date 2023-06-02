@@ -75,7 +75,7 @@ def generate_csv_file():
                         Details = ''
                     EndDateTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     StartDateTime = (datetime.datetime.now() - datetime.timedelta(seconds=int(float(Duration)))).strftime("%Y-%m-%d %H:%M:%S")
-                    data.append([Source, BuildId, OS_VERSION, PYTHON_VERSION, Module, Name, Description, StartDateTime, EndDateTime, Status, Details, ExtendedProperties])
+                    data.append([Source, BuildId, OS_VERSION, PYTHON_VERSION, Module, Name, Description, StartDateTime, EndDateTime, Duration, Status, Details, ExtendedProperties])
         return data
 
     data.extend(_get_data(parallel_file))

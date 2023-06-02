@@ -57,8 +57,8 @@ jobs:
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        aro-${{ plat.name }}:
-          Target: aro
+        ext-ai-examples-${{ plat.name }}:
+          Target: ext-ai-examples
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
