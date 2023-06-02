@@ -30,6 +30,8 @@ ARTIFACT_DIR = sys.argv[7]
 REQUESTED_FOR_EMAIL = sys.argv[8]
 ACCOUNT_KEY = sys.argv[9]
 COMMIT_ID = sys.argv[10]
+USER_REPO_EXT = sys.argv[11]
+USER_BRANCH_EXT = sys.argv[12]
 
 
 resource_html = """
@@ -307,7 +309,7 @@ def main():
     try:
         # Generate index.html
         container_url = 'https://clitestresultstac.blob.core.windows.net/' + container
-        html_content = generate_index.generate(container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_ID, USER_LIVE, USER_TARGET, ACCOUNT_KEY)
+        html_content = generate_index.generate(container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_ID, USER_LIVE, USER_TARGET, ACCOUNT_KEY, USER_REPO_EXT, USER_BRANCH_EXT)
         # Send email
         send_email(html_content)
     except Exception:

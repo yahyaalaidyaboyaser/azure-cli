@@ -18,7 +18,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def generate(container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_ID, USER_LIVE, USER_TARGET, ACCOUNT_KEY):
+def generate(container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_ID, USER_LIVE, USER_TARGET, ACCOUNT_KEY, USER_REPO_EXT, USER_BRANCH_EXT):
     """
     Generate index.html. Upload it to storage account
     :param container:
@@ -46,7 +46,7 @@ def generate(container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_
                 data.append({'name': name, 'url': url})
         break
     logger.warning(data)
-    html = render(data, container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_ID, USER_LIVE)
+    html = render(data, container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_ID, USER_LIVE, USER_REPO_EXT, USER_BRANCH_EXT)
     with open('index.html', 'w') as f:
         f.write(html)
 
@@ -74,7 +74,7 @@ def sort_by_module_name(item):
         return item[0], 0  # sort with lower priority
 
 
-def render(data, container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_ID, USER_LIVE):
+def render(data, container, container_url, testdata, USER_REPO, USER_BRANCH, COMMIT_ID, USER_LIVE, USER_REPO_EXT, USER_BRANCH_EXT):
     """
     Return a HTML string
     :param data:
@@ -111,11 +111,13 @@ def render(data, container, container_url, testdata, USER_REPO, USER_BRANCH, COM
     <p>
     Repository: {}<br>
     Branch: {}<br>
+    Repository of extension: {}<br>
+    Branch of extension: {}<br>
     Commit: {}<br>
     Live: {}<br>
     Date: {}
     </p>
-    """.format(USER_REPO, USER_BRANCH, COMMIT_ID, live, date)
+    """.format(USER_REPO, USER_BRANCH, USER_REPO_EXT, USER_BRANCH_EXT, COMMIT_ID, live, date)
 
     content += """
     <p>
