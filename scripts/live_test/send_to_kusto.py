@@ -80,6 +80,7 @@ def generate_csv_file():
 
     data.extend(_get_data(parallel_file))
     data.extend(_get_data(sequential_file))
+    logger.warning('CSV data: {data}'.format(data=data))
 
     with open(f'{OUTPUT_DIR}/{TARGET}.csv', mode='w', newline='') as file:
         writer = csv.writer(file)
