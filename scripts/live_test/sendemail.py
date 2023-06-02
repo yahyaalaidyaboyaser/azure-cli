@@ -318,8 +318,9 @@ def main():
 
 
 def get_remaining_tests():
+    logger.warning('Enter get_remaining_tests()')
     cmd = ['az', 'group', 'list', '--tag', 'module', '--query', '[][name, tags]']
-    print(cmd)
+    logger.warning(cmd)
     out = subprocess.run(cmd, capture_output=True)
     remaing_tests = json.loads(out.stdout) if out.stdout else []
     if remaing_tests:
@@ -347,9 +348,11 @@ def get_remaining_tests():
             tr.append(td_group)
             tbody.append(tr)
             soup.table.append(tbody)
-        with open('./resource.html', 'w') as f:
+        with open('resource.html', 'w') as f:
             f.write(str(soup))
-        cmd = 'az storage blob upload -f {} -c {} -n {} --account-name clitestresultstac --account-key {}'.format('./', BUILD_ID, 'resource.html', ACCOUNT_KEY)
+            logger.warning('resource.html: ' + str(soup))
+        cmd = 'az storage blob upload -f resource.html -c {} -n resource.html --account-name clitestresultstac --account-key {}'.format(BUILD_ID, ACCOUNT_KEY)
+        logger.warning('Running: ' + cmd)
         os.system(cmd)
 
 
