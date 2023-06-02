@@ -662,6 +662,7 @@ jobs:
         architecture: 'x64'
     - bash: |
         set -o errexit
+        workDir=$(pwd)
         pip install tqdm
         az -v
         echo "login to user azureclilivetest"
