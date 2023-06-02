@@ -646,5 +646,5 @@ jobs:
         echo "set account"
         echo "send email to grid"
         python $workDir/scripts/live_test/sendemail.py "$(SENDGRID_KEY)" "$(Build.BuildId)" "$(USER_REPO)" "$(USER_BRANCH)" "$(USER_TARGET)" "$(USER_LIVE)" "$(System.ArtifactsDirectory)" "$(Build.RequestedForEmail)" "$(ACCOUNT_KEY)" "$commit_id"
-        python $workDir/scripts/live_test/clean.py
+        python $workDir/scripts/live_test/clean.py "$(Build.BuildId)" "$(ACCOUNT_KEY)"
         # python $workDir/scripts/live_test/upload.py "$(System.ArtifactsDirectory)" "$(ACCOUNT_KEY)" "$(USER_LIVE)"
