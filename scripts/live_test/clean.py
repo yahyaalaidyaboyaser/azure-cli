@@ -21,8 +21,8 @@ def main():
     clean_storage()
     clean_servicebus()
     clean_backup()
-    clean_deleted_keyvault()
     clean_resource_group()
+    clean_deleted_keyvault()
 
 
 def clean_lock():
