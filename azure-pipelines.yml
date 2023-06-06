@@ -34,6 +34,7 @@ jobs:
     system.debug: 'true'
   steps:
   - bash: |
+      set -v
       ls -l -R
       git config -l
       git config --system -l
