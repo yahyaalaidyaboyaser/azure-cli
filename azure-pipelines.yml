@@ -13,7 +13,7 @@ pr:
     - '*'
 
 variables:
-  system.debug: 'true'
+- template: ${{ variables.Pipeline.Workspace }}/.azure-pipelines/templates/variables.yml
 
 parameters:
 - name: architectures
@@ -30,6 +30,8 @@ jobs:
 - job: CheckFilePermissions
   pool:
     name: ${{ variables.ubuntu_pool }}
+  variables:
+    system.debug: 'true'
   steps:
   - bash: |
       ls -l -R
