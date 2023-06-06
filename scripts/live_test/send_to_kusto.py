@@ -89,6 +89,7 @@ def generate_csv_file():
 
 
 def send_to_kusto():
+    # TODO add filter for main repo and ext repo
     if USER_TARGET in ['ALL', 'all', '']:
         logger.info('Start send csv data to kusto db for {TARGET}'.format(TARGET=TARGET))
         kcsb = KustoConnectionStringBuilder.with_aad_application_key_authentication(KUSTO_CLUSTER, KUSTO_CLIENT_ID, KUSTO_CLIENT_SECRET, KUSTO_TENANT_ID)
