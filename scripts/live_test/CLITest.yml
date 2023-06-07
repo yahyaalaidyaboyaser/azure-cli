@@ -241,7 +241,7 @@ jobs:
         # Clean resources
         python $workDir/s/scripts/live_test/clean_policy.py
 
-        python scripts/live_test/automation_full_test.py
+        python $workDir/s/scripts/live_test/automation_full_test.py
         # # Whether commit changes
         # if [[ "$(USER_USERNAME)" != "" && "$(USER_TOKEN)" != "" ]]; then
         #   echo "Commit mode"
