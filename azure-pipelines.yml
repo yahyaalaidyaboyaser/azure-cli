@@ -39,5 +39,5 @@ jobs:
       git config -l
       git config --system -l
       git config --global -l
-      getfacl
+      getfacl src/azure-cli-core/azure/cli/core/__init__.py
       mount
