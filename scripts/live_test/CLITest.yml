@@ -277,8 +277,8 @@ jobs:
         # python $workDir/s/scripts/live_test/send_to_kusto.py "$(KUSTO_CLUSTER)" "$(KUSTO_CLIENT_ID)" "$(KUSTO_CLIENT_SECRET)" "$(KUSTO_TENANT_ID)" "$(KUSTO_DATABASE)" "$(KUSTO_TABLE)" "$(Target)" "$(Build.BuildId)" "$(USER_TARGET)" "$workDir" "$(PYTHON_VERSION)" "$(platform)"
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       env:
-        INSTANCE_CNT: ${{ parameters.instance_cnt }}
-        INSTANCE_IDX: ${{ parameters.instance_idx }}
+        INSTANCE_CNT: 20
+        INSTANCE_IDX: $(Instance_idx)
         USER_TARGET: $(USER_TARGET)
         USER_USERNAME: $(USER_USERNAME)
         USER_TOKEN: $(USER_TOKEN)
