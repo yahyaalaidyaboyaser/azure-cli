@@ -49,1051 +49,106 @@ jobs:
     name: $(pool)
     vmImage: $(vmImage)
   strategy:
-    maxParallel: 20
+    maxParallel: 100
     matrix:
       ${{ each plat in parameters.platforms }}:
-        acr-${{ plat.name }}:
-          Target: acr
+        instance1-${{ plat.name }}:
+          Instance_idx: 1
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        acs-${{ plat.name }}:
-          Target: acs
+        instance2-${{ plat.name }}:
+          Instance_idx: 2
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        advisor-${{ plat.name }}:
-          Target: advisor
+        instance3-${{ plat.name }}:
+          Instance_idx: 3
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        ams-${{ plat.name }}:
-          Target: ams
+        instance4-${{ plat.name }}:
+          Instance_idx: 4
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        apim-${{ plat.name }}:
-          Target: apim
+        instance5-${{ plat.name }}:
+          Instance_idx: 5
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        appconfig-${{ plat.name }}:
-          Target: appconfig
+        instance6-${{ plat.name }}:
+          Instance_idx: 6
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        appservice-${{ plat.name }}:
-          Target: appservice
+        instance7-${{ plat.name }}:
+          Instance_idx: 7
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        aro-${{ plat.name }}:
-          Target: aro
+        instance8-${{ plat.name }}:
+          Instance_idx: 8
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        backup-${{ plat.name }}:
-          Target: backup
+        instance9-${{ plat.name }}:
+          Instance_idx: 9
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        batch-${{ plat.name }}:
-          Target: batch
+        instance10-${{ plat.name }}:
+          Instance_idx: 10
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        batchai-${{ plat.name }}:
-          Target: batchai
+        instance11-${{ plat.name }}:
+          Instance_idx: 11
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        billing-${{ plat.name }}:
-          Target: billing
+        instance12-${{ plat.name }}:
+          Instance_idx: 12
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        botservice-${{ plat.name }}:
-          Target: botservice
+        instance13-${{ plat.name }}:
+          Instance_idx: 13
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        cdn-${{ plat.name }}:
-          Target: cdn
+        instance14-${{ plat.name }}:
+          Instance_idx: 14
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        cloud-${{ plat.name }}:
-          Target: cloud
+        instance15-${{ plat.name }}:
+          Instance_idx: 15
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        cognitiveservices-${{ plat.name }}:
-          Target: cognitiveservices
+        instance16-${{ plat.name }}:
+          Instance_idx: 16
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        config-${{ plat.name }}:
-          Target: config
+        instance17-${{ plat.name }}:
+          Instance_idx: 17
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        configure-${{ plat.name }}:
-          Target: configure
+        instance18-${{ plat.name }}:
+          Instance_idx: 18
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        consumption-${{ plat.name }}:
-          Target: consumption
+        instance19-${{ plat.name }}:
+          Instance_idx: 19
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
-        container-${{ plat.name }}:
-          Target: container
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        cosmosdb-${{ plat.name }}:
-          Target: cosmosdb
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        databoxedge-${{ plat.name }}:
-          Target: databoxedge
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        deploymentmanager-${{ plat.name }}:
-          Target: deploymentmanager
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        dla-${{ plat.name }}:
-          Target: dla
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        dls-${{ plat.name }}:
-          Target: dls
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        dms-${{ plat.name }}:
-          Target: dms
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        eventgrid-${{ plat.name }}:
-          Target: eventgrid
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        eventhubs-${{ plat.name }}:
-          Target: eventhubs
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        extension-${{ plat.name }}:
-          Target: extension
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        feedback-${{ plat.name }}:
-          Target: feedback
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        find-${{ plat.name }}:
-          Target: find
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        hdinsight-${{ plat.name }}:
-          Target: hdinsight
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        identity-${{ plat.name }}:
-          Target: identity
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        iot-${{ plat.name }}:
-          Target: iot
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        keyvault-${{ plat.name }}:
-          Target: keyvault
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        kusto-${{ plat.name }}:
-          Target: kusto
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        lab-${{ plat.name }}:
-          Target: lab
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        managedservices-${{ plat.name }}:
-          Target: managedservices
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        maps-${{ plat.name }}:
-          Target: maps
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        marketplaceordering-${{ plat.name }}:
-          Target: marketplaceordering
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        monitor-${{ plat.name }}:
-          Target: monitor
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        mysql-${{ plat.name }}:
-          Target: mysql
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        natgateway-${{ plat.name }}:
-          Target: natgateway
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        netappfiles-${{ plat.name }}:
-          Target: netappfiles
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        network-${{ plat.name }}:
-          Target: network
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        policyinsights-${{ plat.name }}:
-          Target: policyinsights
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        privatedns-${{ plat.name }}:
-          Target: privatedns
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        profile-${{ plat.name }}:
-          Target: profile
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        rdbms-${{ plat.name }}:
-          Target: rdbms
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        redis-${{ plat.name }}:
-          Target: redis
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        relay-${{ plat.name }}:
-          Target: relay
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        reservations-${{ plat.name }}:
-          Target: reservations
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        resource-${{ plat.name }}:
-          Target: resource
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        role-${{ plat.name }}:
-          Target: role
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        search-${{ plat.name }}:
-          Target: search
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        security-${{ plat.name }}:
-          Target: security
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        servicebus-${{ plat.name }}:
-          Target: servicebus
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        serviceconnector-${{ plat.name }}:
-          Target: serviceconnector
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        servicefabric-${{ plat.name }}:
-          Target: servicefabric
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        signalr-${{ plat.name }}:
-          Target: signalr
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        sql-${{ plat.name }}:
-          Target: sql
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        sqlvm-${{ plat.name }}:
-          Target: sqlvm
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        storage-${{ plat.name }}:
-          Target: storage
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        synapse-${{ plat.name }}:
-          Target: synapse
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        util-${{ plat.name }}:
-          Target: util
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        vm-${{ plat.name }}:
-          Target: vm
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-account-${{ plat.name }}:
-          Target: ext-account
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-acrquery-${{ plat.name }}:
-          Target: ext-acrquery
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-acrtransfer-${{ plat.name }}:
-          Target: ext-acrtransfer
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-ad-${{ plat.name }}:
-          Target: ext-ad
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-adp-${{ plat.name }}:
-          Target: ext-adp
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-aem-${{ plat.name }}:
-          Target: ext-aem
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-ai-examples-${{ plat.name }}:
-          Target: ext-ai-examples
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-aks-preview-${{ plat.name }}:
-          Target: ext-aks-preview
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-alertsmanagement-${{ plat.name }}:
-          Target: ext-alertsmanagement
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-alias-${{ plat.name }}:
-          Target: ext-alias
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-amg-${{ plat.name }}:
-          Target: ext-amg
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-application-insights-${{ plat.name }}:
-          Target: ext-application-insights
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-appservice-kube-${{ plat.name }}:
-          Target: ext-appservice-kube
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-attestation-${{ plat.name }}:
-          Target: ext-attestation
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-authV2-${{ plat.name }}:
-          Target: ext-authV2
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-automanage-${{ plat.name }}:
-          Target: ext-automanage
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-automation-${{ plat.name }}:
-          Target: ext-automation
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-azure-firewall-${{ plat.name }}:
-          Target: ext-azure-firewall
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-bastion-${{ plat.name }}:
-          Target: ext-bastion
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-billing-benefits-${{ plat.name }}:
-          Target: ext-billing-benefits
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-blockchain-${{ plat.name }}:
-          Target: ext-blockchain
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-blueprint-${{ plat.name }}:
-          Target: ext-blueprint
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-change-analysis-${{ plat.name }}:
-          Target: ext-change-analysis
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-cli-translator-${{ plat.name }}:
-          Target: ext-cli-translator
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-cloudservice-${{ plat.name }}:
-          Target: ext-cloudservice
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-communication-${{ plat.name }}:
-          Target: ext-communication
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-confcom-${{ plat.name }}:
-          Target: ext-confcom
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-confidentialledger-${{ plat.name }}:
-          Target: ext-confidentialledger
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-confluent-${{ plat.name }}:
-          Target: ext-confluent
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-connectedk8s-${{ plat.name }}:
-          Target: ext-connectedk8s
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-connectedmachine-${{ plat.name }}:
-          Target: ext-connectedmachine
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-connectedvmware-${{ plat.name }}:
-          Target: ext-connectedvmware
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-connection-monitor-preview-${{ plat.name }}:
-          Target: ext-connection-monitor-preview
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-containerapp-${{ plat.name }}:
-          Target: ext-containerapp
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-containerapp-preview-${{ plat.name }}:
-          Target: ext-containerapp-preview
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-cosmosdb-preview-${{ plat.name }}:
-          Target: ext-cosmosdb-preview
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-costmanagement-${{ plat.name }}:
-          Target: ext-costmanagement
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-custom-providers-${{ plat.name }}:
-          Target: ext-custom-providers
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-databox-${{ plat.name }}:
-          Target: ext-databox
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-databricks-${{ plat.name }}:
-          Target: ext-databricks
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-datadog-${{ plat.name }}:
-          Target: ext-datadog
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-datafactory-${{ plat.name }}:
-          Target: ext-datafactory
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-datamigration-${{ plat.name }}:
-          Target: ext-datamigration
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-dataprotection-${{ plat.name }}:
-          Target: ext-dataprotection
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-datashare-${{ plat.name }}:
-          Target: ext-datashare
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-db-up-${{ plat.name }}:
-          Target: ext-db-up
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-desktopvirtualization-${{ plat.name }}:
-          Target: ext-desktopvirtualization
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-dev-spaces-${{ plat.name }}:
-          Target: ext-dev-spaces
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-devcenter-${{ plat.name }}:
-          Target: ext-devcenter
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-diskpool-${{ plat.name }}:
-          Target: ext-diskpool
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-dms-preview-${{ plat.name }}:
-          Target: ext-dms-preview
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-dnc-${{ plat.name }}:
-          Target: ext-dnc
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-dns-resolver-${{ plat.name }}:
-          Target: ext-dns-resolver
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-dynatrace-${{ plat.name }}:
-          Target: ext-dynatrace
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-edgeorder-${{ plat.name }}:
-          Target: ext-edgeorder
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-elastic-${{ plat.name }}:
-          Target: ext-elastic
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-elastic-san-${{ plat.name }}:
-          Target: ext-elastic-san
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-eventgrid-${{ plat.name }}:
-          Target: ext-eventgrid
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-express-route-cross-connection-${{ plat.name }}:
-          Target: ext-express-route-cross-connection
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-fleet-${{ plat.name }}:
-          Target: ext-fleet
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-fluid-relay-${{ plat.name }}:
-          Target: ext-fluid-relay
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-footprint-${{ plat.name }}:
-          Target: ext-footprint
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-front-door-${{ plat.name }}:
-          Target: ext-front-door
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-functionapp-${{ plat.name }}:
-          Target: ext-functionapp
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-guestconfig-${{ plat.name }}:
-          Target: ext-guestconfig
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-hack-${{ plat.name }}:
-          Target: ext-hack
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-hardware-security-modules-${{ plat.name }}:
-          Target: ext-hardware-security-modules
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-healthbot-${{ plat.name }}:
-          Target: ext-healthbot
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-healthcareapis-${{ plat.name }}:
-          Target: ext-healthcareapis
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-hpc-cache-${{ plat.name }}:
-          Target: ext-hpc-cache
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-image-copy-${{ plat.name }}:
-          Target: ext-image-copy
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-image-gallery-${{ plat.name }}:
-          Target: ext-image-gallery
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-import-export-${{ plat.name }}:
-          Target: ext-import-export
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-init-${{ plat.name }}:
-          Target: ext-init
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-interactive-${{ plat.name }}:
-          Target: ext-interactive
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-internet-analyzer-${{ plat.name }}:
-          Target: ext-internet-analyzer
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-ip-group-${{ plat.name }}:
-          Target: ext-ip-group
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-k8s-configuration-${{ plat.name }}:
-          Target: ext-k8s-configuration
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-k8s-extension-${{ plat.name }}:
-          Target: ext-k8s-extension
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-keyvault-preview-${{ plat.name }}:
-          Target: ext-keyvault-preview
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-kusto-${{ plat.name }}:
-          Target: ext-kusto
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-load-${{ plat.name }}:
-          Target: ext-load
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-log-analytics-${{ plat.name }}:
-          Target: ext-log-analytics
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-log-analytics-solution-${{ plat.name }}:
-          Target: ext-log-analytics-solution
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-logic-${{ plat.name }}:
-          Target: ext-logic
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-logz-${{ plat.name }}:
-          Target: ext-logz
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-maintenance-${{ plat.name }}:
-          Target: ext-maintenance
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-managedccfs-${{ plat.name }}:
-          Target: ext-managedccfs
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-managementpartner-${{ plat.name }}:
-          Target: ext-managementpartner
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-mesh-${{ plat.name }}:
-          Target: ext-mesh
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-mixed-reality-${{ plat.name }}:
-          Target: ext-mixed-reality
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-mobile-network-${{ plat.name }}:
-          Target: ext-mobile-network
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-monitor-control-service-${{ plat.name }}:
-          Target: ext-monitor-control-service
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-netappfiles-preview-${{ plat.name }}:
-          Target: ext-netappfiles-preview
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-network-manager-${{ plat.name }}:
-          Target: ext-network-manager
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-next-${{ plat.name }}:
-          Target: ext-next
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-nginx-${{ plat.name }}:
-          Target: ext-nginx
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-notification-hub-${{ plat.name }}:
-          Target: ext-notification-hub
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-nsp-${{ plat.name }}:
-          Target: ext-nsp
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-offazure-${{ plat.name }}:
-          Target: ext-offazure
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-orbital-${{ plat.name }}:
-          Target: ext-orbital
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-peering-${{ plat.name }}:
-          Target: ext-peering
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-portal-${{ plat.name }}:
-          Target: ext-portal
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-powerbidedicated-${{ plat.name }}:
-          Target: ext-powerbidedicated
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-providerhub-${{ plat.name }}:
-          Target: ext-providerhub
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-purview-${{ plat.name }}:
-          Target: ext-purview
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-quantum-${{ plat.name }}:
-          Target: ext-quantum
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-quota-${{ plat.name }}:
-          Target: ext-quota
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-rdbms-connect-${{ plat.name }}:
-          Target: ext-rdbms-connect
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-redisenterprise-${{ plat.name }}:
-          Target: ext-redisenterprise
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-reservation-${{ plat.name }}:
-          Target: ext-reservation
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-resource-graph-${{ plat.name }}:
-          Target: ext-resource-graph
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-resource-mover-${{ plat.name }}:
-          Target: ext-resource-mover
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-scenario-guide-${{ plat.name }}:
-          Target: ext-scenario-guide
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-scheduled-query-${{ plat.name }}:
-          Target: ext-scheduled-query
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-scvmm-${{ plat.name }}:
-          Target: ext-scvmm
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-securityinsight-${{ plat.name }}:
-          Target: ext-securityinsight
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-self-help-${{ plat.name }}:
-          Target: ext-self-help
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-serial-console-${{ plat.name }}:
-          Target: ext-serial-console
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-serviceconnector-passwordless-${{ plat.name }}:
-          Target: ext-serviceconnector-passwordless
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-spring-${{ plat.name }}:
-          Target: ext-spring
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-spring-cloud-${{ plat.name }}:
-          Target: ext-spring-cloud
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-ssh-${{ plat.name }}:
-          Target: ext-ssh
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-stack-hci-${{ plat.name }}:
-          Target: ext-stack-hci
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-staticwebapp-${{ plat.name }}:
-          Target: ext-staticwebapp
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-storage-blob-preview-${{ plat.name }}:
-          Target: ext-storage-blob-preview
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-storage-mover-${{ plat.name }}:
-          Target: ext-storage-mover
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-storage-preview-${{ plat.name }}:
-          Target: ext-storage-preview
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-storagesync-${{ plat.name }}:
-          Target: ext-storagesync
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-stream-analytics-${{ plat.name }}:
-          Target: ext-stream-analytics
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-subscription-${{ plat.name }}:
-          Target: ext-subscription
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-support-${{ plat.name }}:
-          Target: ext-support
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-swiftlet-${{ plat.name }}:
-          Target: ext-swiftlet
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-timeseriesinsights-${{ plat.name }}:
-          Target: ext-timeseriesinsights
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-traffic-collector-${{ plat.name }}:
-          Target: ext-traffic-collector
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-traffic-controller-${{ plat.name }}:
-          Target: ext-traffic-controller
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-virtual-network-tap-${{ plat.name }}:
-          Target: ext-virtual-network-tap
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-virtual-wan-${{ plat.name }}:
-          Target: ext-virtual-wan
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-vm-repair-${{ plat.name }}:
-          Target: ext-vm-repair
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-vmware-${{ plat.name }}:
-          Target: ext-vmware
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-voice-service-${{ plat.name }}:
-          Target: ext-voice-service
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-webapp-${{ plat.name }}:
-          Target: ext-webapp
-          pool: ${{ plat.pool }}
-          vmImage: ${{ plat.vmImage }}
-          platform: ${{ plat.name }}
-        ext-webpubsub-${{ plat.name }}:
-          Target: ext-webpubsub
+        instance20-${{ plat.name }}:
+          Instance_idx: 20
           pool: ${{ plat.pool }}
           vmImage: ${{ plat.vmImage }}
           platform: ${{ plat.name }}
@@ -1162,15 +217,15 @@ jobs:
 
         azdev setup -c azure-cli -r azure-cli-extensions
 
-        # Remove ext- prefix
-        FinalTarget="$(Target)"
-        if [[ "${FinalTarget}" =~ ^ext-.* ]]; then
-          echo "It is an extention"
-          echo $(Target)
-          FinalTarget=${FinalTarget:4}
-          azdev extension add ${FinalTarget}
-        fi
-        echo ${FinalTarget}
+#        # Remove ext- prefix
+#        FinalTarget="$(Target)"
+#        if [[ "${FinalTarget}" =~ ^ext-.* ]]; then
+#          echo "It is an extention"
+#          echo $(Target)
+#          FinalTarget=${FinalTarget:4}
+#          azdev extension add ${FinalTarget}
+#        fi
+#        echo ${FinalTarget}
 
         # This helps detect issues in CI if a used SDK API version is deleted by the below script.
         python $workDir/s/scripts/trim_sdk.py
@@ -1182,22 +237,23 @@ jobs:
         # az login -u azureclilivetest@azuresdkteam.onmicrosoft.com -p $(AZURECLITESTPASSWORD)
         az login --service-principal --username $(AZURECLITESTUSER) --password $(AZURECLITESTPASSWORD) --tenant $(AZURECLITESTTENANTID)
         az account set -s $(AZURECLITESTSUBSCRIPTIONID)
-        
+
         # Clean resources
         python $workDir/s/scripts/live_test/clean_policy.py
 
-        # Whether commit changes
-        if [[ "$(USER_USERNAME)" != "" && "$(USER_TOKEN)" != "" ]]; then
-          echo "Commit mode"
-          azdev test ${FinalTarget} --no-exitfirst -a "-n $(USER_PARALLELISM)"
-          azdev test ${FinalTarget} --live --lf --xml-path test_results.parallel.xml --no-exitfirst -a "-n $(USER_PARALLELISM) --json-report --json-report-summary --json-report-file=$(Target).$(platform).report.parallel.json --html=$(Target).$(platform).report.parallel.html --self-contained-html --capture=sys"
-        else
-          echo "Normal mode"
-          # Sequential
-          azdev test ${FinalTarget} $(USER_LIVE) --mark serial --xml-path test_results.sequential.xml --no-exitfirst -a "-n 1 --json-report --json-report-summary --json-report-file=$(Target).$(platform).report.sequential.json --html=$(Target).$(platform).report.sequential.html --self-contained-html --capture=sys"
-          # Parallel
-          azdev test ${FinalTarget} $(USER_LIVE) --mark "not serial" --xml-path test_results.parallel.xml --no-exitfirst -a "-n $(USER_PARALLELISM) --json-report --json-report-summary --json-report-file=$(Target).$(platform).report.parallel.json --html=$(Target).$(platform).report.parallel.html --self-contained-html --capture=sys"
-        fi
+        python scripts/live_test/automation_full_test.py $(USER_LIVE) "${{ parameters.instance_cnt }}" "${{ parameters.instance_idx }}" "$serial_modules" "$(USER_USERNAME)" "$(USER_TOKEN)" $(USER_PARALLELISM) $(USER_TARGET) $(platform)
+#        # Whether commit changes
+#        if [[ "$(USER_USERNAME)" != "" && "$(USER_TOKEN)" != "" ]]; then
+#          echo "Commit mode"
+#          azdev test ${FinalTarget} --no-exitfirst -a "-n $(USER_PARALLELISM)"
+#          azdev test ${FinalTarget} --live --lf --xml-path test_results.parallel.xml --no-exitfirst -a "-n $(USER_PARALLELISM) --json-report --json-report-summary --json-report-file=$(Target).$(platform).report.parallel.json --html=$(Target).$(platform).report.parallel.html --self-contained-html --capture=sys"
+#        else
+#          echo "Normal mode"
+#          # Sequential
+#          azdev test ${FinalTarget} $(USER_LIVE) --mark serial --xml-path test_results.sequential.xml --no-exitfirst -a "-n 1 --json-report --json-report-summary --json-report-file=$(Target).$(platform).report.sequential.json --html=$(Target).$(platform).report.sequential.html --self-contained-html --capture=sys"
+#          # Parallel
+#          azdev test ${FinalTarget} $(USER_LIVE) --mark "not serial" --xml-path test_results.parallel.xml --no-exitfirst -a "-n $(USER_PARALLELISM) --json-report --json-report-summary --json-report-file=$(Target).$(platform).report.parallel.json --html=$(Target).$(platform).report.parallel.html --self-contained-html --capture=sys"
+#        fi
 
         pwd
         ls
