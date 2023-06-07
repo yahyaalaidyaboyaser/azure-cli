@@ -6,7 +6,6 @@
 # --------------------------------------------------------------------------------------------
 
 from azdev.utilities import get_path_table
-import json
 import logging
 import os
 import subprocess
@@ -20,22 +19,16 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
-# sys.argv is passed by
-# .azure-pipelines/templates/automation_test.yml in section `Running full test`
-# scripts/regression_test/regression_test.yml in section "Rerun tests"
-instance_cnt = int(sys.argv[1]) if len(sys.argv) >= 2 else 1
-instance_idx = int(sys.argv[2]) if len(sys.argv) >= 3 else 1
-profile = sys.argv[3] if len(sys.argv) >= 4 else 'latest'
-serial_modules = sys.argv[4].split() if len(sys.argv) >= 5 else []
-fix_failure_tests = sys.argv[5].lower() == 'true' if len(sys.argv) >= 6 else False
-target = sys.argv[6].lower() if len(sys.argv) >= 7 else 'cli'
-working_directory = os.getenv('BUILD_SOURCESDIRECTORY') if target == 'cli' else f"{os.getenv('BUILD_SOURCESDIRECTORY')}/azure-cli-extensions"
-azdev_test_result_dir = os.path.expanduser("~/.azdev/env_config/mnt/vss/_work/1/s/env")
-python_version = os.environ.get('PYTHON_VERSION', None)
-job_name = os.environ.get('JOB_NAME', None)
-pull_request_number = os.environ.get('PULL_REQUEST_NUMBER', None)
-enable_pipeline_result = bool(job_name and python_version)
-unique_job_name = ' '.join([job_name, python_version, profile, str(instance_idx)]) if enable_pipeline_result else None
+instance_cnt = os.environ.get('INSTANCE_CNT', None)
+instance_idx = os.environ.get('INSTANCE_IDX', None)
+target = os.environ.get('USER_TARGET', None)
+user_name = os.environ.get('USER_USERNAME', None)
+user_token = os.environ.get('USER_TOKEN', None)
+user_parallelism = os.environ.get('USER_PARALLELISM', None)
+platform = os.environ.get('PLATFORM', None)
+azdev_test_result_dir = ''
+
+
 # Test time (minutes) for each module.
 jobs = {
     'acr': 34,
@@ -377,7 +370,6 @@ class AutomaticScheduling(object):
         """
         self.jobs: Record the test time of each module
         self.modules: All modules and core, ignore extensions
-        self.serial_modules: All modules which need to execute in serial mode
         self.works: Record which modules each worker needs to test
         self.instance_cnt:
         The total number of concurrent automation full test pipeline instance with specify python version
@@ -385,7 +377,6 @@ class AutomaticScheduling(object):
         Best practice is to keep the number of concurrent tasks below 50
         If you set a larger number of concurrency, it will cause many instances to be in the waiting state
         And the network module has the largest number of test cases and can only be tested serially for now, so setting instance_cnt = 8 is sufficient
-        Total concurrent number: AutomationTest20200901 * 3 + AutomationTest20190301 * 3 + AutomationTest20180301 * 3 + AutomationFullTest * 8 * 3 (python_version) = 33
         self.instance_idx:
         The index of concurrent automation full test pipeline instance with specify python version
         For example:
@@ -394,14 +385,13 @@ class AutomaticScheduling(object):
         """
         self.jobs = []
         self.modules = {}
-        self.serial_modules = serial_modules
         self.works = []
         self.instance_cnt = instance_cnt
         self.instance_idx = instance_idx
         for i in range(self.instance_cnt):
             worker = {}
             self.works.append(worker)
-        self.profile = profile
+        self.serial_modules = []
 
     def get_all_modules(self):
         result = get_path_table()
@@ -464,15 +454,15 @@ class AutomaticScheduling(object):
             else:
                 parallel_tests.append(k)
         if serial_tests:
-            azdev_test_result_fp = os.path.join(azdev_test_result_dir, f"test_results_{python_version}_{profile}_{instance_idx}.serial.xml")
+            azdev_test_result_fp = os.path.join(azdev_test_result_dir, f"test_results_{instance_idx}.serial.xml")
             cmd = ['azdev', 'test', '--no-exitfirst', '--verbose', '--series'] + serial_tests + \
-                  ['--profile', f'{profile}', '--xml-path', azdev_test_result_fp, '--pytest-args', '-o junit_family=xunit1 --durations=10 --tb=no']
+                  ['--profile', '--xml-path', azdev_test_result_fp, '--pytest-args', '-o junit_family=xunit1 --durations=10 --tb=no']
             print(cmd)
             # serial_error_flag = process_test(cmd, azdev_test_result_fp, live_rerun=fix_failure_tests)
         if parallel_tests:
-            azdev_test_result_fp = os.path.join(azdev_test_result_dir, f"test_results_{python_version}_{profile}_{instance_idx}.parallel.xml")
+            azdev_test_result_fp = os.path.join(azdev_test_result_dir, f"test_results_{instance_idx}.parallel.xml")
             cmd = ['azdev', 'test', '--no-exitfirst', '--verbose'] + parallel_tests + \
-                  ['--profile', f'{profile}', '--xml-path', azdev_test_result_fp, '--pytest-args', '-o junit_family=xunit1 --durations=10 --tb=no']
+                  ['--profile', '--xml-path', azdev_test_result_fp, '--pytest-args', '-o junit_family=xunit1 --durations=10 --tb=no']
             print(cmd)
             # parallel_error_flag = process_test(cmd, azdev_test_result_fp, live_rerun=fix_failure_tests)
         return serial_error_flag or parallel_error_flag
@@ -486,7 +476,7 @@ class AutomaticScheduling(object):
                 azdev_test_result_fp = os.path.join(azdev_test_result_dir, f"test_results_{module}.xml")
                 cmd = ['azdev', 'test', module, '--discover', '--no-exitfirst', '--verbose',
                        '--xml-path', azdev_test_result_fp, '--pytest-args', '"--durations=10"']
-                error_flag = process_test(cmd, azdev_test_result_fp, live_rerun=fix_failure_tests, modules=[module])
+                error_flag = process_test(cmd, azdev_test_result_fp, live_rerun=False, modules=[module])
             remove_extension(module)
             global_error_flag = global_error_flag or error_flag
         return global_error_flag
