@@ -19,12 +19,12 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
-instance_cnt = os.environ.get('INSTANCE_CNT', None)
-instance_idx = os.environ.get('INSTANCE_IDX', None)
+instance_cnt = int(os.environ.get('INSTANCE_CNT'))
+instance_idx = int(os.environ.get('INSTANCE_IDX'))
 target = os.environ.get('USER_TARGET', None)
 user_name = os.environ.get('USER_USERNAME', None)
 user_token = os.environ.get('USER_TOKEN', None)
-user_parallelism = os.environ.get('USER_PARALLELISM', None)
+user_parallelism = int(os.environ.get('USER_PARALLELISM'))
 platform = os.environ.get('PLATFORM', None)
 azdev_test_result_dir = ''
 
