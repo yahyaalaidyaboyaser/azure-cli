@@ -39,3 +39,5 @@ jobs:
       git config -l
       git config --system -l
       git config --global -l
+      getfacl
+      mount
