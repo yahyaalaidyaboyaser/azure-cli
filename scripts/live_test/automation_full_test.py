@@ -10,7 +10,6 @@ import logging
 import os
 import subprocess
 import sys
-import time
 import xml.etree.ElementTree as ET
 
 logger = logging.getLogger(__name__)
@@ -379,6 +378,7 @@ class AutomaticScheduling(object):
     def run_instance_modules(self, instance_modules):
         global_error_flag = False
         error_flag = False
+        logger.warning(instance_modules)
         for module in instance_modules.keys():
             if is_extension(module) and (USER_TARGET.lower() in ['all', 'extension', ''] or module == USER_TARGET):
                 ext = get_extension_name(module)

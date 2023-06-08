@@ -38,7 +38,8 @@ BUILD_ID = os.environ.get('BUILD_ID')
 USER_TARGET = os.environ.get('USER_TARGET')
 PYTHON_VERSION = os.environ.get('PYTHON_VERSION')
 OS_VERSION = os.environ.get('PLATFORM')
-INSTANCE_MODULES = AutomaticScheduling().get_instance_modules()
+autoscheduling = AutomaticScheduling()
+INSTANCE_MODULES = autoscheduling.get_instance_modules()
 
 
 def generate_csv_file():
