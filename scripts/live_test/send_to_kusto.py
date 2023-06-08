@@ -44,7 +44,7 @@ INSTANCE_MODULES = autoscheduling.get_instance_modules()
 
 def generate_csv_file():
     for module in INSTANCE_MODULES.keys():
-        logger.warning('Start generate csv file for {TARGET}.'.format(TARGET=module))
+        logger.info('Start generate csv file for {TARGET}.'.format(TARGET=module))
         data = []
         parallel_file = f'{OUTPUT_DIR}/{module}.{OS_VERSION}.report.parallel.html'
         sequential_file = f'{OUTPUT_DIR}/{module}.{OS_VERSION}.report.sequential.html'
@@ -83,12 +83,12 @@ def generate_csv_file():
 
         data.extend(_get_data(parallel_file))
         data.extend(_get_data(sequential_file))
-        logger.warning('CSV data: {data}'.format(data=data))
+        logger.info('CSV data: {data}'.format(data=data))
 
         with open(f'{OUTPUT_DIR}/{module}.csv', mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerows(data)
-        logger.warning('Finish generate csv file for {TARGET}.'.format(TARGET=module))
+        logger.info('Finish generate csv file for {TARGET}.'.format(TARGET=module))
 
 
 def send_to_kusto():

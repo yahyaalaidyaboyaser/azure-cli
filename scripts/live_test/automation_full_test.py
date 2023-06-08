@@ -271,23 +271,6 @@ def remove_extension(extension_module):
     return error_flag
 
 
-def get_failed_tests(test_result_fp):
-    tree = ET.parse(test_result_fp)
-    root = tree.getroot()
-    failed_tests = {}
-    for testsuite in root:
-        for testcase in testsuite:
-            # Collect failed tests
-            failures = testcase.findall('failure')
-            if failures:
-                logger.info(f"failed testcase attributes: {testcase.attrib}")
-                test_case = testcase.attrib['name']
-                test_case_class = testcase.attrib['classname'] + '.' + test_case
-                recording_folder = os.path.join(os.path.dirname(testcase.attrib['file']), 'recordings')
-                failed_tests[test_case_class] = os.path.join(recording_folder, test_case + '.yaml')
-    return failed_tests
-
-
 def is_extension(module):
     return module.startswith('ext-')
 
@@ -338,7 +321,7 @@ class AutomaticScheduling(object):
         exts = {'ext-' + extension.split('\t')[1]: extension.split('\t')[2].strip('\r')
                         for extension in extensions if len(extension.split('\t')) > 2}
         self.modules = {**result['mod'], **exts}
-        logger.warning(self.modules)
+        logger.info(self.modules)
 
 
     def append_new_modules(self, jobs):
@@ -378,7 +361,7 @@ class AutomaticScheduling(object):
     def run_instance_modules(self, instance_modules):
         global_error_flag = False
         error_flag = False
-        logger.warning(instance_modules)
+        logger.info(instance_modules)
         for module in instance_modules.keys():
             if is_extension(module) and (USER_TARGET.lower() in ['all', 'extension', ''] or module == USER_TARGET):
                 ext = get_extension_name(module)
@@ -387,12 +370,12 @@ class AutomaticScheduling(object):
                 if not error_flag:
                     sequential = ['azdev', 'test', ext, USER_LIVE, '--mark', 'serial', '--xml-path', f'test_results.{ext}.sequential.xml', '--no-exitfirst', '-a',
                                   f'"-n 1 --json-report --json-report-summary --json-report-file={ext}.{PLATFORM}.report.sequential.json --html={ext}.{PLATFORM}.report.sequential.html --self-contained-html --capture=sys"']
-                    logger.warning(sequential)
+                    logger.info(sequential)
                     error_flag = run_command(sequential, check_return_code=True)
                     global_error_flag = global_error_flag or error_flag
                     parallel = ['azdev', 'test', ext, USER_LIVE, '--mark', 'not serial', '--xml-path', f'test_results.{ext}.parallel.xml', '--no-exitfirst', '-a',
                                 f'"-n {USER_PARALLELISM} --json-report --json-report-summary --json-report-file={ext}.{PLATFORM}.report.parallel.json --html={ext}.{PLATFORM}.report.parallel.html --self-contained-html --capture=sys"']
-                    logger.warning(parallel)
+                    logger.info(parallel)
                     error_flag = run_command(parallel, check_return_code=True)
                     global_error_flag = global_error_flag or error_flag
                 error_flag = remove_extension(ext)
@@ -400,12 +383,12 @@ class AutomaticScheduling(object):
             elif not is_extension(module) and (USER_TARGET.lower() in ['all', 'main', ''] or module == USER_TARGET):
                 sequential = ['azdev', 'test', module, USER_LIVE, '--mark', 'serial', '--xml-path', f'test_results.{module}.sequential.xml', '--no-exitfirst', '-a',
                               f'"-n 1 --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.sequential.json --html={module}.{PLATFORM}.report.sequential.html --self-contained-html --capture=sys"']
-                logger.warning(sequential)
+                logger.info(sequential)
                 error_flag = run_command(sequential, check_return_code=True)
                 global_error_flag = global_error_flag or error_flag
                 parallel = ['azdev', 'test', module, USER_LIVE, '--mark', 'not serial', '--xml-path', f'test_results.{module}.parallel.xml', '--no-exitfirst', '-a',
                             f'"-n {USER_PARALLELISM} --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.parallel.json --html={module}.{PLATFORM}.report.parallel.html --self-contained-html --capture=sys"']
-                logger.warning(parallel)
+                logger.info(parallel)
                 error_flag = run_command(parallel, check_return_code=True)
                 global_error_flag = global_error_flag or error_flag
         return global_error_flag or error_flag
