@@ -199,11 +199,7 @@ jobs:
           echo "##vso[task.setvariable variable=workDir]$(Agent.BuildDirectory)"
         fi
 
-        pip install azdev
-        pip install pytest-json-report
-        pip install pytest-html
-        pip install pytest-rerunfailures
-        pip install azure-kusto-data azure-kusto-ingest bs4
+        pip install azdev azure-kusto-data azure-kusto-ingest bs4 pytest-json-report pytest-html pytest-rerunfailures
 
         azdev setup -c azure-cli -r azure-cli-extensions
 
