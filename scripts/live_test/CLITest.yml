@@ -240,9 +240,9 @@ jobs:
           git push origin $(USER_BRANCH_EXT)
         fi
 
-       echo "Send data to kusto db!"
-       pip install azure-kusto-data azure-kusto-ingest bs4
-       python $workDir/s/scripts/live_test/send_to_kusto.py "$workDir"
+        echo "Send data to kusto db!"
+        pip install azure-kusto-data azure-kusto-ingest bs4
+        python $workDir/s/scripts/live_test/send_to_kusto.py "$workDir"
       condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       env:
         INSTANCE_CNT: 20
