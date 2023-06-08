@@ -203,6 +203,7 @@ jobs:
         pip install pytest-json-report
         pip install pytest-html
         pip install pytest-rerunfailures
+        pip install azure-kusto-data azure-kusto-ingest bs4
 
         azdev setup -c azure-cli -r azure-cli-extensions
 
@@ -220,7 +221,7 @@ jobs:
         python $workDir/s/scripts/live_test/clean_policy.py
         
         echo "Run tests"
-        python $workDir/s/scripts/live_test/automation_full_test.py
+        python $workDir/s/scripts/live_test/live_test.py "$workDir"
 
         pwd
         ls
@@ -238,10 +239,6 @@ jobs:
           git commit -m "Upload recording files"
           git push origin $(USER_BRANCH_EXT)
         fi
-
-        echo "Send data to kusto db!"
-        pip install azure-kusto-data azure-kusto-ingest bs4
-        python $workDir/s/scripts/live_test/send_to_kusto.py "$workDir"
       env:
         INSTANCE_CNT: 20
         INSTANCE_IDX: $(Instance_idx)
