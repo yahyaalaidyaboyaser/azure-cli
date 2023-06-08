@@ -19,15 +19,12 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
-instance_cnt = int(os.environ.get('INSTANCE_CNT'))
-instance_idx = int(os.environ.get('INSTANCE_IDX'))
-target = os.environ.get('USER_TARGET', None)
-user_name = os.environ.get('USER_USERNAME', None)
-user_token = os.environ.get('USER_TOKEN', None)
-user_parallelism = int(os.environ.get('USER_PARALLELISM'))
-platform = os.environ.get('PLATFORM', None)
-azdev_test_result_dir = ''
-
+INSTANCE_CNT = int(os.environ.get('INSTANCE_CNT'))
+INSTANCE_IDX = int(os.environ.get('INSTANCE_IDX'))
+USER_PARALLELISM = int(os.environ.get('USER_PARALLELISM'))
+USER_LIVE = os.environ.get('USER_LIVE')
+USER_TARGET = os.environ.get('USER_TARGET')
+PLATFORM = os.environ.get('PLATFORM', None)
 
 # Test time (minutes) for each module.
 jobs = {
@@ -255,6 +252,7 @@ def run_command(cmd, check_return_code=False):
 
 
 def install_extension(extension_module):
+
     try:
         cmd = ['azdev', 'extension', 'add', extension_module]
         error_flag = run_command(cmd, check_return_code=True)
@@ -274,50 +272,6 @@ def remove_extension(extension_module):
     return error_flag
 
 
-def git_restore(file_path):
-    if not file_path:
-        return
-    logger.info(f"git restore *{file_path}")
-    out = subprocess.Popen(["git", "restore", "*" + file_path], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    stdout, err = out.communicate()
-    if stdout:
-        logger.info(stdout)
-    if err:
-        logger.warning(err)
-
-
-def git_push(message, modules=[]):
-    out = subprocess.Popen(["git", "status"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    stdout, _ = out.communicate()
-    if "nothing to commit, working tree clean" in str(stdout):
-        return
-    try:
-        if modules:
-            build_id = os.getenv("BUILD_BUILDID")
-            module_name = '_'.join(modules)
-            branch_name = f"regression_test_{build_id}_{module_name}"
-            run_command(["git", "checkout", "-b", branch_name])
-            run_command(["git", "push", "--set-upstream", "azclibot", branch_name], check_return_code=True)
-        run_command(["git", "add", "src/*"], check_return_code=True)
-        run_command(["git", "commit", "-m", message], check_return_code=True)
-    except RuntimeError as ex:
-        raise ex
-    retry = 3
-    while retry >= 0:
-        try:
-            run_command(["git", "fetch"], check_return_code=True)
-            run_command(["git", "pull", "--rebase"], check_return_code=True)
-            run_command(["git", "push"], check_return_code=True)
-
-            logger.info("git push all recording files")
-            break
-        except RuntimeError as ex:
-            if retry == 0:
-                raise ex
-            retry -= 1
-            time.sleep(10)
-
-
 def get_failed_tests(test_result_fp):
     tree = ET.parse(test_result_fp)
     root = tree.getroot()
@@ -335,33 +289,12 @@ def get_failed_tests(test_result_fp):
     return failed_tests
 
 
-def process_test(cmd, azdev_test_result_fp, live_rerun=False, modules=[]):
-    error_flag = run_command(cmd)
-    if not error_flag or not live_rerun:
-        return error_flag
-    if not os.path.exists(azdev_test_result_fp):
-        logger.warning(f"{cmd} failed directly. The related module can't work!")
-        if modules:
-            test_results_error_modules_fp = os.path.join(azdev_test_result_dir, f'test_results_error_modules_{instance_idx}.txt')
-            with open(test_results_error_modules_fp, 'a') as fp:
-                fp.write(','.join(modules)+"\n")
-        return error_flag
-    # drop the original `--pytest-args` and add new arguments
-    cmd = cmd[:-2] + ['--lf', '--live', '--pytest-args', '-o junit_family=xunit1']
-    error_flag = run_command(cmd)
-    # restore original recording yaml file for failed test in live run
-    if error_flag:
-        failed_tests = get_failed_tests(azdev_test_result_fp)
-        for (test, file) in failed_tests.items():
-            git_restore(file)
-            test_results_failure_tests_fp = os.path.join(azdev_test_result_dir, f'test_results_failure_tests_{instance_idx}.txt')
-            with open(test_results_failure_tests_fp, 'a') as fp:
-                fp.write(test + "\n")
+def is_extension(module):
+    return module.startswith('ext-')
 
-    # save live run recording changes to git
-    commit_message = f"Rerun tests from instance {instance_idx}. See {os.path.basename(azdev_test_result_fp)} for details"
-    git_push(commit_message, modules=modules)
-    return False
+
+def get_extension_name(module):
+    return module[4:]
 
 
 class AutomaticScheduling(object):
@@ -386,28 +319,20 @@ class AutomaticScheduling(object):
         self.jobs = []
         self.modules = {}
         self.works = []
-        self.instance_cnt = instance_cnt
-        self.instance_idx = instance_idx
+        self.instance_cnt = INSTANCE_CNT
+        self.instance_idx = INSTANCE_IDX
         for i in range(self.instance_cnt):
             worker = {}
             self.works.append(worker)
         self.serial_modules = []
+        self.get_all_modules()
+        self.append_new_modules(jobs)
 
     def get_all_modules(self):
         result = get_path_table()
         # only get modules and core, ignore extensions
         self.modules = {**result['mod'], **result['ext']}
         logger.warning(self.modules)
-
-    # def get_extension_modules(self):
-    #     out = subprocess.Popen(['azdev', 'extension', 'list', '-o', 'tsv'], stdout=subprocess.PIPE)
-    #     stdout = out.communicate()[0]
-    #     if not stdout:
-    #         raise RuntimeError("No extension detected")
-    #     extensions = stdout.decode('UTF-8').split('\n')
-    #     self.modules = {extension.split('\t')[1]: extension.split('\t')[2].strip('\r')
-    #                     for extension in extensions if len(extension.split('\t')) > 2}
-    #     logger.info(self.modules)
 
     def append_new_modules(self, jobs):
         # If add a new module, use average test time
@@ -444,49 +369,43 @@ class AutomaticScheduling(object):
         return self.works[self.instance_idx]
 
     def run_instance_modules(self, instance_modules):
-        # divide the modules that the current instance needs to execute into parallel or serial execution
-        serial_error_flag = parallel_error_flag = False
-        serial_tests = []
-        parallel_tests = []
-        for k, v in instance_modules.items():
-            if k in self.serial_modules:
-                serial_tests.append(k)
-            else:
-                parallel_tests.append(k)
-        if serial_tests:
-            azdev_test_result_fp = os.path.join(azdev_test_result_dir, f"test_results_{instance_idx}.serial.xml")
-            cmd = ['azdev', 'test', '--no-exitfirst', '--verbose', '--series'] + serial_tests + \
-                  ['--profile', '--xml-path', azdev_test_result_fp, '--pytest-args', '-o junit_family=xunit1 --durations=10 --tb=no']
-            print(cmd)
-            # serial_error_flag = process_test(cmd, azdev_test_result_fp, live_rerun=fix_failure_tests)
-        if parallel_tests:
-            azdev_test_result_fp = os.path.join(azdev_test_result_dir, f"test_results_{instance_idx}.parallel.xml")
-            cmd = ['azdev', 'test', '--no-exitfirst', '--verbose'] + parallel_tests + \
-                  ['--profile', '--xml-path', azdev_test_result_fp, '--pytest-args', '-o junit_family=xunit1 --durations=10 --tb=no']
-            print(cmd)
-            # parallel_error_flag = process_test(cmd, azdev_test_result_fp, live_rerun=fix_failure_tests)
-        return serial_error_flag or parallel_error_flag
-
-    def run_extension_instance_modules(self, instance_modules):
         global_error_flag = False
-        for module, path in instance_modules.items():
-            run_command(["git", "checkout", f"regression_test_{os.getenv('BUILD_BUILDID')}"], check_return_code=True)
-            error_flag = install_extension(module)
-            if not error_flag:
-                azdev_test_result_fp = os.path.join(azdev_test_result_dir, f"test_results_{module}.xml")
-                cmd = ['azdev', 'test', module, '--discover', '--no-exitfirst', '--verbose',
-                       '--xml-path', azdev_test_result_fp, '--pytest-args', '"--durations=10"']
-                error_flag = process_test(cmd, azdev_test_result_fp, live_rerun=False, modules=[module])
-            remove_extension(module)
-            global_error_flag = global_error_flag or error_flag
-        return global_error_flag
+        error_flag = False
+        for module in instance_modules.keys():
+            if is_extension(module) and (USER_TARGET.lower() in ['all', 'extension', ''] or module == USER_TARGET):
+                ext = get_extension_name(module)
+                error_flag = install_extension(ext)
+                global_error_flag = global_error_flag or error_flag
+                if not error_flag:
+                    sequential = ['azdev', 'test', ext, USER_LIVE, '--mark', 'serial', '--xml-path', f'test_results.{ext}.sequential.xml', '--no-exitfirst', '-a',
+                                  f'"-n 1 --json-report --json-report-summary --json-report-file={ext}.{PLATFORM}.report.sequential.json --html={ext}.{PLATFORM}.report.sequential.html --self-contained-html --capture=sys"']
+                    logger.warning(sequential)
+                    error_flag = run_command(sequential, check_return_code=True)
+                    global_error_flag = global_error_flag or error_flag
+                    parallel = ['azdev', 'test', ext, USER_LIVE, '--mark', 'not serial', '--xml-path', f'test_results.{ext}.parallel.xml', '--no-exitfirst', '-a',
+                                f'"-n {USER_PARALLELISM} --json-report --json-report-summary --json-report-file={ext}.{PLATFORM}.report.parallel.json --html={ext}.{PLATFORM}.report.parallel.html --self-contained-html --capture=sys"']
+                    logger.warning(parallel)
+                    error_flag = run_command(parallel, check_return_code=True)
+                    global_error_flag = global_error_flag or error_flag
+                error_flag = remove_extension(ext)
+                global_error_flag = global_error_flag or error_flag
+            elif not is_extension(module) and (USER_TARGET.lower() in ['all', 'main', ''] or module == USER_TARGET):
+                sequential = ['azdev', 'test', module, USER_LIVE, '--mark', 'serial', '--xml-path', f'test_results.{module}.sequential.xml', '--no-exitfirst', '-a',
+                              f'"-n 1 --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.sequential.json --html={module}.{PLATFORM}.report.sequential.html --self-contained-html --capture=sys"']
+                logger.warning(sequential)
+                error_flag = run_command(sequential, check_return_code=True)
+                global_error_flag = global_error_flag or error_flag
+                parallel = ['azdev', 'test', module, USER_LIVE, '--mark', 'not serial', '--xml-path', f'test_results.{module}.parallel.xml', '--no-exitfirst', '-a',
+                            f'"-n {USER_PARALLELISM} --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.parallel.json --html={module}.{PLATFORM}.report.parallel.html --self-contained-html --capture=sys"']
+                logger.warning(parallel)
+                error_flag = run_command(parallel, check_return_code=True)
+                global_error_flag = global_error_flag or error_flag
+        return global_error_flag or error_flag
 
 
 def main():
     logger.info("Start automation full test ...\n")
     autoscheduling = AutomaticScheduling()
-    autoscheduling.get_all_modules()
-    autoscheduling.append_new_modules(jobs)
     instance_modules = autoscheduling.get_instance_modules()
     sys.exit(1) if autoscheduling.run_instance_modules(instance_modules) else sys.exit(0)
 
