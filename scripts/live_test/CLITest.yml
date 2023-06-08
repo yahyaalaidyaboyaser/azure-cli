@@ -252,12 +252,20 @@ jobs:
         KUSTO_DATABASE: $(KUSTO_DATABASE)
         KUSTO_TABLE: $(KUSTO_TABLE)
         BUILD_ID: $(Build.BuildId)
-
+    - script: |
+        if [ -f "$(workDir)/test_results.*.xml" ]; then
+          echo "##vso[task.setvariable variable=pathExists;isOutput=true]true"
+        else
+          echo "##vso[task.setvariable variable=pathExists;isOutput=true]false"
+        fi
+      displayName: 'Check if path exists'
+      name: checkPath
     - task: PublishTestResults@2
       inputs:
         testResultsFiles: '$(workDir)/test_results.*.xml'
         testRunTitle: 'Azure CLI live test results of $(Target)'
         mergeTestResults: true
+      condition: eq(variables['checkPath.pathExists'], 'true')
     - task: CopyFiles@2
       displayName: 'move desired artifacts'
       inputs:
@@ -266,14 +274,25 @@ jobs:
         # $(module).$(platform).report.parallel.html
         # $(module).$(platform).report.sequential.json
         # $(module).$(platform).report.sequential.html
-        contents: '*.*.report.*.json|*.*.report.*.html'
+        contents: |
+          *report*.json
+          *report*.html
         targetFolder: 'live_test/temp/'
+    - script: |
+        if [ -d "live_test/tmp" ]; then
+          echo "##vso[task.setvariable variable=pathExists;isOutput=true]true"
+        else
+          echo "##vso[task.setvariable variable=pathExists;isOutput=true]false"
+        fi
+      displayName: 'Check if path exists'
+      name: checkPath
     - task: PublishBuildArtifacts@1
       displayName: 'publish artifacts'
       inputs:
         PathtoPublish: livetest/temp/
         ArtifactName: 'livetest'
         publishLocation: 'Container'
+      condition: eq(variables['checkPath.pathExists'], 'true')
 #    - task: PublishBuildArtifacts@1
 #      inputs:
 #        PathtoPublish: '$(workDir)'
