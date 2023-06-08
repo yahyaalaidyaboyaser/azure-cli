@@ -257,26 +257,26 @@ jobs:
         testResultsFiles: '$(workDir)/test_results.*.xml'
         testRunTitle: 'Azure CLI live test results of $(Target)'
         mergeTestResults: true
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(workDir)'
-        ArtifactName: 'livetest'
-        publishLocation: 'Container'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(workDir)'
-        ArtifactName: 'livetest'
-        publishLocation: 'Container'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(workDir)'
-        ArtifactName: 'livetest'
-        publishLocation: 'Container'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(workDir)'
-        ArtifactName: 'livetest'
-        publishLocation: 'Container'
+#    - task: PublishBuildArtifacts@1
+#      inputs:
+#        PathtoPublish: '$(workDir)'
+#        ArtifactName: 'livetest'
+#        publishLocation: 'Container'
+#    - task: PublishBuildArtifacts@1
+#      inputs:
+#        PathtoPublish: '$(workDir)'
+#        ArtifactName: 'livetest'
+#        publishLocation: 'Container'
+#    - task: PublishBuildArtifacts@1
+#      inputs:
+#        PathtoPublish: '$(workDir)'
+#        ArtifactName: 'livetest'
+#        publishLocation: 'Container'
+#    - task: PublishBuildArtifacts@1
+#      inputs:
+#        PathtoPublish: '$(workDir)'
+#        ArtifactName: 'livetest'
+#        publishLocation: 'Container'
 
 #- job: SendEmail
 #  displayName: Send email
