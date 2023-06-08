@@ -262,10 +262,10 @@ jobs:
       displayName: 'move desired artifacts'
       inputs:
         sourceFolder: '$(workDir)/'
-        # $(Target).$(platform).report.parallel.json
-        # $(Target).$(platform).report.parallel.html
-        # $(Target).$(platform).report.sequential.json
-        # $(Target).$(platform).report.sequential.html
+        # $(module).$(platform).report.parallel.json
+        # $(module).$(platform).report.parallel.html
+        # $(module).$(platform).report.sequential.json
+        # $(module).$(platform).report.sequential.html
         contents: '*.*.report.*.json|*.*.report.*.html'
         targetFolder: 'live_test/temp/'
     - task: PublishBuildArtifacts@1
