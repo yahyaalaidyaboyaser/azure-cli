@@ -328,11 +328,19 @@ class AutomaticScheduling(object):
         self.get_all_modules()
         self.append_new_modules(jobs)
 
+
     def get_all_modules(self):
         result = get_path_table()
-        # only get modules and core, ignore extensions
-        self.modules = {**result['mod'], **result['ext']}
+        out = subprocess.Popen(['azdev', 'extension', 'list', '-o', 'tsv'], stdout=subprocess.PIPE)
+        stdout = out.communicate()[0]
+        if not stdout:
+            raise RuntimeError("No extension detected")
+        extensions = stdout.decode('UTF-8').split('\n')
+        exts = {'ext-' + extension.split('\t')[1]: extension.split('\t')[2].strip('\r')
+                        for extension in extensions if len(extension.split('\t')) > 2}
+        self.modules = {**result['mod'], **exts}
         logger.warning(self.modules)
+
 
     def append_new_modules(self, jobs):
         # If add a new module, use average test time
