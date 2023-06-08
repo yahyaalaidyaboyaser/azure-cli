@@ -253,15 +253,7 @@ jobs:
         KUSTO_TABLE: $(KUSTO_TABLE)
         BUILD_ID: $(Build.BuildId)
     - script: |
-        python -c "
-        import os
-        import glob
-        files = glob.glob('$(workDir)/test_results.*.xml')
-        if files:
-            print('##vso[task.setvariable variable=pathExists;isOutput=true]true')
-        else:
-            print('##vso[task.setvariable variable=pathExists;isOutput=true]false')
-        "
+        python -c "import os; import glob; files = glob.glob('$(workDir)/test_results.*.xml'); print('##vso[task.setvariable variable=pathExists;isOutput=true]true') if files else print('##vso[task.setvariable variable=pathExists;isOutput=true]false')"
       displayName: 'Check if path exists'
       name: checkPath1
     - task: PublishTestResults@2
@@ -281,15 +273,9 @@ jobs:
         contents: |
           *report*.json
           *report*.html
-        targetFolder: 'live_test/temp/'
+        targetFolder: 'livetest/temp/'
     - script: |
-        python -c "
-        import os
-        if os.path.exists('livetest/temp/'):
-            print('##vso[task.setvariable variable=pathExists;isOutput=true]true')
-        else:
-            print('##vso[task.setvariable variable=pathExists;isOutput=true]false')
-        "
+        python -c "import os; print('##vso[task.setvariable variable=pathExists;isOutput=true]true') if os.path.exists('livetest/temp/') else print('##vso[task.setvariable variable=pathExists;isOutput=true]false')"
       displayName: 'Check if path exists'
       name: checkPath2
     - task: PublishBuildArtifacts@1
