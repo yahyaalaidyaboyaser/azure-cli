@@ -259,13 +259,13 @@ jobs:
           echo "##vso[task.setvariable variable=pathExists;isOutput=true]false"
         fi
       displayName: 'Check if path exists'
-      name: checkPath
+      name: checkPath1
     - task: PublishTestResults@2
       inputs:
         testResultsFiles: '$(workDir)/test_results.*.xml'
         testRunTitle: 'Azure CLI live test results of $(Target)'
         mergeTestResults: true
-      condition: eq(variables['checkPath.pathExists'], 'true')
+      condition: eq(variables['checkPath1.pathExists'], 'true')
     - task: CopyFiles@2
       displayName: 'move desired artifacts'
       inputs:
@@ -285,14 +285,14 @@ jobs:
           echo "##vso[task.setvariable variable=pathExists;isOutput=true]false"
         fi
       displayName: 'Check if path exists'
-      name: checkPath
+      name: checkPath2
     - task: PublishBuildArtifacts@1
       displayName: 'publish artifacts'
       inputs:
         PathtoPublish: livetest/temp/
         ArtifactName: 'livetest'
         publishLocation: 'Container'
-      condition: eq(variables['checkPath.pathExists'], 'true')
+      condition: eq(variables['checkPath2.pathExists'], 'true')
 #    - task: PublishBuildArtifacts@1
 #      inputs:
 #        PathtoPublish: '$(workDir)'
