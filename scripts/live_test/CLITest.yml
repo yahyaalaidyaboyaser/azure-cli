@@ -258,6 +258,22 @@ jobs:
         testResultsFiles: '$(workDir)/test_results.*.xml'
         testRunTitle: 'Azure CLI live test results of $(Target)'
         mergeTestResults: true
+    - task: CopyFiles@2
+      displayName: 'move desired artifacts'
+      inputs:
+        sourceFolder: '$(workDir)/'
+        # $(Target).$(platform).report.parallel.json
+        # $(Target).$(platform).report.parallel.html
+        # $(Target).$(platform).report.sequential.json
+        # $(Target).$(platform).report.sequential.html
+        contents: '*.*.report.*.json|*.*.report.*.html'
+        targetFolder: 'live_test/temp/'
+    - task: PublishBuildArtifacts@1
+      displayName: 'publish artifacts'
+      inputs:
+        PathtoPublish: livetest/temp/
+        ArtifactName: 'livetest'
+        publishLocation: 'Container'
 #    - task: PublishBuildArtifacts@1
 #      inputs:
 #        PathtoPublish: '$(workDir)'
