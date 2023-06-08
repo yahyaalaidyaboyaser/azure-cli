@@ -154,7 +154,6 @@ jobs:
           platform: ${{ plat.name }}
   steps:
     - task: UsePythonVersion@0
-      condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
         versionSpec: '$(PYTHON_VERSION)'
         addToPath: true
@@ -243,7 +242,6 @@ jobs:
         echo "Send data to kusto db!"
         pip install azure-kusto-data azure-kusto-ingest bs4
         python $workDir/s/scripts/live_test/send_to_kusto.py "$workDir"
-      condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       env:
         INSTANCE_CNT: 20
         INSTANCE_IDX: $(Instance_idx)
@@ -262,31 +260,26 @@ jobs:
         BUILD_ID: $(Build.BuildId)
 
     - task: PublishTestResults@2
-      condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
         testResultsFiles: '$(workDir)/test_results.*.xml'
         testRunTitle: 'Azure CLI live test results of $(Target)'
         mergeTestResults: true
     - task: PublishBuildArtifacts@1
-      condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
         PathtoPublish: '$(workDir)'
         ArtifactName: 'livetest'
         publishLocation: 'Container'
     - task: PublishBuildArtifacts@1
-      condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
         PathtoPublish: '$(workDir)'
         ArtifactName: 'livetest'
         publishLocation: 'Container'
     - task: PublishBuildArtifacts@1
-      condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
         PathtoPublish: '$(workDir)'
         ArtifactName: 'livetest'
         publishLocation: 'Container'
     - task: PublishBuildArtifacts@1
-      condition: and(succeededOrFailed(), eq(variables.Match, '1'))
       inputs:
         PathtoPublish: '$(workDir)'
         ArtifactName: 'livetest'
