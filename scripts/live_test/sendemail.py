@@ -2,6 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
+import sys
 
 from azure.kusto.data import KustoConnectionStringBuilder
 from azure.kusto.data.data_format import DataFormat
@@ -19,6 +20,7 @@ import logging
 import os
 import re
 import subprocess
+import sys
 import test_data
 import traceback
 
@@ -28,10 +30,10 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
+COMMIT_ID = sys.argv[1]
 ACCOUNT_KEY = os.environ.get('ACCOUNT_KEY')
 ARTIFACT_DIR = os.environ.get('ARTIFACTS_DIR')
 BUILD_ID = os.environ.get('BUILD_ID')
-COMMIT_ID = os.environ.get('COMMIT_ID')
 EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
 EMAIL_KEY = os.environ.get('EMAIL_KEY')
 # authenticate with AAD application.
