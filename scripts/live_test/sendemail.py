@@ -295,16 +295,16 @@ function toggleSortStates(elem) {
 
 
 def main():
-    logger.warning('Enter main()')
+    logger.info('Enter main()')
 
-    logger.warning(BUILD_ID)
-    logger.warning(USER_REPO)
-    logger.warning(USER_BRANCH)
-    logger.warning(USER_TARGET)
-    logger.warning(USER_LIVE)
-    logger.warning(ARTIFACT_DIR)
-    logger.warning(EMAIL_ADDRESS)
-    logger.warning(COMMIT_ID)
+    logger.info(BUILD_ID)
+    logger.info(USER_REPO)
+    logger.info(USER_BRANCH)
+    logger.info(USER_TARGET)
+    logger.info(USER_LIVE)
+    logger.info(ARTIFACT_DIR)
+    logger.info(EMAIL_ADDRESS)
+    logger.info(COMMIT_ID)
 
     # Collect statistics
     testdata = test_data.TestData(ARTIFACT_DIR)
@@ -316,7 +316,7 @@ def main():
     # Upload results to storage account, container
     container = ''
     try:
-        logger.warning('Uploading test results to storage account...')
+        logger.info('Uploading test results to storage account...')
         container = get_container_name()
         upload_files(container)
     except Exception:
@@ -333,13 +333,13 @@ def main():
         logger.exception(traceback.format_exc())
 
     get_remaining_tests()
-    logger.warning('Exit main()')
+    logger.info('Exit main()')
 
 
 def get_remaining_tests():
-    logger.warning('Enter get_remaining_tests()')
+    logger.info('Enter get_remaining_tests()')
     cmd = ['az', 'group', 'list', '--tag', 'module', '--query', '[][name, tags]']
-    logger.warning(cmd)
+    logger.info(cmd)
     out = subprocess.run(cmd, capture_output=True)
     remaing_tests = json.loads(out.stdout) if out.stdout else []
     if remaing_tests:
@@ -369,14 +369,14 @@ def get_remaining_tests():
             soup.table.append(tbody)
         with open('resource.html', 'w') as f:
             f.write(str(soup))
-            logger.warning('resource.html: ' + str(soup))
+            logger.info('resource.html: ' + str(soup))
         cmd = 'az storage blob upload -f resource.html -c {} -n resource.html --account-name clitestresultstac --account-key {}'.format(BUILD_ID, ACCOUNT_KEY)
-        logger.warning('Running: ' + cmd)
+        logger.info('Running: ' + cmd)
         os.system(cmd)
 
 
 def summary_data(testdata):
-    logger.warning('Enter summary_data_by_module()')
+    logger.info('Enter summary_data_by_module()')
     modules = [module[0].split('.')[0] for module in testdata.modules]
     data = []
     for idx, module in enumerate(modules):
@@ -452,7 +452,7 @@ def summary_data(testdata):
 
     # send to kusto db
     # TODO: delete the following code after testing
-    logger.info('csv data: ' + data)
+    logger.info(f'csv data: {data}')
     if USER_TARGET.lower() in ['all', ''] \
             and USER_REPO == 'https://github.com/Azure/azure-cli.git' \
             and USER_REPO_EXT == 'https://github.com/Azure/azure-cli-extensions.git' \
@@ -490,7 +490,7 @@ def html_to_csv(html_file, module):
                         elif not content.name:
                             Details += content
                         else:
-                            logger.warning(content.name)
+                            logger.info(content.name)
                 else:
                     Details = ''
                 EndDateTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -534,9 +534,9 @@ def get_container_name():
     Generate container name in storage account. It is also an identifier of the pipeline run.
     :return:
     """
-    logger.warning('Enter get_container_name()')
+    logger.info('Enter get_container_name()')
     name = BUILD_ID
-    logger.warning('Exit get_container_name()')
+    logger.info('Exit get_container_name()')
     return name
 
 
@@ -546,7 +546,7 @@ def upload_files(container):
     :param container:
     :return:
     """
-    logger.warning('Enter upload_files()')
+    logger.info('Enter upload_files()')
 
     # Create container
     cmd = 'az storage container create -n {} --account-name clitestresultstac --account-key {} --public-access container'.format(container, ACCOUNT_KEY)
@@ -560,11 +560,11 @@ def upload_files(container):
                 cmd = 'az storage blob upload -f {} -c {} -n {} --account-name clitestresultstac --account-key {}'.format(fullpath, container, name, ACCOUNT_KEY)
                 os.system(cmd)
 
-    logger.warning('Exit upload_files()')
+    logger.info('Exit upload_files()')
 
 
 def send_email(html_content):
-    logger.warning('Sending email...')
+    logger.info('Sending email...')
     from azure.communication.email import EmailClient
 
     client = EmailClient.from_connection_string(EMAIL_KEY);
@@ -607,9 +607,9 @@ def send_email(html_content):
         }
 
         client.begin_send(message)
-        logger.warning('Finish sending email')
+        logger.info('Finish sending email')
     else:
-        logger.warning('No recipients, skip sending email')
+        logger.info('No recipients, skip sending email')
 
 
 if __name__ == '__main__':
