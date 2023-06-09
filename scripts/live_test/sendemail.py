@@ -3,14 +3,22 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
+from azure.kusto.data import KustoConnectionStringBuilder
+from azure.kusto.data.data_format import DataFormat
+from azure.kusto.ingest import (
+    IngestionProperties,
+    QueuedIngestClient,
+    ReportLevel,
+)
 from bs4 import BeautifulSoup
+import csv
+import datetime
 import generate_index
 import json
 import logging
 import os
 import re
 import subprocess
-import sys
 import test_data
 import traceback
 
@@ -20,19 +28,28 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
-SENDGRID_KEY = sys.argv[1]
-BUILD_ID = sys.argv[2]
-USER_REPO = sys.argv[3]
-USER_BRANCH = sys.argv[4]
-USER_TARGET = sys.argv[5]
-USER_LIVE = sys.argv[6]
-ARTIFACT_DIR = sys.argv[7]
-REQUESTED_FOR_EMAIL = sys.argv[8]
-ACCOUNT_KEY = sys.argv[9]
-COMMIT_ID = sys.argv[10]
-USER_REPO_EXT = sys.argv[11]
-USER_BRANCH_EXT = sys.argv[12]
-
+ACCOUNT_KEY = os.environ.get('ACCOUNT_KEY')
+ARTIFACT_DIR = os.environ.get('ARTIFACTS_DIR')
+BUILD_ID = os.environ.get('BUILD_ID')
+COMMIT_ID = os.environ.get('COMMIT_ID')
+EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
+EMAIL_KEY = os.environ.get('EMAIL_KEY')
+# authenticate with AAD application.
+KUSTO_CLIENT_ID = os.environ.get('KUSTO_CLIENT_ID')
+KUSTO_CLIENT_SECRET = os.environ.get('KUSTO_CLIENT_SECRET')
+KUSTO_CLUSTER = os.environ.get('KUSTO_CLUSTER')
+KUSTO_DATABASE = os.environ.get('KUSTO_DATABASE')
+KUSTO_TABLE = os.environ.get('KUSTO_TABLE')
+# get tenant id from https://docs.microsoft.com/en-us/onedrive/find-your-office-365-tenant-id
+KUSTO_TENANT_ID = os.environ.get('KUSTO_TENANT_ID')
+PLATFORM = os.environ.get('PLATFORM')
+PYTHON_VERSION = os.environ.get('PYTHON_VERSION')
+USER_BRANCH = os.environ.get('USER_BRANCH')
+USER_BRANCH_EXT = os.environ.get('USER_BRANCH_EXT')
+USER_LIVE = os.environ.get('USER_LIVE')
+USER_REPO = os.environ.get('USER_REPO')
+USER_REPO_EXT = os.environ.get('USER_REPO_EXT')
+USER_TARGET = os.environ.get('USER_TARGET')
 
 resource_html = """
 <!DOCTYPE html>
@@ -286,15 +303,15 @@ def main():
     logger.warning(USER_TARGET)
     logger.warning(USER_LIVE)
     logger.warning(ARTIFACT_DIR)
-    logger.warning(REQUESTED_FOR_EMAIL)
+    logger.warning(EMAIL_ADDRESS)
     logger.warning(COMMIT_ID)
 
     # Collect statistics
     testdata = test_data.TestData(ARTIFACT_DIR)
     testdata.collect()
 
-    # Summary data by module
-    summary_data_by_module(testdata)
+    # Summary data and send to kusto db
+    summary_data(testdata)
 
     # Upload results to storage account, container
     container = ''
@@ -358,9 +375,10 @@ def get_remaining_tests():
         os.system(cmd)
 
 
-def summary_data_by_module(testdata):
+def summary_data(testdata):
     logger.warning('Enter summary_data_by_module()')
     modules = [module[0].split('.')[0] for module in testdata.modules]
+    data = []
     for idx, module in enumerate(modules):
         total_test = testdata.modules[idx][1] + testdata.modules[idx][2]
         passed = testdata.modules[idx][1]
@@ -375,6 +393,7 @@ def summary_data_by_module(testdata):
                     First = False
                     platform = file.split('.')[1]
                     first = os.path.join(root, file)
+                    data.extend(html_to_csv(first, module))
                     with open(first, 'r') as f:
                         src_html = f.read()
                         src_soup = BeautifulSoup(src_html, 'html.parser')
@@ -408,6 +427,7 @@ def summary_data_by_module(testdata):
                 elif file.startswith(module) and file.endswith('html'):
                     platform = file.split('.')[1]
                     other = os.path.join(root, file)
+                    data.extend(html_to_csv(first, module))
                     with open(other, 'r') as f:
                         other_html = f.read()
                         other_soup = BeautifulSoup(other_html, 'html.parser')
@@ -430,10 +450,82 @@ def summary_data_by_module(testdata):
         with open(dst_html, 'w') as f:
             f.write(str(src_soup))
 
+    # send to kusto db
+        # # TODO: add filter for main repo and ext repo
+    if USER_TARGET.lower() in ['all', ''] \
+            and USER_REPO == 'https://github.com/Azure/azure-cli.git' \
+            and USER_REPO_EXT == 'https://github.com/Azure/azure-cli-extensions.git' \
+            and USER_BRANCH == 'dev' and USER_BRANCH_EXT == 'main' \
+            and USER_LIVE == '--live':
+        send_to_kusto(data)
+
     for root, dirs, files in os.walk(ARTIFACT_DIR):
         for file in files:
             if len(file.split('.')) > 3 and file.endswith('html'):
                 os.remove(os.path.join(root, file))
+
+
+def html_to_csv(html_file, module):
+    data = []
+    if os.path.exists(html_file):
+        with open(html_file) as file:
+            bs = BeautifulSoup(file, "html.parser")
+            results = bs.find(id="results-table")
+            Source = 'LiveTest'
+            BuildId = BUILD_ID
+            Module = module
+            Description = ''
+            ExtendedProperties = ''
+            for result in results.find_all('tbody'):
+                Name = result.find('td', {'class': 'col-name'}).text.split('::')[-1]
+                Duration = result.find('td', {'class': 'col-duration'}).text
+                Status = result.find('td', {'class': 'col-result'}).text
+                if Status == 'Failed':
+                    contents = result.find('td', {'class': 'extra'}).find('div', {'class': 'log'}).contents
+                    Details = ''
+                    for content in contents:
+                        if content.name == 'br':
+                            Details += '\n'
+                        elif not content.name:
+                            Details += content
+                        else:
+                            logger.warning(content.name)
+                else:
+                    Details = ''
+                EndDateTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                StartDateTime = (datetime.datetime.now() - datetime.timedelta(seconds=int(float(Duration)))).strftime(
+                    "%Y-%m-%d %H:%M:%S")
+                data.append(
+                    [Source, BuildId, PLATFORM, PYTHON_VERSION, Module, Name, Description, StartDateTime, EndDateTime,
+                     Duration, Status, Details, ExtendedProperties])
+    return data
+
+
+def send_to_kusto(self, data):
+    logger.info('Start send csv data to kusto db')
+
+    with open(f'{ARTIFACT_DIR}/livetest.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(data)
+    logger.info('Finish generate csv file for live test.')
+
+    kcsb = KustoConnectionStringBuilder.with_aad_application_key_authentication(KUSTO_CLUSTER, KUSTO_CLIENT_ID, KUSTO_CLIENT_SECRET, KUSTO_TENANT_ID)
+    # The authentication method will be taken from the chosen KustoConnectionStringBuilder.
+    client = QueuedIngestClient(kcsb)
+
+    # there are a lot of useful properties, make sure to go over docs and check them out
+    ingestion_props = IngestionProperties(
+        database=KUSTO_DATABASE,
+        table=KUSTO_TABLE,
+        data_format=DataFormat.CSV,
+        report_level=ReportLevel.FailuresAndSuccesses
+    )
+
+    # ingest from file
+    result = client.ingest_from_file(f"{ARTIFACT_DIR}/livetest.csv", ingestion_properties=ingestion_props)
+    # Inspect the result for useful information, such as source_id and blob_url
+    print(repr(result))
+    logger.info('Finsh send live test csv data to kusto db.')
 
 
 def get_container_name():
@@ -478,7 +570,7 @@ def send_email(html_content):
     logger.warning('Sending email...')
     from azure.communication.email import EmailClient
 
-    client = EmailClient.from_connection_string(SENDGRID_KEY);
+    client = EmailClient.from_connection_string(EMAIL_KEY);
     content = {
         "subject": "Test results of Azure CLI",
         "html": html_content,
@@ -486,16 +578,19 @@ def send_email(html_content):
 
     recipients = ''
 
-    if REQUESTED_FOR_EMAIL != '':
+    if EMAIL_ADDRESS != '':
         recipients = {
             "to": [
                 {
-                    "address": REQUESTED_FOR_EMAIL
+                    "address": EMAIL_ADDRESS
                 },
             ]
         }
-    # TODO: USER_TARGET == 'all'
-    elif USER_TARGET == '' and USER_REPO == 'https://github.com/Azure/azure-cli.git' and USER_BRANCH == 'dev' and USER_LIVE == '--live' and REQUESTED_FOR_EMAIL == '':
+    elif USER_TARGET.lower() in ['all', ''] \
+            and USER_REPO == 'https://github.com/Azure/azure-cli.git' \
+            and USER_REPO_EXT == 'https://github.com/Azure/azure-cli-extensions.git' \
+            and USER_BRANCH == 'dev' and USER_BRANCH_EXT == 'main' \
+            and USER_LIVE == '--live' and EMAIL_ADDRESS == '':
         recipients = {
             "to": [
                 {

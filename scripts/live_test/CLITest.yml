@@ -200,7 +200,6 @@ jobs:
         fi
 
         pip install azdev pytest-json-report pytest-html pytest-rerunfailures
-        # pip install azdev azure-kusto-data azure-kusto-ingest bs4 pytest-json-report pytest-html pytest-rerunfailures
 
         azdev setup -c azure-cli -r azure-cli-extensions
 
@@ -237,21 +236,15 @@ jobs:
           git push origin $(USER_BRANCH_EXT)
         fi
       env:
+        BUILD_ID: $(Build.BuildId)
         INSTANCE_CNT: 20
         INSTANCE_IDX: $(Instance_idx)
-        USER_TARGET: $(USER_TARGET)
-        USER_USERNAME: $(USER_USERNAME)
-        USER_TOKEN: $(USER_TOKEN)
-        USER_PARALLELISM: $(USER_PARALLELISM)
         PLATFORM: $(platform)
         PYTHON_VERSION: $(PYTHON_VERSION)
-        KUSTO_CLUSTER: $(KUSTO_CLUSTER)
-        KUSTO_CLIENT_ID: $(KUSTO_CLIENT_ID)
-        KUSTO_CLIENT_SECRET: $(KUSTO_CLIENT_SECRET)
-        KUSTO_TENANT_ID: $(KUSTO_TENANT_ID)
-        KUSTO_DATABASE: $(KUSTO_DATABASE)
-        KUSTO_TABLE: $(KUSTO_TABLE)
-        BUILD_ID: $(Build.BuildId)
+        USER_PARALLELISM: $(USER_PARALLELISM)
+        USER_TARGET: $(USER_TARGET)
+        USER_TOKEN: $(USER_TOKEN)
+        USER_USERNAME: $(USER_USERNAME)
     - script: |
         python -c "import os; import glob; files = glob.glob('$(workDir)/test_results.*.xml'); print('##vso[task.setvariable variable=pathExists;isOutput=true]true') if files else print('##vso[task.setvariable variable=pathExists;isOutput=true]false')"
       displayName: 'Check if path exists'
@@ -285,89 +278,89 @@ jobs:
         ArtifactName: 'livetest'
         publishLocation: 'Container'
       condition: eq(variables['checkPath2.pathExists'], 'true')
-#    - task: PublishBuildArtifacts@1
-#      inputs:
-#        PathtoPublish: '$(workDir)'
-#        ArtifactName: 'livetest'
-#        publishLocation: 'Container'
-#    - task: PublishBuildArtifacts@1
-#      inputs:
-#        PathtoPublish: '$(workDir)'
-#        ArtifactName: 'livetest'
-#        publishLocation: 'Container'
-#    - task: PublishBuildArtifacts@1
-#      inputs:
-#        PathtoPublish: '$(workDir)'
-#        ArtifactName: 'livetest'
-#        publishLocation: 'Container'
-#    - task: PublishBuildArtifacts@1
-#      inputs:
-#        PathtoPublish: '$(workDir)'
-#        ArtifactName: 'livetest'
-#        publishLocation: 'Container'
 
-#- job: SendEmail
-#  displayName: Send email
-#  timeoutInMinutes: 120
-#  dependsOn: LiveTest
-#  condition: succeededOrFailed()
-#  pool:
-#    name: ${{ variables.ubuntu_pool }}
-#  steps:
-#    - task: UsePythonVersion@0
-#      inputs:
-#        versionSpec: '$(PYTHON_VERSION)'
-#        addToPath: true
-#        architecture: 'x64'
-#    - task: DownloadBuildArtifacts@0
-#      inputs:
-#        buildType: 'current'
-#        downloadType: 'specific'
-#        downloadPath: '$(System.ArtifactsDirectory)'
-#    - bash: |
-#        set -o errexit
-#        echo "ArtifastsDirectory: $(System.ArtifactsDirectory)"
-#        ls $(System.ArtifactsDirectory)
-#        pwd
-#        workDir=$(pwd)
-#        commit_id=`git ls-remote https://github.com/Azure/azure-cli.git HEAD`
-#        pip install azure-communication-email
-#        pip install mysql-connector-python
-#        pip install requests
-#        pip install tqdm
-#        pip install bs4
-#        # pip install certifi
-#        # Send notification
-#        az -v
-#        echo "login to user azureclilivetest"
-#        # az login -u $(AZURECLITESTUSER) -p $(AZURECLITESTPASSWORD)
-#        az login --service-principal --username $(AZURECLITESTUSER) --password $(AZURECLITESTPASSWORD) --tenant $(AZURECLITESTTENANTID)
-#        az account set -s $(AZURECLITESTSUBSCRIPTIONID)
-#        echo "set account"
-#        echo "send email to grid"
-#        python $workDir/scripts/live_test/sendemail.py "$(SENDGRID_KEY)" "$(Build.BuildId)" "$(USER_REPO)" "$(USER_BRANCH)" "$(USER_TARGET)" "$(USER_LIVE)" "$(System.ArtifactsDirectory)" "$(Build.RequestedForEmail)" "$(ACCOUNT_KEY)" "$commit_id" "$(USER_REPO_EXT)" "$(USER_BRANCH_EXT)"
-#
-#- job: CleanResource
-#  displayName: Clean Resource
-#  timeoutInMinutes: 360
-#  dependsOn: LiveTest
-#  condition: succeededOrFailed()
-#  pool:
-#    name: ${{ variables.ubuntu_pool }}
-#  steps:
-#    - task: UsePythonVersion@0
-#      inputs:
-#        versionSpec: '$(PYTHON_VERSION)'
-#        addToPath: true
-#        architecture: 'x64'
-#    - bash: |
-#        set -o errexit
-#        workDir=$(pwd)
-#        pip install tqdm
-#        az -v
-#        echo "login to user azureclilivetest"
-#        az login --service-principal --username $(AZURECLITESTUSER) --password $(AZURECLITESTPASSWORD) --tenant $(AZURECLITESTTENANTID)
-#        az account set -s $(AZURECLITESTSUBSCRIPTIONID)
-#        echo "set account"
-#        echo "clean resource"
-#        python $workDir/scripts/live_test/clean.py
+- job: SendEmail
+  displayName: Send email
+  timeoutInMinutes: 120
+  dependsOn: LiveTest
+  condition: succeededOrFailed()
+  pool:
+    name: ${{ variables.ubuntu_pool }}
+  steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(PYTHON_VERSION)'
+        addToPath: true
+        architecture: 'x64'
+    - task: DownloadBuildArtifacts@0
+      inputs:
+        buildType: 'current'
+        downloadType: 'specific'
+        downloadPath: '$(System.ArtifactsDirectory)'
+    - bash: |
+        set -o errexit
+        echo "ArtifastsDirectory: $(System.ArtifactsDirectory)"
+        ls $(System.ArtifactsDirectory)
+        pwd
+        workDir=$(pwd)
+        commit_id=`git ls-remote https://github.com/Azure/azure-cli.git HEAD`
+        pip install azure-communication-email
+        pip install mysql-connector-python
+        pip install requests
+        pip install tqdm
+        pip install azure-kusto-data azure-kusto-ingest bs4
+        
+        # Send notification
+        az -v
+        echo "login to user azureclilivetest"
+        az login --service-principal --username $(AZURECLITESTUSER) --password $(AZURECLITESTPASSWORD) --tenant $(AZURECLITESTTENANTID)
+        az account set -s $(AZURECLITESTSUBSCRIPTIONID)
+        echo "set account"
+        echo "send email to grid"
+        python $workDir/scripts/live_test/sendemail.py
+      env:
+        ACCOUNT_KEY: $(ACCOUNT_KEY)
+        ARTIFACTS_DIR: $(System.ArtifactsDirectory)
+        BUILD_ID: $(Build.BuildId)
+        COMMIT_ID: $commit_id
+        EMAIL_ADDRESS: $(Build.RequestedForEmail)
+        EMAIL_KEY: $(SENDGRID_KEY)
+        KUSTO_CLIENT_ID: $(KUSTO_CLIENT_ID)
+        KUSTO_CLIENT_SECRET: $(KUSTO_CLIENT_SECRET)
+        KUSTO_CLUSTER: $(KUSTO_CLUSTER)
+        KUSTO_DATABASE: $(KUSTO_DATABASE)
+        KUSTO_TABLE: $(KUSTO_TABLE)
+        KUSTO_TENANT_ID: $(KUSTO_TENANT_ID)
+        PLATFORM: $(platform)
+        PYTHON_VERSION: $(PYTHON_VERSION)
+        USER_BRANCH: $(USER_BRANCH)
+        USER_BRANCH_EXT: $(USER_BRANCH_EXT)
+        USER_LIVE: $(USER_LIVE)
+        USER_REPO: $(USER_REPO)
+        USER_REPO_EXT: $(USER_REPO_EXT)
+        USER_TARGET: $(USER_TARGET)
+
+- job: CleanResource
+  displayName: Clean Resource
+  timeoutInMinutes: 360
+  dependsOn: LiveTest
+  condition: succeededOrFailed()
+  pool:
+    name: ${{ variables.ubuntu_pool }}
+  steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(PYTHON_VERSION)'
+        addToPath: true
+        architecture: 'x64'
+    - bash: |
+        set -o errexit
+        workDir=$(pwd)
+        pip install tqdm
+        az -v
+        echo "login to user azureclilivetest"
+        az login --service-principal --username $(AZURECLITESTUSER) --password $(AZURECLITESTPASSWORD) --tenant $(AZURECLITESTTENANTID)
+        az account set -s $(AZURECLITESTSUBSCRIPTIONID)
+        echo "set account"
+        echo "clean resource"
+        python $workDir/scripts/live_test/clean.py
