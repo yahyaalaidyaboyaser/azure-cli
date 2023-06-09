@@ -451,12 +451,13 @@ def summary_data(testdata):
             f.write(str(src_soup))
 
     # send to kusto db
-        # # TODO: add filter for main repo and ext repo
+    # TODO: delete the following code after testing
+    logger.info('csv data: ' + data)
     if USER_TARGET.lower() in ['all', ''] \
             and USER_REPO == 'https://github.com/Azure/azure-cli.git' \
             and USER_REPO_EXT == 'https://github.com/Azure/azure-cli-extensions.git' \
             and USER_BRANCH == 'dev' and USER_BRANCH_EXT == 'main' \
-            and USER_LIVE == '--live':
+            and USER_LIVE == '--live' and data:
         send_to_kusto(data)
 
     for root, dirs, files in os.walk(ARTIFACT_DIR):
@@ -534,10 +535,6 @@ def get_container_name():
     :return:
     """
     logger.warning('Enter get_container_name()')
-    # if USER_TARGET:
-    #     name = USER_TARGET + '-' + BUILD_ID
-    # else:
-    #     name = 'all-' + BUILD_ID
     name = BUILD_ID
     logger.warning('Exit get_container_name()')
     return name
