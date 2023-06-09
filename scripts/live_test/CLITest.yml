@@ -18,18 +18,18 @@ parameters:
 - name: platforms
   type: object
   default:
-  # 1es: 1ES self-hosted agent pools, https://dev.azure.com/azclitools/internal/_settings/agentqueues
-  # ado: Microsoft-hosted agent pools, https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&tabs=yaml#software
+  # self-hosted: 1ES self-hosted agent pools, https://dev.azure.com/azclitools/internal/_settings/agentqueues
+  # microsoft-hosted: Microsoft-hosted agent pools, https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&tabs=yaml#software
   # Please do not use 1es pool and ado pool at the same time.
   - name: ubuntu2004
-    1es: pool-ubuntu-2004
-    ado:
+    self-hosted: pool-ubuntu-2004
+    microsoft-hosted:
   - name: window2019
-    1es: pool-windows-2019
-    ado:
+    self-hosted: pool-windows-2019
+    microsoft-hosted:
   - name: macos12
-    1es:
-    ado: macOS-12
+    self-hosted:
+    microsoft-hosted: macOS-12
 
 #schedules:
 #- cron: "0 18 * * 5"
@@ -54,103 +54,103 @@ jobs:
       ${{ each plat in parameters.platforms }}:
         instance1-${{ plat.name }}:
           Instance_idx: 1
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance2-${{ plat.name }}:
           Instance_idx: 2
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance3-${{ plat.name }}:
           Instance_idx: 3
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance4-${{ plat.name }}:
           Instance_idx: 4
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance5-${{ plat.name }}:
           Instance_idx: 5
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance6-${{ plat.name }}:
           Instance_idx: 6
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance7-${{ plat.name }}:
           Instance_idx: 7
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance8-${{ plat.name }}:
           Instance_idx: 8
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance9-${{ plat.name }}:
           Instance_idx: 9
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance10-${{ plat.name }}:
           Instance_idx: 10
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance11-${{ plat.name }}:
           Instance_idx: 11
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance12-${{ plat.name }}:
           Instance_idx: 12
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance13-${{ plat.name }}:
           Instance_idx: 13
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance14-${{ plat.name }}:
           Instance_idx: 14
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance15-${{ plat.name }}:
           Instance_idx: 15
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance16-${{ plat.name }}:
           Instance_idx: 16
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance17-${{ plat.name }}:
           Instance_idx: 17
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance18-${{ plat.name }}:
           Instance_idx: 18
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance19-${{ plat.name }}:
           Instance_idx: 19
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
         instance20-${{ plat.name }}:
           Instance_idx: 20
-          pool: ${{ plat.1es }}
-          vmImage: ${{ plat.ado }}
+          pool: ${{ plat.self-hosted }}
+          vmImage: ${{ plat.microsoft-hosted }}
           platform: ${{ plat.name }}
   steps:
     - task: UsePythonVersion@0
