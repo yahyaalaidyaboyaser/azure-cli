@@ -1,6 +1,6 @@
-# Some content of this file is generated.
 # USER_Target
-#   "": CLI modules
+#   "" / all / ALL: main repo and all extensions
+#   main: main repo
 #   extensions: ALL extensions
 #   vm ext-account: certain targets
 
@@ -24,9 +24,10 @@ parameters:
   - name: ubuntu2004
     selfhosted: pool-ubuntu-2004
     microsofthosted:
-  - name: window2019
-    selfhosted: pool-windows-2019
-    microsofthosted:
+  # TODO: Need to discuss whether to support the windows platform
+  #- name: window2019
+  #  selfhosted: pool-windows-2019
+  #  microsofthosted:
   - name: macos12
     selfhosted:
     microsofthosted: macOS-12
@@ -42,7 +43,6 @@ parameters:
 #    - CLITest
 #  always: true
 
-# https://stackoverflow.com/questions/54372758/azure-devops-yaml-pipelines-specification-of-matrix-through-build-variable
 jobs:
 - job: LiveTest
   displayName: Live Test
@@ -52,7 +52,8 @@ jobs:
     name: $(pool)
     vmImage: $(vmImage)
   strategy:
-    maxParallel: 100
+    # If the maxParallel is too large, the resource group will reach the limit of 980, so it is recommended that the maxParallel should not exceed 30.
+    maxParallel: 30
     matrix:
       ${{ each plat in parameters.platforms }}:
         instance1-${{ plat.name }}:
@@ -102,56 +103,6 @@ jobs:
           platform: ${{ plat.name }}
         instance10-${{ plat.name }}:
           Instance_idx: 10
-          pool: ${{ plat.selfhosted }}
-          vmImage: ${{ plat.microsofthosted }}
-          platform: ${{ plat.name }}
-        instance11-${{ plat.name }}:
-          Instance_idx: 11
-          pool: ${{ plat.selfhosted }}
-          vmImage: ${{ plat.microsofthosted }}
-          platform: ${{ plat.name }}
-        instance12-${{ plat.name }}:
-          Instance_idx: 12
-          pool: ${{ plat.selfhosted }}
-          vmImage: ${{ plat.microsofthosted }}
-          platform: ${{ plat.name }}
-        instance13-${{ plat.name }}:
-          Instance_idx: 13
-          pool: ${{ plat.selfhosted }}
-          vmImage: ${{ plat.microsofthosted }}
-          platform: ${{ plat.name }}
-        instance14-${{ plat.name }}:
-          Instance_idx: 14
-          pool: ${{ plat.selfhosted }}
-          vmImage: ${{ plat.microsofthosted }}
-          platform: ${{ plat.name }}
-        instance15-${{ plat.name }}:
-          Instance_idx: 15
-          pool: ${{ plat.selfhosted }}
-          vmImage: ${{ plat.microsofthosted }}
-          platform: ${{ plat.name }}
-        instance16-${{ plat.name }}:
-          Instance_idx: 16
-          pool: ${{ plat.selfhosted }}
-          vmImage: ${{ plat.microsofthosted }}
-          platform: ${{ plat.name }}
-        instance17-${{ plat.name }}:
-          Instance_idx: 17
-          pool: ${{ plat.selfhosted }}
-          vmImage: ${{ plat.microsofthosted }}
-          platform: ${{ plat.name }}
-        instance18-${{ plat.name }}:
-          Instance_idx: 18
-          pool: ${{ plat.selfhosted }}
-          vmImage: ${{ plat.microsofthosted }}
-          platform: ${{ plat.name }}
-        instance19-${{ plat.name }}:
-          Instance_idx: 19
-          pool: ${{ plat.selfhosted }}
-          vmImage: ${{ plat.microsofthosted }}
-          platform: ${{ plat.name }}
-        instance20-${{ plat.name }}:
-          Instance_idx: 20
           pool: ${{ plat.selfhosted }}
           vmImage: ${{ plat.microsofthosted }}
           platform: ${{ plat.name }}
@@ -226,13 +177,13 @@ jobs:
         pwd
         ls
         # Whether commit changes
-        if [[ "$(USER_USERNAME)" != "" && "$(USER_TOKEN)" != "" && ! "$(USER_TARGET)" =~ ^ext-.* && "$(USER_TARGET)" != "extensions" ]]; then
+        if [[ "$(USER_USERNAME)" != "" && "$(USER_TOKEN)" != "" && ! "$(USER_TARGET)" =~ ^ext-.* && "$(USER_TARGET)" != "extensions" && "$(USER_TARGET)" != ""  && "$(USER_TARGET)" != "all" && "$(USER_TARGET)" != "ALL" ]]; then
           cd azure-cli
           git status
           git add .
           git commit -m "Upload recording files"
           git push origin $(USER_BRANCH)
-        elif [[ "$(USER_USERNAME)" != "" && "$(USER_TOKEN)" != "" && ("$(USER_TARGET)" =~ ^ext-.* || "$(USER_TARGET)" == "extensions") ]]; then
+        elif [[ "$(USER_USERNAME)" != "" && "$(USER_TOKEN)" != "" && ("$(USER_TARGET)" =~ ^ext-.* ]]; then
           cd azure-cli-extensions
           git status
           git add .
