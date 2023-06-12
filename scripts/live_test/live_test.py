@@ -30,7 +30,7 @@ USER_PARALLELISM = int(os.environ.get('USER_PARALLELISM'))
 USER_TARGET = os.environ.get('USER_TARGET')
 USER_TARGET = os.environ.get('USER_TARGET')
 BLACK_LIST = os.environ.get('BLACK_LIST')
-logger.info(BLACK_LIST)
+logger.info(f'BLACK_LIST: {BLACK_LIST}')
 
 # Test time (minutes) for each module.
 jobs = {
