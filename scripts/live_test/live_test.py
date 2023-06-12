@@ -30,7 +30,7 @@ USER_PARALLELISM = int(os.environ.get('USER_PARALLELISM'))
 USER_TARGET = os.environ.get('USER_TARGET')
 USER_TARGET = os.environ.get('USER_TARGET')
 BLACK_LIST = os.environ.get('BLACK_LIST')
-logger.info(type(BLACK_LIST))
+logger.info(f'TYPE: {type(BLACK_LIST)}')
 
 # Test time (minutes) for each module.
 jobs = {
@@ -282,7 +282,7 @@ def is_extension(module):
     return module.startswith('ext-')
 
 
-def (module):
+def get_extension_name(module):
     return module[4:]
 
 
