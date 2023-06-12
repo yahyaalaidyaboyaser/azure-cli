@@ -171,9 +171,7 @@ jobs:
         git config --global user.name "AzurePipelines"
 
         # print variables
-        echo "1: ${{ convertToJson(parameters.blacklist) }}"
-        echo "2: $(convertToJson(parameters.blacklist))"
-        echo "3: $(convertToJson(blacklist))"
+        echo "blacklist: ${{ convertToJson(parameters.blacklist) }}"
         echo "USER_TARGET: $(USER_TARGET)"
         echo "USER_REPO: $(USER_REPO)"
         echo "USER_REPO_EXT: $(USER_REPO_EXT)"
@@ -283,16 +281,15 @@ jobs:
           *report*.html
         targetFolder: 'livetest/temp/'
     - script: |
-        python -c "import os; print('##vso[task.setvariable variable=pathExists]true') if os.path.exists('livetest/temp/') else print('##vso[task.setvariable variable=pathExists]false')"
+        python -c "import os; print('##vso[task.setvariable variable=path2Exists]true') if os.path.exists('livetest/temp/') else print('##vso[task.setvariable variable=path2Exists]false')"
       displayName: 'Check if path exists'
-      name: checkPath2
     - task: PublishBuildArtifacts@1
       displayName: 'publish artifacts'
       inputs:
         PathtoPublish: livetest/temp/
         ArtifactName: 'livetest'
         publishLocation: 'Container'
-      condition: eq(variables['checkPath2.pathExists'], 'true')
+      condition: eq(variables['path2Exists'], 'true')
 
 - job: SendEmail
   displayName: Send email
