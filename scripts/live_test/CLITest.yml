@@ -197,16 +197,16 @@ jobs:
           source env/bin/activate
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
           echo "##vso[task.setvariable variable=workDir]$workDir"
-          echo "##vso[task.setvariable variable=isWindows;isOutput=true]False"
+          echo "##vso[task.setvariable variable=isWindows]false"
         elif [[ "$(expr substr $(uname -s) 1 5)" == "Linux" ]]; then
           source env/bin/activate
           echo "##vso[task.setvariable variable=workDir]$workDir"
-          echo "##vso[task.setvariable variable=isWindows;isOutput=true]False"
+          echo "##vso[task.setvariable variable=isWindows]false"
         elif [[ "$(expr substr $(uname -s) 1 5)" == "MINGW" ]]; then
           source env/Scripts/activate
           echo "##vso[task.setvariable variable=workDir]$(Agent.BuildDirectory)"
           echo "##vso[task.setvariable variable=winWorkDir]$workDir"
-          echo "##vso[task.setvariable variable=isWindows;isOutput=true]True"
+          echo "##vso[task.setvariable variable=isWindows]true"
         fi
 
         pip install azdev pytest-json-report pytest-html pytest-rerunfailures
@@ -257,21 +257,19 @@ jobs:
         USER_USERNAME: $(USER_USERNAME)
         BLACK_LIST: ${{ convertToJson(parameters.blacklist) }}
     - script: |
-        python -c "import os; import glob; files = glob.glob(os.path.join(r'$(workDir)', 'test_results.*.xml')); print('##vso[task.setvariable variable=pathExists;isOutput=true]true') if files else print('##vso[task.setvariable variable=pathExists;isOutput=true]false')"
+        python -c "import os; import glob; files = glob.glob(os.path.join(r'$(workDir)', 'test_results.*.xml')); print('##vso[task.setvariable variable=pathExists]true') if files else print('##vso[task.setvariable variable=pathExists]false')"
       displayName: 'Check if path exists'
-      name: checkPath1
-      condition: eq($(isWindows), 'False')
+      condition: eq(variables['isWindows'], 'false')
     - script: |
-        python -c "import os; import glob; files = glob.glob(os.path.join(r'$(winWorkDir)', 'test_results.*.xml')); print('##vso[task.setvariable variable=pathExists;isOutput=true]true') if files else print('##vso[task.setvariable variable=pathExists;isOutput=true]false')"
+        python -c "import os; import glob; files = glob.glob(os.path.join(r'$(winWorkDir)', 'test_results.*.xml')); print('##vso[task.setvariable variable=pathExists]true') if files else print('##vso[task.setvariable variable=pathExists]false')"
       displayName: 'Check if path exists'
-      name: checkPath1
-      condition: eq($(isWindows), 'True')
+      condition: eq(variables['isWindows'], 'true')
     - task: PublishTestResults@2
       inputs:
         testResultsFiles: '$(workDir)/test_results.*.xml'
         testRunTitle: 'Azure CLI live test results of $(Target)'
         mergeTestResults: true
-      condition: eq(variables['checkPath1.pathExists'], 'true')
+      condition: eq(variables['pathExists'], 'true')
     - task: CopyFiles@2
       displayName: 'move desired artifacts'
       inputs:
@@ -285,7 +283,7 @@ jobs:
           *report*.html
         targetFolder: 'livetest/temp/'
     - script: |
-        python -c "import os; print('##vso[task.setvariable variable=pathExists;isOutput=true]true') if os.path.exists('livetest/temp/') else print('##vso[task.setvariable variable=pathExists;isOutput=true]false')"
+        python -c "import os; print('##vso[task.setvariable variable=pathExists]true') if os.path.exists('livetest/temp/') else print('##vso[task.setvariable variable=pathExists]false')"
       displayName: 'Check if path exists'
       name: checkPath2
     - task: PublishBuildArtifacts@1
