@@ -171,9 +171,9 @@ jobs:
         git config --global user.name "AzurePipelines"
 
         # print variables
-        echo "1: ${{ parameters.blacklist }}"
-        echo "2: $(parameters.blacklist)"
-        echo "3: $(blacklist)"
+        echo "1: ${{ convertToJson(parameters.blacklist) }}"
+        echo "2: $(convertToJson(parameters.blacklist))"
+        echo "3: $(convertToJson(blacklist))"
         echo "USER_TARGET: $(USER_TARGET)"
         echo "USER_REPO: $(USER_REPO)"
         echo "USER_REPO_EXT: $(USER_REPO_EXT)"
@@ -255,7 +255,7 @@ jobs:
         USER_TARGET: $(USER_TARGET)
         USER_TOKEN: $(USER_TOKEN)
         USER_USERNAME: $(USER_USERNAME)
-        BLACK_LIST: ${{ parameters.blacklist }}
+        BLACK_LIST: ${{ convertToJson(parameters.blacklist) }}
     - script: |
         python -c "import os; import glob; files = glob.glob(os.path.join(r'$(workDir)', 'test_results.*.xml')); print('##vso[task.setvariable variable=pathExists;isOutput=true]true') if files else print('##vso[task.setvariable variable=pathExists;isOutput=true]false')"
       displayName: 'Check if path exists'
