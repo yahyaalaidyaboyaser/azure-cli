@@ -32,7 +32,7 @@ parameters:
     microsofthosted: macOS-12
 - name: blacklist
   type: object
-  default: ['a', 'b', 'c']
+  default: ['ext-mesh', 'ext-ai-examples']
 
 #schedules:
 #- cron: "0 18 * * 5"
@@ -195,16 +195,12 @@ jobs:
           source env/bin/activate
           export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
           echo "##vso[task.setvariable variable=workDir]$workDir"
-          echo "##vso[task.setvariable variable=isWindows]false"
         elif [[ "$(expr substr $(uname -s) 1 5)" == "Linux" ]]; then
           source env/bin/activate
           echo "##vso[task.setvariable variable=workDir]$workDir"
-          echo "##vso[task.setvariable variable=isWindows]false"
         elif [[ "$(expr substr $(uname -s) 1 5)" == "MINGW" ]]; then
           source env/Scripts/activate
           echo "##vso[task.setvariable variable=workDir]$(Agent.BuildDirectory)"
-          echo "##vso[task.setvariable variable=winWorkDir]$workDir"
-          echo "##vso[task.setvariable variable=isWindows]true"
         fi
 
         pip install azdev pytest-json-report pytest-html pytest-rerunfailures
@@ -254,20 +250,6 @@ jobs:
         USER_TOKEN: $(USER_TOKEN)
         USER_USERNAME: $(USER_USERNAME)
         BLACK_LIST: ${{ convertToJson(parameters.blacklist) }}
-    - script: |
-        python -c "import os; import glob; files = glob.glob(os.path.join(r'$(workDir)', 'test_results.*.xml')); print('##vso[task.setvariable variable=pathExists]true') if files else print('##vso[task.setvariable variable=pathExists]false')"
-      displayName: 'Check if path exists'
-      condition: eq(variables['isWindows'], 'false')
-    - script: |
-        python -c "import os; import glob; files = glob.glob(os.path.join(r'$(winWorkDir)', 'test_results.*.xml')); print('##vso[task.setvariable variable=pathExists]true') if files else print('##vso[task.setvariable variable=pathExists]false')"
-      displayName: 'Check if path exists'
-      condition: eq(variables['isWindows'], 'true')
-    - task: PublishTestResults@2
-      inputs:
-        testResultsFiles: '$(workDir)/test_results.*.xml'
-        testRunTitle: 'Azure CLI live test results of $(Target)'
-        mergeTestResults: true
-      condition: eq(variables['pathExists'], 'true')
     - task: CopyFiles@2
       displayName: 'move desired artifacts'
       inputs:

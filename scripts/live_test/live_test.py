@@ -30,7 +30,7 @@ USER_PARALLELISM = int(os.environ.get('USER_PARALLELISM'))
 USER_TARGET = os.environ.get('USER_TARGET')
 USER_TARGET = os.environ.get('USER_TARGET')
 BLACK_LIST = os.environ.get('BLACK_LIST')
-logger.info(f'BLACK_LIST: {BLACK_LIST}')
+logger.info(type(BLACK_LIST))
 
 # Test time (minutes) for each module.
 jobs = {
@@ -282,7 +282,7 @@ def is_extension(module):
     return module.startswith('ext-')
 
 
-def get_extension_name(module):
+def (module):
     return module[4:]
 
 
@@ -370,7 +370,7 @@ class AutomaticScheduling(object):
         error_flag = False
         logger.info(instance_modules)
         for module in instance_modules.keys():
-            if is_extension(module) and (USER_TARGET.lower() in ['all', 'extension', ''] or module == USER_TARGET):
+            if is_extension(module) and (USER_TARGET.lower() in ['all', 'extension', ''] or module == USER_TARGET) and module not in BLACK_LIST:
                 ext = get_extension_name(module)
                 error_flag = install_extension(ext)
                 global_error_flag = global_error_flag or error_flag
@@ -385,7 +385,7 @@ class AutomaticScheduling(object):
                     global_error_flag = global_error_flag or error_flag
                 error_flag = remove_extension(ext)
                 global_error_flag = global_error_flag or error_flag
-            elif not is_extension(module) and (USER_TARGET.lower() in ['all', 'main', ''] or module == USER_TARGET):
+            elif not is_extension(module) and (USER_TARGET.lower() in ['all', 'main', ''] or module == USER_TARGET) and module not in BLACK_LIST:
                 sequential = ['azdev', 'test', module, USER_LIVE, '--mark', 'serial', '--xml-path', f'test_results.{module}.sequential.xml', '--no-exitfirst', '-a',
                               f'-n 1 --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.sequential.json --html={module}.{PLATFORM}.report.sequential.html --self-contained-html --capture=sys']
                 error_flag = run_command(sequential, check_return_code=True)
