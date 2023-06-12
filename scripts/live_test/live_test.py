@@ -6,6 +6,7 @@
 # --------------------------------------------------------------------------------------------
 
 from azdev.utilities import get_path_table
+import json
 import logging
 import os
 import subprocess
@@ -29,8 +30,7 @@ USER_LIVE = os.environ.get('USER_LIVE')
 USER_PARALLELISM = int(os.environ.get('USER_PARALLELISM'))
 USER_TARGET = os.environ.get('USER_TARGET')
 USER_TARGET = os.environ.get('USER_TARGET')
-BLACK_LIST = os.environ.get('BLACK_LIST')
-logger.info(f'TYPE: {type(BLACK_LIST)}')
+BLACK_LIST = json.loads(os.environ.get('BLACK_LIST', '[]'))
 
 # Test time (minutes) for each module.
 jobs = {

@@ -32,7 +32,7 @@ parameters:
     microsofthosted: macOS-12
 - name: blacklist
   type: object
-  default: ['ext-mesh', 'ext-ai-examples']
+  default: []
 
 #schedules:
 #- cron: "0 18 * * 5"
