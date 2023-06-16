@@ -36,8 +36,7 @@ ARTIFACT_DIR = os.environ.get('ARTIFACTS_DIR')
 BUILD_ID = os.environ.get('BUILD_ID')
 EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
 EMAIL_KEY = os.environ.get('EMAIL_KEY')
-# authenticate with AAD application.
-KUSTO_CLIENT_ID = os.environ.get('KUSTO_CLIENT_ID')
+# authenticate with AAD application.KUSTO_CLIENT_ID = os.environ.get('KUSTO_CLIENT_ID')
 KUSTO_CLIENT_SECRET = os.environ.get('KUSTO_CLIENT_SECRET')
 KUSTO_CLUSTER = os.environ.get('KUSTO_CLUSTER')
 KUSTO_DATABASE = os.environ.get('KUSTO_DATABASE')
@@ -395,7 +394,12 @@ def summary_data(testdata):
                     First = False
                     platform = file.split('.')[1]
                     first = os.path.join(root, file)
-                    data.extend(html_to_csv(first, module))
+                    try:
+                        data.extend(html_to_csv(first, module))
+                    except Exception as e:
+                        logger.error(f'Error load {first}')
+                        First = True
+                        continue
                     with open(first, 'r') as f:
                         src_html = f.read()
                         src_soup = BeautifulSoup(src_html, 'html.parser')
@@ -429,7 +433,11 @@ def summary_data(testdata):
                 elif file.startswith(module) and file.endswith('html'):
                     platform = file.split('.')[1]
                     other = os.path.join(root, file)
-                    data.extend(html_to_csv(first, module))
+                    try:
+                        data.extend(html_to_csv(other, module))
+                    except Exception as e:
+                        logger.error(f'Error load {other}')
+                        continue
                     with open(other, 'r') as f:
                         other_html = f.read()
                         other_soup = BeautifulSoup(other_html, 'html.parser')
@@ -496,7 +504,7 @@ def html_to_csv(html_file, module):
                         elif not content.name:
                             Details += content
                         else:
-                            logger.info(content.name)
+                            logger.info(content.name) if content.name != 'span' else None
                 else:
                     Details = ''
                 EndDateTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

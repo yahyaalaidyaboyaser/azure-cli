@@ -11,6 +11,7 @@ import logging
 import os
 import subprocess
 import sys
+import time
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -379,10 +380,12 @@ class AutomaticScheduling(object):
                     sequential = ['azdev', 'test', ext, USER_LIVE, '--mark', 'serial', '--xml-path', f'test_results.{ext}.sequential.xml', '--no-exitfirst', '-a',
                                   f'-n 1 --json-report --json-report-summary --json-report-file={ext}.{PLATFORM}.report.sequential.json --html={ext}.{PLATFORM}.report.sequential.html --self-contained-html --capture=sys']
                     error_flag = run_command(sequential, check_return_code=True)
+                    time.sleep(60)
                     global_error_flag = global_error_flag or error_flag
                     parallel = ['azdev', 'test', ext, USER_LIVE, '--mark', 'not serial', '--xml-path', f'test_results.{ext}.parallel.xml', '--no-exitfirst', '-a',
                                 f'-n {USER_PARALLELISM} --json-report --json-report-summary --json-report-file={ext}.{PLATFORM}.report.parallel.json --html={ext}.{PLATFORM}.report.parallel.html --self-contained-html --capture=sys']
                     error_flag = run_command(parallel, check_return_code=True)
+                    time.sleep(60)
                     global_error_flag = global_error_flag or error_flag
                 error_flag = remove_extension(ext)
                 global_error_flag = global_error_flag or error_flag
@@ -390,10 +393,12 @@ class AutomaticScheduling(object):
                 sequential = ['azdev', 'test', module, USER_LIVE, '--mark', 'serial', '--xml-path', f'test_results.{module}.sequential.xml', '--no-exitfirst', '-a',
                               f'-n 1 --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.sequential.json --html={module}.{PLATFORM}.report.sequential.html --self-contained-html --capture=sys']
                 error_flag = run_command(sequential, check_return_code=True)
+                time.sleep(60)
                 global_error_flag = global_error_flag or error_flag
                 parallel = ['azdev', 'test', module, USER_LIVE, '--mark', 'not serial', '--xml-path', f'test_results.{module}.parallel.xml', '--no-exitfirst', '-a',
                             f'-n {USER_PARALLELISM} --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.parallel.json --html={module}.{PLATFORM}.report.parallel.html --self-contained-html --capture=sys']
                 error_flag = run_command(parallel, check_return_code=True)
+                time.sleep(60)
                 global_error_flag = global_error_flag or error_flag
         return global_error_flag or error_flag
 
