@@ -192,7 +192,7 @@ jobs:
         fi
       env:
         BUILD_ID: $(Build.BuildId)
-        INSTANCE_CNT: 20
+        INSTANCE_CNT: 10
         INSTANCE_IDX: $(Instance_idx)
         PLATFORM: $(platform)
         PYTHON_VERSION: $(PYTHON_VERSION)

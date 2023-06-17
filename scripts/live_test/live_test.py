@@ -364,7 +364,9 @@ class AutomaticScheduling(object):
             self.works[idx][k] = v
         # instance_idx: 1~n, python list index: 0~n-1
         self.instance_idx -= 1
-        logger.info(f'Auto Schedule Results: {self.works}')
+        logger.info('Auto Schedule Results:')
+        for idx, i in enumerate(self.works):
+            logger.info(f'instance {idx + 1}: {i}')
         return self.works[self.instance_idx]
 
     def run_instance_modules(self, instance_modules):
