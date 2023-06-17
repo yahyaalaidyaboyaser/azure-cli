@@ -36,14 +36,14 @@ ARTIFACT_DIR = os.environ.get('ARTIFACTS_DIR')
 BUILD_ID = os.environ.get('BUILD_ID')
 EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
 EMAIL_KEY = os.environ.get('EMAIL_KEY')
-# authenticate with AAD application.KUSTO_CLIENT_ID = os.environ.get('KUSTO_CLIENT_ID')
+# authenticate with AAD application.
+KUSTO_CLIENT_ID = os.environ.get('KUSTO_CLIENT_ID')
 KUSTO_CLIENT_SECRET = os.environ.get('KUSTO_CLIENT_SECRET')
 KUSTO_CLUSTER = os.environ.get('KUSTO_CLUSTER')
 KUSTO_DATABASE = os.environ.get('KUSTO_DATABASE')
 KUSTO_TABLE = os.environ.get('KUSTO_TABLE')
 # get tenant id from https://docs.microsoft.com/en-us/onedrive/find-your-office-365-tenant-id
 KUSTO_TENANT_ID = os.environ.get('KUSTO_TENANT_ID')
-PLATFORM = os.environ.get('PLATFORM')
 PYTHON_VERSION = os.environ.get('PYTHON_VERSION')
 USER_BRANCH = os.environ.get('USER_BRANCH')
 USER_BRANCH_EXT = os.environ.get('USER_BRANCH_EXT')
@@ -395,7 +395,7 @@ def summary_data(testdata):
                     platform = file.split('.')[1]
                     first = os.path.join(root, file)
                     try:
-                        data.extend(html_to_csv(first, module))
+                        data.extend(html_to_csv(first, module, platform))
                     except Exception as e:
                         logger.error(f'Error load {first}')
                         First = True
@@ -434,7 +434,7 @@ def summary_data(testdata):
                     platform = file.split('.')[1]
                     other = os.path.join(root, file)
                     try:
-                        data.extend(html_to_csv(other, module))
+                        data.extend(html_to_csv(other, module, platform))
                     except Exception as e:
                         logger.error(f'Error load {other}')
                         continue
@@ -461,9 +461,7 @@ def summary_data(testdata):
             f.write(str(src_soup))
 
     # TODO: delete the following code after testing
-    if USER_TARGET.lower() in ['all', ''] \
-            and USER_LIVE == '--live' and data:
-        logger.info(f'csv data: {data}')
+    if data:
         send_to_kusto(data)
 
     # # send to kusto db
@@ -480,7 +478,7 @@ def summary_data(testdata):
                 os.remove(os.path.join(root, file))
 
 
-def html_to_csv(html_file, module):
+def html_to_csv(html_file, module, platform):
     data = []
     if os.path.exists(html_file):
         with open(html_file) as file:
@@ -511,12 +509,12 @@ def html_to_csv(html_file, module):
                 StartDateTime = (datetime.datetime.now() - datetime.timedelta(seconds=int(float(Duration)))).strftime(
                     "%Y-%m-%d %H:%M:%S")
                 data.append(
-                    [Source, BuildId, PLATFORM, PYTHON_VERSION, Module, Name, Description, StartDateTime, EndDateTime,
+                    [Source, BuildId, platform, PYTHON_VERSION, Module, Name, Description, StartDateTime, EndDateTime,
                      Duration, Status, Details, ExtendedProperties])
     return data
 
 
-def send_to_kusto(self, data):
+def send_to_kusto(data):
     logger.info('Start send csv data to kusto db')
 
     with open(f'{ARTIFACT_DIR}/livetest.csv', mode='w', newline='') as file:
