@@ -263,6 +263,8 @@ def install_extension(extension_module):
     try:
         cmd = ['azdev', 'extension', 'add', extension_module]
         error_flag = run_command(cmd, check_return_code=True)
+        cmd = ['azdev', 'setup', '-c', 'azure-cli', '-r', 'azure-cli-extensions']
+        error_flag = error_flag or run_command(cmd, check_return_code=True)
     except Exception:
         error_flag = True
 
@@ -379,12 +381,12 @@ class AutomaticScheduling(object):
                 error_flag = install_extension(ext)
                 global_error_flag = global_error_flag or error_flag
                 if not error_flag:
-                    sequential = ['azdev', 'test', ext, USER_LIVE, '--mark', 'serial', '--no-exitfirst', '-a',
+                    sequential = ['azdev', 'test', ext, '--discover', USER_LIVE, '--mark', 'serial', '--no-exitfirst', '-a',
                                   f'-n 1 --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.sequential.json --html={module}.{PLATFORM}.report.sequential.html --self-contained-html --capture=sys']
                     error_flag = run_command(sequential, check_return_code=True)
                     time.sleep(60)
                     global_error_flag = global_error_flag or error_flag
-                    parallel = ['azdev', 'test', ext, USER_LIVE, '--mark', 'not serial', '--no-exitfirst', '-a',
+                    parallel = ['azdev', 'test', ext, '--discover', USER_LIVE, '--mark', 'not serial', '--no-exitfirst', '-a',
                                 f'-n {USER_PARALLELISM} --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.parallel.json --html={module}.{PLATFORM}.report.parallel.html --self-contained-html --capture=sys']
                     error_flag = run_command(parallel, check_return_code=True)
                     time.sleep(60)
