@@ -288,6 +288,7 @@ jobs:
   timeoutInMinutes: 360
   dependsOn: LiveTest
   condition: succeededOrFailed()
+  continueOnError: true
   pool:
     name: ${{ variables.ubuntu_pool }}
   steps:
