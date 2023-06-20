@@ -336,9 +336,10 @@ class AutomaticScheduling(object):
 
     def append_new_modules(self, jobs):
         # If add a new module, use average test time
+        # The newly added extension needs to be updated manually
         avg_cost = int(sum(jobs.values()) / len(jobs.values()))
         for module in self.modules:
-            if module not in jobs.keys():
+            if module not in jobs.keys() and not module.startswith('ext-'):
                 jobs[module] = avg_cost
         # sort jobs by time cost (desc)
         self.jobs = sorted(jobs.items(), key=lambda item: -item[1])
