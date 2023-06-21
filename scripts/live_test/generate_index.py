@@ -163,7 +163,6 @@ def render(data, container, container_url, testdata, USER_REPO, USER_BRANCH, COM
       </tr>
     """.format(testdata.total[1], testdata.total[2], testdata.total[3])
 
-    logger.warning(testdata.modules)
     sorted_modules = sorted(testdata.modules, key=sort_by_module_name)
 
     for module, passed, failed, rate in sorted_modules:
