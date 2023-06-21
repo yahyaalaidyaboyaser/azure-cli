@@ -383,12 +383,12 @@ class AutomaticScheduling(object):
                 global_error_flag = global_error_flag or error_flag
                 if not error_flag:
                     sequential = ['azdev', 'test', ext, '--discover', USER_LIVE, '--mark', 'serial', '--no-exitfirst', '-a',
-                                  f'-n 1 --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.sequential.json --html={module}.{PLATFORM}.report.sequential.html --self-contained-html --capture=sys']
+                                  f'-n 1 --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.sequential.json --html={module}.{PLATFORM}.report.sequential.html --self-contained-html']
                     error_flag = run_command(sequential, check_return_code=True)
                     time.sleep(60)
                     global_error_flag = global_error_flag or error_flag
                     parallel = ['azdev', 'test', ext, '--discover', USER_LIVE, '--mark', 'not serial', '--no-exitfirst', '-a',
-                                f'-n {USER_PARALLELISM} --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.parallel.json --html={module}.{PLATFORM}.report.parallel.html --self-contained-html --capture=sys']
+                                f'-n {USER_PARALLELISM} --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.parallel.json --html={module}.{PLATFORM}.report.parallel.html --self-contained-html']
                     error_flag = run_command(parallel, check_return_code=True)
                     time.sleep(60)
                     global_error_flag = global_error_flag or error_flag
@@ -396,12 +396,12 @@ class AutomaticScheduling(object):
                 global_error_flag = global_error_flag or error_flag
             elif not is_extension(module) and (USER_TARGET.lower() in ['all', 'main', ''] or module == USER_TARGET) and module not in BLACK_LIST:
                 sequential = ['azdev', 'test', module, USER_LIVE, '--mark', 'serial', '--no-exitfirst', '-a',
-                              f'-n 1 --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.sequential.json --html={module}.{PLATFORM}.report.sequential.html --self-contained-html --capture=sys']
+                              f'-n 1 --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.sequential.json --html={module}.{PLATFORM}.report.sequential.html --self-contained-html']
                 error_flag = run_command(sequential, check_return_code=True)
                 time.sleep(60)
                 global_error_flag = global_error_flag or error_flag
                 parallel = ['azdev', 'test', module, USER_LIVE, '--mark', 'not serial', '--no-exitfirst', '-a',
-                            f'-n {USER_PARALLELISM} --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.parallel.json --html={module}.{PLATFORM}.report.parallel.html --self-contained-html --capture=sys']
+                            f'-n {USER_PARALLELISM} --json-report --json-report-summary --json-report-file={module}.{PLATFORM}.report.parallel.json --html={module}.{PLATFORM}.report.parallel.html --self-contained-html']
                 error_flag = run_command(parallel, check_return_code=True)
                 time.sleep(60)
                 global_error_flag = global_error_flag or error_flag

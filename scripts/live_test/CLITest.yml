@@ -47,7 +47,7 @@ jobs:
 - job: LiveTest
   displayName: Live Test
   # Sometimes the live test will be stuck forever, so the timeout cannot be set to 0, it is recommended to set it to twice the maximum time
-  timeoutInMinutes: 600
+  timeoutInMinutes: 1200
   pool:
     name: $(pool)
     vmImage: $(vmImage)
