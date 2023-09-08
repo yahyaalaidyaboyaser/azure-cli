@@ -1,62 +1,111 @@
 name: CLI Build Windows SAW MSI $(CLI_VERSION)
 
 resources:
-- repo: self
+  - repo: self
 
 trigger:
   branches:
     exclude:
-    - '*'
+      - '*'
 
 jobs:
-- job: ExtractMetadata
-  displayName: Extract Metadata
+  - job: ExtractMetadata
+    displayName: Extract Metadata
 
-  condition: succeeded()
-  pool:
-    vmImage: 'ubuntu-20.04'
-  steps:
-  - task: Bash@3
-    displayName: 'Extract Version'
-    inputs:
-      targetType: 'filePath'
-      filePath: scripts/release/get_version.sh
+    condition: succeeded()
+    pool:
+      vmImage: 'ubuntu-20.04'
+    steps:
+      - task: Bash@3
+        displayName: 'Extract Version'
+        inputs:
+          targetType: 'filePath'
+          filePath: scripts/release/get_version.sh
 
-  - task: PublishPipelineArtifact@0
-    displayName: 'Publish Artifact: metadata'
-    inputs:
-      TargetPath: $(Build.ArtifactStagingDirectory)
-      ArtifactName: metadata
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Artifact: metadata'
+        inputs:
+          TargetPath: $(Build.ArtifactStagingDirectory)
+          ArtifactName: metadata
 
-- job: BuildWindowsSAWMSI
-  displayName: Build Windows SAW MSI
+  - job: BuildWindowsSawMsi
+    displayName: Build Windows SAW MSI
 
-  dependsOn: ExtractMetadata
-  condition: succeeded()
-  pool:
-    vmImage: 'windows-2019'
-  steps:
-  - task: DownloadPipelineArtifact@1
-    displayName: 'Download Build Artifacts'
-    inputs:
-      TargetPath: '$(Build.ArtifactStagingDirectory)/metadata'
-      artifactName: metadata
+    dependsOn: ExtractMetadata
+    condition: succeeded()
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+      - task: DownloadPipelineArtifact@1
+        displayName: 'Download Build Artifacts'
+        inputs:
+          TargetPath: '$(Build.ArtifactStagingDirectory)/metadata'
+          artifactName: metadata
 
-  - script: |
-      set /p CLI_VERSION=<$(System.ArtifactsDirectory)/metadata/version
-      set
-      set BLOB_SAS="$(BLOB_SAS)"
-      
-      build_scripts/windows/scripts/build_saw.cmd
-    displayName: 'Build Windows SAW MSI'
+      - script: |
+          set /p CLI_VERSION=<$(System.ArtifactsDirectory)/metadata/version
+          set
+          set BLOB_SAS="$(BLOB_SAS)"
+          
+          build_scripts/windows/scripts/build_saw.cmd
+        displayName: 'Build Windows SAW MSI'
 
-  - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
-    displayName: 'SBOM'
-    inputs:
-      BuildDropPath: 'build_scripts/windows/out/'
+      - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
+        displayName: 'SBOM'
+        inputs:
+          BuildDropPath: 'build_scripts/windows/out/'
 
-  - task: PublishPipelineArtifact@0
-    displayName: 'Publish Artifact: MSI'
-    inputs:
-      TargetPath: 'build_scripts/windows/out/'
-      ArtifactName: msi-saw
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish Artifact: MSI'
+        inputs:
+          TargetPath: 'build_scripts/windows/out/'
+          ArtifactName: msi-saw
+
+  - job: TestMsiInstallation
+    displayName: Test MSI Installation
+
+    dependsOn: BuildWindowsSawMsi
+    condition: succeeded()
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+      - task: DownloadPipelineArtifact@1
+        displayName: 'Download Build Artifacts'
+        inputs:
+          TargetPath: '$(Build.ArtifactStagingDirectory)/metadata'
+          artifactName: metadata
+
+      - task: DownloadPipelineArtifact@1
+        displayName: 'Download Build Artifacts'
+        inputs:
+          TargetPath: '$(Build.ArtifactStagingDirectory)/msi'
+          artifactName: msi-saw
+
+      - task: PowerShell@2
+        displayName: 'Install MSI'
+        inputs:
+          targetType: 'inline'
+          script: |
+            az --version
+            $cli_package = Get-Package -Provider Programs -IncludeWindowsInstaller -Name "Microsoft Azure CLI*"
+            $cli_package | Format-List
+            Uninstall-Package -Name $cli_package.Name
+            
+            $InstallArgs = @(
+                "/i"
+                "`"$env:SYSTEM_ARTIFACTSDIRECTORY\msi\Microsoft Azure CLI.msi`""
+                "/q"
+                "/norestart"
+                "/l*v"
+                ".\install_logs.txt"
+            )
+            Write-Output "Calling: msiexec.exe $InstallArgs"
+            $install_time = Measure-Command {Start-Process "msiexec.exe" -ArgumentList $InstallArgs -Wait -NoNewWindow}
+
+            # Show installation log. Since the log is too big, we only print it when needed.
+            # Get-Content .\install_logs.txt
+
+            # Show installation time
+            Write-Output "Installation time (seconds): $($install_time.TotalSeconds)"
+            
+            az --version

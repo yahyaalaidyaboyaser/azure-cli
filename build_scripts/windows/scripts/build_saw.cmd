@@ -17,8 +17,11 @@ if %BLOB_SAS%=="" (
     echo Please set the BLOB_SAS environment variable
     goto ERROR
 )
-set PYTHON_VERSION=3.10.5
-set SPYTHON_VERSION=3.10.22251.3
+
+set ARCH=x64
+
+set PYTHON_VERSION=3.10.10
+set SPYTHON_VERSION=3.10.23194.4
 
 set WIX_DOWNLOAD_URL="https://azurecliprod.blob.core.windows.net/msi/wix310-binaries-mirror.zip"
 @REM windows-http only support amd64
@@ -293,7 +296,7 @@ popd
 if %errorlevel% neq 0 goto ERROR
 
 echo Building MSI...
-msbuild /t:rebuild /p:Configuration=Release %REPO_ROOT%\build_scripts\windows\azure-cli.wixproj
+msbuild /t:rebuild /p:Configuration=Release /p:Platform=%ARCH% %REPO_ROOT%\build_scripts\windows\azure-cli.wixproj
 
 if %errorlevel% neq 0 goto ERROR
 
