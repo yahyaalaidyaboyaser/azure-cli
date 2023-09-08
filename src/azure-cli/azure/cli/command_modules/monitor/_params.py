@@ -31,7 +31,6 @@ def load_arguments(self, _):
     autoscale_name_type = CLIArgumentType(options_list=['--autoscale-name'], help='Name of the autoscale settings.', id_part='name')
     autoscale_profile_name_type = CLIArgumentType(options_list=['--profile-name'], help='Name of the autoscale profile.')
     autoscale_rule_name_type = CLIArgumentType(options_list=['--rule-name'], help='Name of the autoscale rule.')
-    scope_name_type = CLIArgumentType(help='Name of the Azure Monitor Private Link Scope.')
 
     with self.argument_context('monitor') as c:
         c.argument('location', get_location_type(self.cli_ctx), validator=get_default_location_from_resource_group)
@@ -100,7 +99,7 @@ def load_arguments(self, _):
         c.argument('aggregation', arg_type=get_enum_type(t for t in AggregationType if t.name != 'none'), nargs='*')
         c.argument('metrics', nargs='+')
         c.argument('orderby', help='Aggregation to use for sorting results and the direction of the sort. Only one order can be specificed. Examples: sum asc')
-        c.argument('top', help='Max number of records to retrieve. Valid only if --filter used.')
+        c.argument('top', type=int, help='Max number of records to retrieve. Valid only if --filter used.')
         c.argument('filters', options_list='--filter')
         c.argument('metric_namespace', options_list='--namespace')
 
@@ -110,8 +109,9 @@ def load_arguments(self, _):
         c.argument('offset', type=get_period_type(as_timedelta=True))
         c.argument('interval', arg_group='Time', type=get_period_type())
 
-    with self.argument_context('monitor metrics list-namespaces', arg_group='Time') as c:
-        c.argument('start_time', arg_type=get_datetime_type(help='Start time of the query.'))
+    with self.argument_context('monitor metrics list-namespaces') as c:
+        c.argument("resource_uri", help="The identifier of the resource.")
+        c.argument('start_time', arg_type=get_datetime_type(help='Start time of the query.'), arg_group='Time')
     # endregion
 
     # region MetricAlerts
@@ -268,64 +268,6 @@ def load_arguments(self, _):
     #  https://github.com/Azure/azure-rest-api-specs/issues/1017
     with self.argument_context('monitor autoscale-settings list') as c:
         c.ignore('filter')
-    # endregion
-
-    # region Diagnostic
-    with self.argument_context('monitor diagnostic-settings') as c:
-        c.argument('name', options_list=('--name', '-n'))
-
-    # with self.argument_context('monitor diagnostic-settings show') as c:
-    #     c.resource_parameter('resource_uri', required=True, arg_group='Target Resource')
-    #
-    # with self.argument_context('monitor diagnostic-settings list') as c:
-    #     c.resource_parameter('resource_uri', required=True)
-    #
-    # with self.argument_context('monitor diagnostic-settings delete') as c:
-    #     c.resource_parameter('resource_uri', required=True, arg_group='Target Resource')
-
-    with self.argument_context('monitor diagnostic-settings update') as c:
-        c.resource_parameter('resource_uri', required=True, arg_group='Target Resource')
-
-    # with self.argument_context('monitor diagnostic-settings create') as c:
-    #     c.resource_parameter('resource_uri', required=True, arg_group='Target Resource', skip_validator=True)
-    #     c.argument('logs', type=get_json_object, help="JSON encoded list of logs settings. Use '@{file}' to load from a file."
-    #                'For more information, visit: https://docs.microsoft.com/rest/api/monitor/diagnosticsettings/createorupdate#logsettings')
-    #     c.argument('metrics', type=get_json_object, help="JSON encoded list of metric settings. Use '@{file}' to load from a file. "
-    #                'For more information, visit: https://docs.microsoft.com/rest/api/monitor/diagnosticsettings/createorupdate#metricsettings')
-    #     c.argument('export_to_resource_specific', arg_type=get_three_state_flag(),
-    #                help='Indicate that the export to LA must be done to a resource specific table, '
-    #                     'a.k.a. dedicated or fixed schema table, '
-    #                     'as opposed to the default dynamic schema table called AzureDiagnostics. '
-    #                     'This argument is effective only when the argument --workspace is also given.')
-
-    # with self.argument_context('monitor diagnostic-settings categories list') as c:
-    #     c.resource_parameter('resource_uri', required=True)
-    #
-    # with self.argument_context('monitor diagnostic-settings categories show') as c:
-    #     c.resource_parameter('resource_uri', required=True)
-
-    # with self.argument_context('monitor diagnostic-settings subscription') as c:
-    #     import argparse
-    #     c.argument('subscription_id', validator=process_subscription_id, help=argparse.SUPPRESS, required=False)
-    #     c.argument('logs', type=get_json_object, help="JSON encoded list of logs settings. Use '@{file}' to load from a file.")
-    #     c.argument('name', help='The name of the diagnostic setting.', options_list=['--name', '-n'])
-    #     c.argument('event_hub_name', help='The name of the event hub. If none is specified, the default event hub will be selected.')
-    #     c.argument('event_hub_auth_rule', help='The resource Id for the event hub authorization rule.')
-    #     c.argument('workspace', help='The resource id of the log analytics workspace.')
-    #     c.argument('storage_account', help='The resource id of the storage account to which you would like to send the Activity Log.')
-    #     c.argument('service_bus_rule', help="The service bus rule ID of the service bus namespace in which you would like to have Event Hubs created for streaming the Activity Log. The rule ID is of the format '{service bus resource ID}/authorizationrules/{key name}'.")
-    # # endregion
-
-    # region LogProfiles
-    with self.argument_context('monitor log-profiles') as c:
-        c.argument('log_profile_name', options_list=['--name', '-n'])
-
-    with self.argument_context('monitor log-profiles create') as c:
-        c.argument('name', options_list=['--name', '-n'])
-        c.argument('categories', nargs='+')
-        c.argument('locations', nargs='+')
-        c.argument('days', type=int, arg_group='Retention Policy')
-        c.argument('enabled', arg_type=get_three_state_flag(), arg_group='Retention Policy')
     # endregion
 
     # region ActivityLog
@@ -498,36 +440,4 @@ def load_arguments(self, _):
                         "all monitor settings would be cloned instead of expanding its scope.")
         c.argument('monitor_types', options_list=['--types', '-t'], arg_type=get_enum_type(['metricsAlert']),
                    nargs='+', help='List of types of monitor settings which would be cloned.', default=['metricsAlert'])
-
-    # region Private Link Resources
-    for item in ['create', 'update', 'show', 'delete', 'list']:
-        with self.argument_context('monitor private-link-scope {}'.format(item)) as c:
-            c.argument('scope_name', scope_name_type, options_list=['--name', '-n'])
-    with self.argument_context('monitor private-link-scope create') as c:
-        c.ignore('location')
-
-    with self.argument_context('monitor private-link-scope scoped-resource') as c:
-        c.argument('scope_name', scope_name_type)
-        c.argument('resource_name', options_list=['--name', '-n'], help='Name of the assigned resource.')
-        c.argument('linked_resource_id', options_list=['--linked-resource'], help='ARM resource ID of the linked resource. It should be one of log analytics workspace or application insights component.')
-
-    with self.argument_context('monitor private-link-scope private-link-resource') as c:
-        c.argument('scope_name', scope_name_type)
-        c.argument('group_name', options_list=['--name', '-n'], help='Name of the private link resource.')
-
-    with self.argument_context('monitor private-link-scope private-endpoint-connection') as c:
-        c.argument('scope_name', scope_name_type)
-        c.argument('private_endpoint_connection_name', options_list=['--name', '-n'],
-                   help='The name of the private endpoint connection associated with the private link scope.')
-    for item in ['approve', 'reject', 'show', 'delete']:
-        with self.argument_context('monitor private-link-scope private-endpoint-connection {}'.format(item)) as c:
-            c.argument('private_endpoint_connection_name', options_list=['--name', '-n'], required=False,
-                       help='The name of the private endpoint connection associated with the private link scope.')
-            c.extra('connection_id', options_list=['--id'],
-                    help='The ID of the private endpoint connection associated with the private link scope. You can get '
-                    'it using `az monitor private-link-scope show`.')
-            c.argument('scope_name', help='Name of the Azure Monitor Private Link Scope.', required=False)
-            c.argument('resource_group_name', help='The resource group name of specified private link scope.',
-                       required=False)
-            c.argument('description', help='Comments for {} operation.'.format(item))
     # endregion

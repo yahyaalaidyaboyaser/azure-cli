@@ -5,7 +5,7 @@
 
 import time
 from knack.log import get_logger
-from knack.util import todict
+from knack.util import todict, CLIError
 from msrestazure.tools import parse_resource_id
 from azure.cli.core.azclierror import (
     ValidationError,
@@ -87,8 +87,9 @@ def run_cli_cmd(cmd, retry=0, interval=0, should_retry_func=None):
         if retry:
             time.sleep(interval)
             return run_cli_cmd(cmd, retry - 1, interval)
+        err = output.stderr.decode(encoding='UTF-8', errors='ignore')
         raise CLIInternalError('Command execution failed, command is: '
-                               '{}, error message is: {}'.format(cmd, output.stderr))
+                               '{}, error message is: \n {}'.format(cmd, err))
     try:
         return json.loads(output.stdout.decode(encoding='UTF-8', errors='ignore')) if output.stdout else None
     except ValueError as e:
@@ -180,7 +181,7 @@ def auto_register(func, *args, **kwargs):
         if ex.error and ex.error.code == 'SubscriptionNotRegistered':
             if register_provider():
                 return func(*args, **kwargs_backup)
-            raise CLIInternalError('Registeration failed, please manually run command '
+            raise CLIInternalError('Registration failed, please manually run command '
                                    '`az provider register -n Microsoft.ServiceLinker` to register the provider.')
         # target subscription is not registered, raw check
         if ex.error and ex.error.code == 'UnauthorizedResourceAccess' and 'not registered' in ex.error.message:
@@ -192,7 +193,7 @@ def auto_register(func, *args, **kwargs):
                 if not provider_is_registered(target_subs):
                     if register_provider(target_subs):
                         return func(*args, **kwargs_backup)
-                    raise CLIInternalError('Registeration failed, please manually run command '
+                    raise CLIInternalError('Registration failed, please manually run command '
                                            '`az provider register -n Microsoft.ServiceLinker --subscription {}` '
                                            'to register the provider.'.format(target_subs))
         raise ex
@@ -201,7 +202,7 @@ def auto_register(func, *args, **kwargs):
 def create_key_vault_reference_connection_if_not_exist(cmd, client, source_id, key_vault_id):
     from ._validators import get_source_resource_name
 
-    logger.warning('get valid key vualt reference connection')
+    logger.warning('get valid key vault reference connection')
     key_vault_connections = []
     for connection in client.list(resource_uri=source_id):
         connection = todict(connection)
@@ -287,13 +288,13 @@ def get_auth_if_no_valid_key_vault_connection(source_name, source_id, key_vault_
                     auth_info = connection.get('authInfo')
                     if auth_info.get('clientId') == client_id and auth_info.get('subscriptionId') == subscription_id:
                         logger.warning(
-                            'key vualt reference connection: %s', connection.get('id'))
+                            'key vault reference connection: %s', connection.get('id'))
                         return
             else:  # System Identity
                 for connection in key_vault_connections:
                     if connection.get('authInfo').get('authType') == auth_type:
                         logger.warning(
-                            'key vualt reference connection: %s', connection.get('id'))
+                            'key vault reference connection: %s', connection.get('id'))
                         return
 
         # any connection with csi enabled is a valid connection
@@ -305,7 +306,7 @@ def get_auth_if_no_valid_key_vault_connection(source_name, source_id, key_vault_
             return {'authType': 'userAssignedIdentity'}
 
         else:
-            logger.warning('key vualt reference connection: %s',
+            logger.warning('key vault reference connection: %s',
                            key_vault_connections[0].get('id'))
             return
 
@@ -325,3 +326,154 @@ def is_packaged_installed(package_name):
     pkg_installed = any((package_name) in d.key.lower()
                         for d in installed_packages)
     return pkg_installed
+
+
+def get_object_id_of_current_user():
+    signed_in_user = run_cli_cmd('az account show').get('user')
+    user_type = signed_in_user.get('type')
+    try:
+        if user_type == 'user':
+            user_info = run_cli_cmd('az ad signed-in-user show')
+            user_object_id = user_info.get('objectId') if user_info.get(
+                'objectId') else user_info.get('id')
+            return user_object_id
+        if user_type == 'servicePrincipal':
+            user_info = run_cli_cmd(
+                f'az ad sp show --id {signed_in_user.get("name")}')
+            user_object_id = user_info.get('id')
+            return user_object_id
+    except CLIInternalError as e:
+        if 'AADSTS530003' in e.error_msg:
+            logger.warning(
+                'Please ask your IT department for help to join this device to Azure Active Directory.')
+        raise e
+
+
+def get_cloud_conn_auth_info(secret_auth_info, secret_auth_info_auto,
+                             user_identity_auth_info, system_identity_auth_info,
+                             service_principal_auth_info_secret, new_addon):
+    all_auth_info = []
+    if secret_auth_info is not None:
+        all_auth_info.append(secret_auth_info)
+    if secret_auth_info_auto is not None:
+        all_auth_info.append(secret_auth_info_auto)
+    if user_identity_auth_info is not None:
+        all_auth_info.append(user_identity_auth_info)
+    if system_identity_auth_info is not None:
+        all_auth_info.append(system_identity_auth_info)
+    if service_principal_auth_info_secret is not None:
+        all_auth_info.append(service_principal_auth_info_secret)
+    if not new_addon and len(all_auth_info) != 1:
+        raise ValidationError('Only one auth info is needed')
+    auth_info = all_auth_info[0] if len(all_auth_info) == 1 else None
+    return auth_info
+
+
+def get_local_conn_auth_info(secret_auth_info, secret_auth_info_auto,
+                             user_account_auth_info, service_principal_auth_info_secret):
+    all_auth_info = []
+    if secret_auth_info is not None:
+        all_auth_info.append(secret_auth_info)
+    if secret_auth_info_auto is not None:
+        all_auth_info.append(secret_auth_info_auto)
+    if user_account_auth_info is not None:
+        all_auth_info.append(user_account_auth_info)
+    if service_principal_auth_info_secret is not None:
+        all_auth_info.append(service_principal_auth_info_secret)
+    auth_info = all_auth_info[0] if len(all_auth_info) == 1 else None
+    return auth_info
+
+
+def _get_azext_module(extension_name, module_name):
+    try:
+        # Adding the installed extension in the path
+        from azure.cli.core.extension.operations import add_extension_to_path
+        add_extension_to_path(extension_name)
+        # Import the extension module
+        from importlib import import_module
+        azext_custom = import_module(module_name)
+        return azext_custom
+    except ImportError as ie:
+        raise CLIInternalError(ie)
+
+
+def _get_or_add_extension(cmd, extension_name, extension_module, update=False):
+    from azure.cli.core.extension import (
+        ExtensionNotInstalledException, get_extension)
+    try:
+        get_extension(extension_name)
+        if update:
+            return _update_extension(cmd, extension_name, extension_module)
+    except ExtensionNotInstalledException:
+        return _install_extension(cmd, extension_name)
+    return True
+
+
+def _update_extension(cmd, extension_name):
+    from azure.cli.core.extension import ExtensionNotInstalledException
+    try:
+        from azure.cli.core.extension import operations
+        operations.update_extension(cmd=cmd, extension_name=extension_name)
+        operations.reload_extension(extension_name=extension_name)
+    except CLIError as err:
+        logger.info(err)
+    except ExtensionNotInstalledException as err:
+        logger.debug(err)
+        return False
+    except ModuleNotFoundError as err:
+        logger.debug(err)
+        logger.error(
+            "Error occurred attempting to load the extension module. Use --debug for more information.")
+        return False
+    return True
+
+
+def _install_extension(cmd, extension_name):
+    try:
+        from azure.cli.core.extension import operations
+        operations.add_extension(cmd=cmd, extension_name=extension_name)
+    except Exception:  # nopa pylint: disable=broad-except
+        return False
+    return True
+
+
+def springboot_migration_warning(require_update=False, check_version=False, both_version=False):
+    warning_message = "It is recommended to use Spring Cloud Azure version 4.0 and above. \
+The configurations in the format of \"azure.cosmos.*\" from Spring Cloud Azure 3.x will no longer be supported after 1st July, 2024. \
+Please refer to https://microsoft.github.io/spring-cloud-azure/current/reference/html/appendix.html\
+#configuration-spring-cloud-azure-starter-data-cosmos for more details."
+
+    update_message = "\nPlease update your connection to include the configurations for the newer version."
+
+    check_version_message = "\nManaged identity and service principal are only supported \
+in Spring Cloud Azure version 4.0 and above. Please check your Spring Cloud Azure version. \
+Learn more at https://spring.io/projects/spring-cloud-azure#overview"
+    both_version_message = "\nTwo sets of configuration properties will be configured \
+according to Spring Cloud Azure version 3.x and 4.x. \
+Learn more at https://spring.io/projects/spring-cloud-azure#overview"
+
+    if require_update:
+        warning_message += update_message
+    if check_version:
+        warning_message += check_version_message
+    if both_version:
+        warning_message += both_version_message
+
+    return warning_message
+
+
+def decorate_springboot_cosmossql_config(configs):
+    is_springboot_cosmossql = False
+    require_update = True
+
+    for config in configs.configurations:
+        if config.name.startswith("azure.cosmos."):
+            is_springboot_cosmossql = True
+            config.note = "This configuration property is used in Spring Cloud Azure version 3.x and below."
+        elif config.name.startswith("spring.cloud.azure.cosmos."):
+            is_springboot_cosmossql = True
+            require_update = False
+            config.note = "This configuration property is used in Spring Cloud Azure version 4.0 and above."
+
+    if is_springboot_cosmossql:
+        logger.warning(springboot_migration_warning(require_update=require_update))

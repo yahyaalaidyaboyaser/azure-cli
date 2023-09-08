@@ -77,6 +77,8 @@ class Delete(AAZCommand):
             session = self.client.send_request(request=request, stream=False, **kwargs)
             if session.http_response.status_code in [200]:
                 return self.on_200(session)
+            if session.http_response.status_code in [202]:
+                return self.on_202(session)
             if session.http_response.status_code in [204]:
                 return self.on_204(session)
 
@@ -128,8 +130,15 @@ class Delete(AAZCommand):
         def on_200(self, session):
             pass
 
+        def on_202(self, session):
+            pass
+
         def on_204(self, session):
             pass
+
+
+class _DeleteHelper:
+    """Helper class for Delete"""
 
 
 __all__ = ["Delete"]

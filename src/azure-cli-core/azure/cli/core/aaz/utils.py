@@ -4,7 +4,8 @@
 # --------------------------------------------------------------------------------------------
 # pylint: disable=protected-access
 
-from ._arg import AAZListArg, AAZDictArg, has_value
+from ._arg import AAZListArg, AAZDictArg
+from ._base import has_value
 from ._field_value import AAZList, AAZDict
 from ._base import AAZBaseValue
 
@@ -114,3 +115,11 @@ def assign_aaz_dict_arg(target: AAZDict, source: AAZDict, element_transformer=No
             target[key] = element
 
     return target
+
+
+def get_aaz_profile_module_name(profile_name):
+    profile_module_name = profile_name.lower().replace('-', '_')
+    if profile_module_name != "latest":
+        # the rest profiles for azure-stack use start with digit number, it's not a valid python package name.
+        profile_module_name = "profile_" + profile_module_name
+    return profile_module_name

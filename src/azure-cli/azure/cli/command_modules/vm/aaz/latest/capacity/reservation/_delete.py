@@ -53,7 +53,7 @@ class Delete(AAZCommand):
             id_part="name",
         )
         _args_schema.capacity_reservation_name = AAZStrArg(
-            options=["-n", "--capacity-reservation-name"],
+            options=["-n", "--name", "--capacity-reservation-name"],
             help="The name of the capacity reservation.",
             required=True,
             id_part="child_name_1",
@@ -164,6 +164,10 @@ class Delete(AAZCommand):
 
         def on_204(self, session):
             pass
+
+
+class _DeleteHelper:
+    """Helper class for Delete"""
 
 
 __all__ = ["Delete"]

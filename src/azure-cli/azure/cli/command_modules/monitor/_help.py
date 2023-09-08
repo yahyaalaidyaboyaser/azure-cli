@@ -211,14 +211,6 @@ examples:
     text: |
         az monitor action-group test-notifications create --action-group MyActionGroup \\
         --resource-group MyResourceGroup -a email alice alice@example.com usecommonalertsChema --alert-type budget
-  - name: Create an action group test-notifications with resource-group
-    text: |
-        az monitor action-group test-notifications create --resource-group MyResourceGroup \\
-        -a email alice alice@example.com usecommonalertsChema --alert-type budget
-  - name: Create an action group test-notifications
-    text: |
-        az monitor action-group test-notifications create -a email alice alice@example.com usecommonalertsChema \\
-        --alert-type budget
 """
 
 helps['monitor activity-log'] = """
@@ -228,20 +220,20 @@ short-summary: Manage activity logs.
 
 helps['monitor activity-log alert'] = """
 type: group
-short-summary: Manage activity log alerts
+short-summary: Manage activity log alert rules.
 """
 
 helps['monitor activity-log alert action-group'] = """
 type: group
-short-summary: Manage action groups for activity log alerts
+short-summary: Manage action groups for activity log alert rules.
 """
 
 helps['monitor activity-log alert action-group add'] = """
 type: command
-short-summary: Add action groups to this activity log alert. It can also be used to overwrite existing webhook properties of particular action groups.
+short-summary: Add action groups to this activity log alert rule. It can also be used to overwrite existing webhook properties of particular action groups.
 parameters:
   - name: --name -n
-    short-summary: Name of the activity log alerts
+    short-summary: Name of the activity log alert rule.
   - name: --action-group -a
     short-summary: The names or the resource ids of the action groups to be added.
   - name: --reset
@@ -278,32 +270,32 @@ examples:
 
 helps['monitor activity-log alert action-group remove'] = """
 type: command
-short-summary: Remove action groups from this activity log alert
+short-summary: Remove action groups from this activity log alert rule.
 parameters:
   - name: --name -n
-    short-summary: Name of the activity log alerts
+    short-summary: Name of the activity log alert rule.
   - name: --action-group -a
-    short-summary: The names or the resource ids of the action groups to be added.
+    short-summary: The names or the resource ids of the action groups to be removed.
 """
 
 helps['monitor activity-log alert create'] = """
 type: command
-short-summary: Create a default activity log alert
+short-summary: Create a default activity log alert rule.
 long-summary: This command will create a default activity log with one condition which compares if the activities logs 'category' field equals to 'ServiceHealth'. The newly created activity log alert does not have any action groups attached to it.
 parameters:
   - name: --name -n
-    short-summary: Name of the activity log alerts
+    short-summary: Name of the activity log alert rule.
   - name: --scope -s
     short-summary: A list of strings that will be used as prefixes.
     long-summary: >
-        The alert will only apply to activity logs with resourceIDs that fall under one of these prefixes.
+        The alert rule will only apply to activity logs with resourceIDs that fall under one of these prefixes.
         If not provided, the path to the resource group will be used.
   - name: --disable
-    short-summary: Disable the activity log alert after it is created.
+    short-summary: Disable the activity log alert rule after it is created.
   - name: --description
-    short-summary: A description of this activity log alert
+    short-summary: A description of this activity log alert rule.
   - name: --condition -c
-    short-summary: The condition that will cause the alert to activate. The format is FIELD=VALUE[ and FIELD=VALUE...].
+    short-summary: The condition that will cause the alert rule to activate. The format is FIELD=VALUE[ and FIELD=VALUE...].
     long-summary: >
         The possible values for the field are 'resourceId', 'category', 'caller', 'level', 'operationName', 'resourceGroup',
         'resourceProvider', 'status', 'subStatus', 'resourceType', or anything beginning with 'properties.'.
@@ -319,48 +311,48 @@ parameters:
         For any webhook receiver in these action group, this data is appended to the webhook payload. To attach different webhook
         properties to different action groups, add the action groups in separate update-action commands.
 examples:
-  - name: Create an alert with default settings.
+  - name: Create an alert rule with default settings.
     text: >
         az monitor activity-log alert create -n {AlertName} -g {ResourceGroup}
-  - name: Create an alert with condition about error level service health log.
+  - name: Create an alert rule with condition about error level service health log.
     text: >
         az monitor activity-log alert create -n {AlertName} -g {ResourceGroup} \\
           --condition category=ServiceHealth and level=Error
-  - name: Create an alert with an action group and specify webhook properties.
+  - name: Create an alert rule with an action group and specify webhook properties.
     text: >
         az monitor activity-log alert create -n {AlertName} -g {ResourceGroup} \\
           -a /subscriptions/{SubID}/resourceGroups/{ResourceGroup}/providers/microsoft.insights/actionGroups/{ActionGroup} \\
           -w usage=test owner=jane
-  - name: Create an alert which is initially disabled.
+  - name: Create an alert rule which is initially disabled.
     text: >
         az monitor activity-log alert create -n {AlertName} -g {ResourceGroup} --disable
 """
 
 helps['monitor activity-log alert list'] = """
 type: command
-short-summary: List activity log alerts under a resource group or the current subscription.
+short-summary: List activity log alert rules under a resource group or the current subscription.
 parameters:
   - name: --resource-group -g
-    short-summary: Name of the resource group under which the activity log alerts are being listed. If it is omitted, all the activity log alerts under the current subscription are listed.
+    short-summary: Name of the resource group under which the activity log alert rules are being listed. If it is omitted, all the activity log alert rules under the current subscription are listed.
 """
 
 helps['monitor activity-log alert scope'] = """
 type: group
-short-summary: Manage scopes for activity log alerts
+short-summary: Manage scopes for activity log alert rules.
 """
 
 helps['monitor activity-log alert scope add'] = """
 type: command
-short-summary: Add scopes to this activity log alert.
+short-summary: Add scopes to this activity log alert rule.
 parameters:
   - name: --name -n
-    short-summary: Name of the activity log alerts
+    short-summary: Name of the activity log alert rule.
   - name: --scope -s
     short-summary: List of scopes to add. Each scope could be a resource ID, a resource group ID or a subscription ID.
   - name: --reset
     short-summary: Remove all the existing scopes before add new scopes.
 examples:
-  - name: Add scopes to this activity log alert. (autogenerated)
+  - name: Add scopes to this activity log alert rule. (autogenerated)
     text: |
         az monitor activity-log alert scope add --name MyActivityLogAlerts --resource-group MyResourceGroup --scope /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx  /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myRG  /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/myRG/Microsoft.KeyVault/vaults/mykey
     crafted: true
@@ -368,22 +360,22 @@ examples:
 
 helps['monitor activity-log alert scope remove'] = """
 type: command
-short-summary: Removes scopes from this activity log alert.
+short-summary: Removes scopes from this activity log alert rule.
 parameters:
   - name: --name -n
-    short-summary: Name of the activity log alerts
+    short-summary: Name of the activity log alert rule.
   - name: --scope -s
     short-summary: The scopes to remove
 """
 
 helps['monitor activity-log alert update'] = """
 type: command
-short-summary: Update the details of this activity log alert
+short-summary: Update the details of this activity log alert rule.
 parameters:
   - name: --description
-    short-summary: A description of this activity log alert.
+    short-summary: A description of this activity log alert rule.
   - name: --condition -c
-    short-summary: The conditional expression that will cause the alert to activate. The format is FIELD=VALUE[ and FIELD=VALUE...].
+    short-summary: The conditional expression that will cause the alert rule to activate. The format is FIELD=VALUE[ and FIELD=VALUE...].
     long-summary: >
         The possible values for the field are 'resourceId', 'category', 'caller', 'level', 'operationName', 'resourceGroup',
         'resourceProvider', 'status', 'subStatus', 'resourceType', or anything beginning with 'properties.'.
@@ -392,10 +384,10 @@ examples:
     text: >
         az monitor activity-log alert update -n {AlertName} -g {ResourceGroup} \\
           --condition category=ServiceHealth and level=Error
-  - name: Disable an alert
+  - name: Disable an alert rule.
     text: >
         az monitor activity-log alert update -n {AlertName} -g {ResourceGroup} --enable false
-  - name: Update the details of this activity log alert (autogenerated)
+  - name: Update the details of this activity log alert rule. (autogenerated)
     text: |
         az monitor activity-log alert update --enabled true --name MyActivityLogAlerts --resource-group MyResourceGroup --subscription MySubscription
     crafted: true
@@ -709,140 +701,6 @@ examples:
     crafted: true
 """
 
-helps['monitor diagnostic-settings'] = """
-type: group
-short-summary: Manage service diagnostic settings.
-"""
-
-helps['monitor diagnostic-settings categories'] = """
-type: group
-short-summary: Retrieve service diagnostic settings categories.
-"""
-
-helps['monitor diagnostic-settings categories list'] = """
-type: command
-short-summary:  List the diagnostic settings categories for the specified resource.
-examples:
-  - name: List diagnostic settings categories by using resource ID
-    text: az monitor diagnostic-settings categories list --resource /subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/myRG/providers/microsoft.logic/workflows/myWorkflow
-  - name: List diagnostic settings categories by using resource name
-    text: az monitor diagnostic-settings categories list -g myRG --resource-type microsoft.logic/workflows --resource myWorkflow
-
-"""
-
-helps['monitor diagnostic-settings create'] = """
-type: command
-short-summary: Create diagnostic settings for the specified resource.
-long-summary: >
-    For more information, visit: https://docs.microsoft.com/rest/api/monitor/diagnosticsettings/createorupdate#metricsettings
-parameters:
-  - name: --name -n
-    short-summary: The name of the diagnostic settings.
-  - name: --resource-group -g
-    type: string
-    short-summary: Name of the resource group for the Log Analytics and Storage Account when the name of the service instead of a full resource ID is given.
-  - name: --storage-account
-    type: string
-    short-summary: Name or ID of the storage account to send diagnostic logs to.
-  - name: --workspace
-    type: string
-    short-summary: Name or ID of the Log Analytics workspace to send diagnostic logs to.
-  - name: --event-hub
-    type: string
-    short-summary: >
-        Name or ID an event hub. If none is specified, the default event hub will be selected.
-  - name: --event-hub-rule
-    short-summary: Name or ID of the event hub authorization rule.
-examples:
-  - name: Create diagnostic settings, retention here only applies when the target is a storage account.
-    text: |
-        az monitor diagnostic-settings create --resource {ID} -n {name}
-           --storage-account {storageAccount}
-           --logs '[
-             {
-               "category": "WorkflowRuntime",
-               "enabled": true,
-               "retentionPolicy": {
-                 "enabled": false,
-                 "days": 0
-               }
-             }
-           ]'
-           --metrics '[
-             {
-               "category": "WorkflowRuntime",
-               "enabled": true,
-               "retentionPolicy": {
-                 "enabled": false,
-                 "days": 0
-               }
-             }
-           ]'
-"""
-
-helps['monitor diagnostic-settings update'] = """
-type: command
-short-summary: Update diagnostic settings.
-examples:
-  - name: Update diagnostic settings. (autogenerated)
-    text: |
-        az monitor diagnostic-settings update --name MyDiagnosticSetting --resource myScaleSet --set retentionPolicy.days=365
-    crafted: true
-"""
-
-helps['monitor diagnostic-settings subscription'] = """
-type: group
-short-summary: Manage diagnostic settings for subscription.
-"""
-
-helps['monitor diagnostic-settings subscription create'] = """
-type: command
-short-summary: Create diagnostic settings for a subscription
-examples:
-  - name: Create diagnostic settings for a subscription with EventHub.
-    text: |
-        az monitor diagnostic-settings subscription create -n {name} --location westus --event-hub-auth-rule {eventHubRuleID} --storage-account {storageAccount} \\
-        --logs '[
-           {
-             "category": "Security",
-             "enabled": true
-           },
-           {
-             "category": "Administrative",
-             "enabled": true
-           },
-           {
-             "category": "ServiceHealth",
-             "enabled": true
-           },
-           {
-             "category": "Alert",
-             "enabled": true
-           },
-           {
-             "category": "Recommendation",
-             "enabled": true
-           },
-           {
-             "category": "Policy",
-             "enabled": true
-           },
-           {
-             "category": "Autoscale",
-             "enabled": true
-           },
-           {
-             "category": "ResourceHealth",
-             "enabled": true
-           }
-           ]'
-"""
-
-helps['monitor diagnostic-settings subscription update'] = """
-type: command
-short-summary: Update diagnostic settings for a subscription.
-"""
-
 helps['monitor log-analytics workspace recover'] = """
 type: command
 short-summary: Recover a workspace in a soft-delete state within 14 days.
@@ -937,46 +795,6 @@ examples:
     text: az monitor log-analytics workspace linked-storage remove --type AzureWatson -g MyResourceGroup --workspace-name MyWorkspace --storage-accounts StorageAccount1 StorageAccount2
   - name: Remove one linked storage accounts for a log analytics workspace using the resource id of the storage account.
     text: az monitor log-analytics workspace linked-storage remove --type AzureWatson -g MyResourceGroup --workspace-name MyWorkspace --storage-accounts /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/clitest.rg000001/providers/Microsoft.Storage/storageAccounts/cli000001
-"""
-
-helps['monitor log-profiles'] = """
-type: group
-short-summary: Manage log profiles.
-"""
-
-helps['monitor log-profiles create'] = """
-type: command
-short-summary: Create a log profile.
-parameters:
-  - name: --name -n
-    short-summary: The name of the log profile.
-  - name: --locations
-    short-summary: Space-separated list of regions for which Activity Log events should be stored.
-  - name: --categories
-    short-summary: Space-separated categories of the logs. These categories are created as is convenient to the user. Some values are Write, Delete, and/or Action.
-  - name: --storage-account-id
-    short-summary: The resource id of the storage account to which you would like to send the Activity Log.
-  - name: --service-bus-rule-id
-    short-summary: The service bus rule ID of the service bus namespace in which you would like to have Event Hubs created for streaming the Activity Log. The rule ID is of the format '{service bus resource ID}/authorizationrules/{key name}'.
-  - name: --days
-    short-summary: The number of days for the retention in days. A value of 0 will retain the events indefinitely
-  - name: --enabled
-    short-summary: Whether the retention policy is enabled.
-examples:
-  - name: Create a log profile. (autogenerated)
-    text: |
-        az monitor log-profiles create --categories "Delete" --days 0 --enabled true --location westus2 --locations westus --name MyLogProfile --service-bus-rule-id "/subscriptions/{YOUR SUBSCRIPTION ID}/resourceGroups/{RESOURCE GROUP NAME}/providers/Microsoft.EventHub/namespaces/{EVENT HUB NAME SPACE}/authorizationrules/RootManageSharedAccessKey"
-    crafted: true
-"""
-
-helps['monitor log-profiles update'] = """
-type: command
-short-summary: Update a log profile.
-examples:
-  - name: Update a log profile. (autogenerated)
-    text: |
-        az monitor log-profiles update --name MyLogProfile --set retentionPolicy.days=365
-    crafted: true
 """
 
 helps['monitor metrics'] = """
@@ -1287,140 +1105,4 @@ examples:
   - name: Clone the metric alert settings from one VM to another
     text: |
         az monitor clone --source-resource /subscriptions/{subscriptionID}/resourceGroups/Space1999/providers/Microsoft.Compute/virtualMachines/vm1 --target-resource /subscriptions/{subscriptionID}/resourceGroups/Space1999/providers/Microsoft.Compute/virtualMachines/vm2
-"""
-
-helps['monitor private-link-scope'] = """
-type: group
-short-summary: Manage monitor private link scope resource.
-"""
-
-helps['monitor private-link-scope create'] = """
-type: command
-short-summary: Create a private link scope resource.
-examples:
-  - name: Create a private link scope resource (autogenerated)
-    text: |
-        az monitor private-link-scope create --name MyAzureMonitorPrivateLinkScope --resource-group MyResourceRroup
-    crafted: true
-"""
-
-helps['monitor private-link-scope update'] = """
-type: command
-short-summary: Update a monitor private link scope resource.
-"""
-
-helps['monitor private-link-scope list'] = """
-type: command
-short-summary: List all monitor private link scope resource.
-"""
-
-helps['monitor private-link-scope show'] = """
-type: command
-short-summary: Show a monitor private link scope resource.
-"""
-
-helps['monitor private-link-scope delete'] = """
-type: command
-short-summary: Delete a monitor private link scope resource.
-"""
-
-helps['monitor private-link-scope scoped-resource'] = """
-type: group
-short-summary: Manage scoped resource of a private link scope resource.
-"""
-
-helps['monitor private-link-scope scoped-resource create'] = """
-type: command
-short-summary: Create a scoped resource for a private link scope resource.
-example:
-    - name: Create a scoped resource for log analytic workspace
-      text: az monitor private-link-scope scoped-resource create -g MyRG -n ScopedWS --linked-resource /subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/clitest.rg000001/providers/microsoft.operationalinsights/workspaces/clitest000002 --scope-name MyScope
-"""
-
-helps['monitor private-link-scope scoped-resource list'] = """
-type: command
-short-summary: List all scoped resource of a private link scope resource.
-"""
-
-helps['monitor private-link-scope scoped-resource show'] = """
-type: command
-short-summary: Show a scoped resource of a private link scope resource.
-"""
-
-helps['monitor private-link-scope scoped-resource delete'] = """
-type: command
-short-summary: Delete a scoped resource of a private link scope resource.
-"""
-
-helps['monitor private-link-scope private-link-resource'] = """
-type: group
-short-summary: Manage private link resource of a private link scope resource.
-"""
-
-helps['monitor private-link-scope private-link-resource list'] = """
-type: command
-short-summary: List all private link resources of a private link scope resource.
-"""
-
-helps['monitor private-link-scope private-link-resource show'] = """
-type: command
-short-summary: Show a private link resource of a private link scope resource.
-"""
-
-helps['monitor private-link-scope private-endpoint-connection'] = """
-type: group
-short-summary: Manage private endpoint connection of a private link scope resource.
-"""
-
-helps['monitor private-link-scope private-endpoint-connection approve'] = """
-type: command
-short-summary: Approve a private endpoint connection of a private link scope resource.
-parameters:
-  - name: --name -n
-    short-summary: Name of the private endpoint connection.
-    populator-commands:
-      - az monitor private-link-scope show
-example:
-    - name: Approve a private endpoint connection.
-      text: az monitor private-link-scope private-endpoint-connection approve --scope-name MyScope -g MyRG --name PrivateEndpointConnection
-examples:
-  - name: Approve a private endpoint connection of a private link scope resource. (autogenerated)
-    text: |
-        az monitor private-link-scope private-endpoint-connection approve --name MyPrivateEndpointConnection --resource-group MyResourceGroup --scope-name MyScope
-    crafted: true
-"""
-
-helps['monitor private-link-scope private-endpoint-connection reject'] = """
-type: command
-parameters:
-  - name: --name -n
-    short-summary: Name of the private endpoint connection.
-    populator-commands:
-      - az monitor private-link-scope show
-short-summary: Reject a private endpoint connection of a private link scope resource.
-examples:
-  - name: Reject a private endpoint connection of a private link scope resource. (autogenerated)
-    text: |
-        az monitor private-link-scope private-endpoint-connection reject --name MyPrivateEndpointConnection --resource-group MyResourceGroup --scope-name MyScope
-    crafted: true
-"""
-
-helps['monitor private-link-scope private-endpoint-connection show'] = """
-type: command
-parameters:
-  - name: --name -n
-    short-summary: Name of the private endpoint connection.
-    populator-commands:
-      - az monitor private-link-scope show
-short-summary: Show a private endpoint connection of a private link scope resource.
-"""
-
-helps['monitor private-link-scope private-endpoint-connection delete'] = """
-type: command
-short-summary: Delete a private endpoint connection of a private link scope resource.
-"""
-
-helps['monitor private-link-scope private-endpoint-connection list'] = """
-type: command
-short-summary: List all private endpoint connections of a private link scope resource.
 """
