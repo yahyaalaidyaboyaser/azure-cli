@@ -14,7 +14,10 @@ from azure.core.tracing.common import with_current_context
 from azure.core.tracing.decorator import distributed_trace
 # import requests in main thread to resolve import deadlock between threads in python
 # reference https://github.com/psf/requests/issues/2925 and https://github.com/Azure/azure-cli/issues/26272
-import requests  # pylint: disable=unused-import
+try:
+    import requests  # pylint: disable=unused-import
+except ImportError:
+    pass
 
 _LOGGER = logging.getLogger(__name__)
 

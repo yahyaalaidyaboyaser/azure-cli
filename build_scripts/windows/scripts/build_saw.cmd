@@ -13,7 +13,7 @@ if "%CLI_VERSION%"=="" (
     echo Please set the CLI_VERSION environment variable, e.g. 2.0.13
     goto ERROR
 )
-if %BLOB_SAS%=="" (
+if "%BLOB_SAS%"=="" (
     echo Please set the BLOB_SAS environment variable
     goto ERROR
 )
@@ -52,13 +52,16 @@ set SPYTHON_LIB=%SPYTHON_DIR%\Microsoft.Internal.SPython.win32.%SPYTHON_VERSION%
 set NUGET_DIR=%ARTIFACTS_DIR%\Nuget
 set MISC_DIR=%ARTIFACTS_DIR%\misc
 
-set REPO_ROOT=%~dp0..\..\..
+REM Get the absolute directory since we pushd into different levels of subdirectories.
+PUSHD %~dp0..\..\..
+SET REPO_ROOT=%CD%
+POPD
 
 REM reset nuget dir
 if not exist %NUGET_DIR% (
     mkdir %NUGET_DIR%
     pushd %NUGET_DIR%
-    curl --output nuget.exe %NUGET_DOWNLOAD_URL%
+    curl --fail --output nuget.exe %NUGET_DOWNLOAD_URL%
     popd
 )
 
@@ -66,8 +69,9 @@ REM download wheel
 if not exist %MISC_DIR% (
     mkdir %MISC_DIR%
     pushd %MISC_DIR%
-    curl --output %WINDOWS_HTTP_FILENAME% %BASE_MISC_URL%/%WINDOWS_HTTP_FILENAME%?%BLOB_SAS%
-    curl --output %SPYTHON_FILENAME% %BASE_MISC_URL%/%SPYTHON_FILENAME%?%BLOB_SAS%
+    curl --fail --output %WINDOWS_HTTP_FILENAME% "%BASE_MISC_URL%/%WINDOWS_HTTP_FILENAME%?%BLOB_SAS%"
+    curl --fail --output %SPYTHON_FILENAME% "%BASE_MISC_URL%/%SPYTHON_FILENAME%?%BLOB_SAS%"
+    if %errorlevel% neq 0 goto ERROR
     popd
 )
 
@@ -125,7 +129,7 @@ if not exist %PYTHON_DIR% (
     pushd %PYTHON_DIR%
 
     echo Downloading Python
-    curl --output python-archive.zip %PYTHON_DOWNLOAD_URL%
+    curl --fail --output python-archive.zip %PYTHON_DOWNLOAD_URL%
     unzip python-archive.zip
     if %errorlevel% neq 0 goto ERROR
     del python-archive.zip
@@ -137,7 +141,7 @@ if not exist %PYTHON_DIR% (
     del python*._pth
 
     echo Installing pip
-    curl --output get-pip.py %GET_PIP_DOWNLOAD_URL%
+    curl --fail --output get-pip.py %GET_PIP_DOWNLOAD_URL%
     %PYTHON_DIR%\python.exe get-pip.py
     del get-pip.py
     echo Pip set up successful
@@ -148,7 +152,6 @@ if not exist %PYTHON_DIR% (
 set PYTHON_EXE=%PYTHON_DIR%\python.exe
 
 set CLI_SRC=%REPO_ROOT%\src
-%PYTHON_EXE% -m pip install pycparser==2.18 --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
 for %%a in (%CLI_SRC%\azure-cli %CLI_SRC%\azure-cli-core %CLI_SRC%\azure-cli-telemetry) do (
     pushd %%a
     %PYTHON_EXE% -m pip install --no-warn-script-location --no-cache-dir --no-deps -U .
@@ -160,8 +163,7 @@ pushd %CLI_SRC%\azure-cli\
     powershell -Command "(Get-Content requirements.py3.windows-spython.txt) -replace '^azure-cli-core==.*', '' | Out-File -encoding utf8 requirements.py3.windows-spython.txt"
     powershell -Command "(Get-Content requirements.py3.windows-spython.txt) -replace '^azure-cli-telemetry==.*', '' | Out-File -encoding utf8 requirements.py3.windows-spython.txt"
     powershell -Command "(Get-Content requirements.py3.windows-spython.txt) -replace '^azure-cli==.*', '' | Out-File -encoding utf8 requirements.py3.windows-spython.txt"
-    echo setuptools==63.4.2 >> requirements.py3.windows-spython.txt
-    echo multidict==6.0.2 >> requirements.py3.windows-spython.txt
+    echo setuptools>=63.4.2 >> requirements.py3.windows-spython.txt
 popd
 
 %PYTHON_EXE% -m pip install --no-warn-script-location --requirement %CLI_SRC%\azure-cli\requirements.py3.windows-spython.txt --target %SPYTHON_LIB%
@@ -169,7 +171,8 @@ rm %CLI_SRC%\azure-cli\requirements.py3.windows-spython.txt
 %PYTHON_EXE% -m pip install "%MISC_DIR%\%WINDOWS_HTTP_FILENAME%" --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
 
 @REM Install portalocker free version msal_extensions
-%PYTHON_EXE% -m pip install git+https://github.com/AzureAD/microsoft-authentication-extensions-for-python.git@refs/pull/117/head --no-warn-script-location --force-reinstall --target %SPYTHON_LIB%
+for /d %%G in (%SPYTHON_LIB%\msal_extensions*) do rmdir /s /q "%%G"
+%PYTHON_EXE% -m pip install git+https://github.com/AzureAD/microsoft-authentication-extensions-for-python.git@refs/pull/117/head --no-warn-script-location --force-reinstall --no-deps --target %SPYTHON_LIB%
 
 REM Remove forbidden packages in SPython. (remove requests after calling remove_unused_api_versions.py)
 pushd %SPYTHON_LIB%
@@ -194,28 +197,19 @@ robocopy %SPYTHON_DIR%\Microsoft.Internal.SPython.win32.%SPYTHON_VERSION%\tools 
 
 REM Replace requests to winrequests
 echo Replace requests to winrequests
-pushd %BUILDING_DIR%\Lib\msrest
-for %%a in ("pipeline\__init__.py" "universal_http\__init__.py" "universal_http\requests.py" "authentication.py" "pipeline\requests.py" "universal_http\async_requests.py" "pipeline\async_requests.py") do (
-    powershell -Command "(Get-Content %%a) -replace '^import requests_oauthlib as oauth', '' | Out-File -encoding utf8 %%a"
-    powershell -Command "(Get-Content %%a) -replace '^from requests', 'from azure.cli.core.vendored_sdks.winrequests' | Out-File -encoding utf8 %%a"
-    powershell -Command "(Get-Content %%a) -replace '^import requests', 'import azure.cli.core.vendored_sdks.winrequests as requests' | Out-File -encoding utf8 %%a"
-    powershell -Command "(Get-Content %%a) -replace '^from urllib3 import Retry', '' | Out-File -encoding utf8 %%a"
-)
+for %%d in ("msrest" "msal" "msrestazure" "azure\multiapi\storagev2" "azure\multiapi\storage") do (
+    echo processing %BUILDING_DIR%\Lib\%%d
+    pushd %BUILDING_DIR%\Lib\%%d
+    for /R %%a in ("*.py") do (
+        powershell -Command "(Get-Content %%a) -replace '^\s*import requests_oauthlib as oauth', '' | Out-File -encoding utf8 %%a"
+        powershell -Command "(Get-Content %%a) -replace '^(\s*)from requests', '$1from azure.cli.core.vendored_sdks.winrequests' | Out-File -encoding utf8 %%a"
+        powershell -Command "(Get-Content %%a) -replace '^(\s*)import requests', '$1import azure.cli.core.vendored_sdks.winrequests as requests' | Out-File -encoding utf8 %%a"
+        powershell -Command "(Get-Content %%a) -replace '^\s*from urllib3 import Retry', '' | Out-File -encoding utf8 %%a"
+    )
+    %BUILDING_DIR%\python.exe -m compileall .
+    popd
+ )
 @REM Rebuild __pycache__
-%BUILDING_DIR%\python.exe -m compileall .
-popd
-pushd %BUILDING_DIR%\Lib\msrestazure
-for %%a in ("azure_exceptions.py") do (
-    powershell -Command "(Get-Content %%a) -replace '^from requests', 'from azure.cli.core.vendored_sdks.winrequests' | Out-File -encoding utf8 %%a"
-)
-%BUILDING_DIR%\python.exe -m compileall .
-popd
-pushd %BUILDING_DIR%\Lib\azure\multiapi\storagev2\blob
-for /R %%a in (*_download.py) do (
-    powershell -Command "(Get-Content %%a) -replace '^import requests', 'import azure.cli.core.vendored_sdks.winrequests as requests' | Out-File -encoding utf8 %%a"
-)
-%BUILDING_DIR%\python.exe -m compileall .
-popd
 
 REM Remove cryptography
 echo Remove cryptography
@@ -231,8 +225,9 @@ popd
 if %errorlevel% neq 0 goto ERROR
 
 pushd %BUILDING_DIR%
+%BUILDING_DIR%\python.exe %REPO_ROOT%\scripts\compact_aaz.py
 %BUILDING_DIR%\python.exe %~dp0\patch_models_v2.py
-%BUILDING_DIR%\python.exe %~dp0\remove_unused_api_versions.py
+%BUILDING_DIR%\python.exe %REPO_ROOT%\scripts\trim_sdk.py
 popd
 
 pushd %BUILDING_DIR%\Lib
@@ -276,12 +271,6 @@ popd
 REM Remove __pycache__
 echo remove pycache
 for /d /r %BUILDING_DIR%\Lib\pip %%d in (__pycache__) do (
-    if exist %%d rmdir /s /q "%%d"
-)
-
-REM Remove aio
-echo remove aio
-for /d /r %BUILDING_DIR%\Lib\site-packages\azure\mgmt %%d in (aio) do (
     if exist %%d rmdir /s /q "%%d"
 )
 

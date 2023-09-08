@@ -45,10 +45,11 @@ jobs:
       - script: |
           set /p CLI_VERSION=<$(System.ArtifactsDirectory)/metadata/version
           set
-          set BLOB_SAS="$(BLOB_SAS)"
           
           build_scripts/windows/scripts/build_saw.cmd
         displayName: 'Build Windows SAW MSI'
+        env:
+          BLOB_SAS: $(BLOB_SAS)
 
       - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
         displayName: 'SBOM'
