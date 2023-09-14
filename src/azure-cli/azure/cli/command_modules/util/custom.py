@@ -137,7 +137,7 @@ def upgrade_version(cmd, update_all=None, yes=None):  # pylint: disable=too-many
             logger.warning("Exit the container to pull latest image with 'docker pull mcr.microsoft.com/azure-cli' "
                            "or run 'pip install --upgrade azure-cli' in this container")
         elif installer == 'MSI':
-            exit_code = _upgrade_on_windows()
+            _upgrade_on_windows()
         else:
             logger.warning(UPGRADE_MSG)
     if exit_code:
@@ -185,20 +185,22 @@ def _upgrade_on_windows():
     Directly installing from URL may be blocked by policy: https://github.com/Azure/azure-cli/issues/19171
     This also gives the user a chance to manually install the MSI in case of msiexec.exe failure.
     """
-    logger.warning("Updating Azure CLI with MSI from https://aka.ms/installazurecliwindows")
-    tmp_dir, msi_path = _download_from_url('https://aka.ms/installazurecliwindows')
+    import platform
+    import subprocess
+    import sys
+
+    if platform.architecture()[0] == '32bit':
+        msi_url = 'https://aka.ms/installazurecliwindows'
+    else:
+        msi_url = 'https://aka.ms/installazurecliwindowsx64'
+    logger.warning("Updating Azure CLI with MSI from %s", msi_url)
+    _, msi_path = _download_from_url(msi_url)
 
     logger.warning("Installing MSI")
-    import subprocess
-    exit_code = subprocess.call(['msiexec.exe', '/i', msi_path])
-
-    if exit_code:
-        logger.warning("Installation Failed. You may manually install %s", msi_path)
-    else:
-        from azure.cli.core.util import rmtree_with_retry
-        logger.warning("Succeeded. Deleting %s", tmp_dir)
-        rmtree_with_retry(tmp_dir)
-    return exit_code
+    subprocess.Popen(['msiexec.exe', '/i', msi_path])
+    logger.warning("Installation started. Please complete the upgrade in the opened window.\nTo update extensions, "
+                   "please run `az upgrade` again after completing the upgrade.")
+    sys.exit(0)
 
 
 def _download_from_url(url):
