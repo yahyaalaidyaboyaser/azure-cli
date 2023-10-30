@@ -174,6 +174,16 @@ def check_cli(cmd):
     print('Running CLI self-test.\n')
 
     print('Loading all commands and arguments...')
+    import sys
+    print(sys.path)
+    import jinja2
+    print(jinja2.__path__)
+    print(jinja2.__version__)
+    import markupsafe
+    print(markupsafe.__path__)
+    print(markupsafe.__version__)
+    sys.modules.pop('jinja2')
+    sys.modules.pop('markupsafe')
     try:
         create_invoker_and_load_cmds_and_args(cmd.cli_ctx)
         print('Commands loaded OK.\n')
@@ -181,7 +191,6 @@ def check_cli(cmd):
         exceptions['load_commands'] = ex
         logger.error('Error occurred loading commands!\n')
         raise ex
-
     print('Retrieving all help...')
     try:
         get_all_help(cmd.cli_ctx, skip=False)
