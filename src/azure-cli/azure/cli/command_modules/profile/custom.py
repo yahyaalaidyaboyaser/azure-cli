@@ -4,6 +4,7 @@
 # --------------------------------------------------------------------------------------------
 
 import os
+import time
 
 from knack.log import get_logger
 from knack.prompting import prompt_pass, NoTTYException
@@ -176,14 +177,23 @@ def check_cli(cmd):
     print('Loading all commands and arguments...')
     import sys
     print(sys.path)
-    import jinja2
-    print(jinja2.__path__)
-    print(jinja2.__version__)
-    import markupsafe
-    print(markupsafe.__path__)
-    print(markupsafe.__version__)
-    sys.modules.pop('jinja2')
-    sys.modules.pop('markupsafe')
+    time.sleep(2)
+    try:
+        import markupsafe
+        print(markupsafe.__path__)
+        print(markupsafe.__version__)
+    except:
+        import traceback
+        traceback.print_exc()
+    try:
+        import jinja2
+        print(jinja2.__path__)
+        print(jinja2.__version__)
+    except:
+        import traceback
+        traceback.print_exc()
+    sys.modules.pop('jinja2',None)
+    sys.modules.pop('markupsafe',None)
     try:
         create_invoker_and_load_cmds_and_args(cmd.cli_ctx)
         print('Commands loaded OK.\n')

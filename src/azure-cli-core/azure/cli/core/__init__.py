@@ -289,6 +289,24 @@ class MainCommandsLoader(CLICommandsLoader):
              Otherwise, the list will be extended using ALWAYS_LOADED_EXTENSIONS.
              If the extensions in the list are not installed, it will be skipped.
             """
+            import sys
+            print('in update command table',sys.path)
+            try:
+                import markupsafe
+                print(markupsafe.__path__)
+                print(markupsafe.__version__)
+            except:
+                import traceback
+                traceback.print_exc()
+            try:
+                import jinja2
+                print(jinja2.__path__)
+                print(jinja2.__version__)
+            except:
+                import traceback
+                traceback.print_exc()
+            sys.modules.pop('jinja2',None)
+            sys.modules.pop('markupsafe',None)
             def _handle_extension_suppressions(extensions):
                 filtered_extensions = []
                 for ext in extensions:
