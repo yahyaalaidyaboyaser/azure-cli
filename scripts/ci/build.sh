@@ -137,6 +137,17 @@ for name in `ls src/azure-cli/azure/cli/command_modules`; do
     fi
 done
 
+# Add more test folder in package, for example: azure.cli.core.extension.tests
+for name in `ls src/azure-cli-core/azure/cli/core`; do
+     test_folder=src/azure-cli-core/azure/cli/core/$name/tests
+      if [ -d $test_folder ]; then
+          echo "        'azure.cli.core.$name.tests'," >>$testsrc_dir/setup.py
+          if [ -d $test_folder/$target_profile ]; then
+              echo "        'azure.cli.core.$name.tests.$target_profile'," >>$testsrc_dir/setup.py
+          fi
+      fi
+done
+
 
 cat >>$testsrc_dir/setup.py <<EOL
     ],
