@@ -1,4 +1,4 @@
-# Azure CLI Error Handling Guidelines
+https://github.com/Azure/azure-cli/pull/15505#issue-720003271# Azure CLI Error Handling Guidelines
 
 This document aims to provide the guidelines for command group authors to onboard the error handling method and the new error output format.
 
