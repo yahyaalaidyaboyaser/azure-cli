@@ -70,7 +70,7 @@ class TelemetrySession:  # pylint: disable=too-many-instance-attributes
         self.suppress_new_event = False
         self.poll_start_time = None
         self.poll_end_time = None
-        self.allow_broker = None
+        self.enable_broker_on_windows = None
         self.msal_telemetry = None
 
     def add_event(self, name, properties):
